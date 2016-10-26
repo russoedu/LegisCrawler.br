@@ -1,18 +1,17 @@
 const db = require('../helpers/db');
-const colors = require('colors');
 
 class Legislation {
-  constructor(legislationName = null, legislationData = null) {
-    this.legislationName = legislationName;
+  constructor(legislationType = null, legislationData = null) {
+    this.legislationType = legislationType;
     this.legislationData = legislationData;
   }
 
-  getAllLegislations(callback) {
-    callback(this.Model.find({}));
+  static getAllLegislations(callback) {
+    db.getDocuments(callback);
   }
 
   getLegislationByName(callback) {
-    db.getDocument(this.legislationName, callback);
+    db.getDocument(this.legislationType, callback);
   }
 
   createLegislation(callback) {

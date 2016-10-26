@@ -67,7 +67,11 @@ module.exports = {
     insert(document, 'insertMany', callback);
   },
 
-  getDocument(legislationName, callback) {
-    retrieve({ legislationName }, callback);
+  getDocument(legislationType, callback) {
+    retrieve({ legislationType }, callback);
+  },
+
+  getDocuments(callback) {
+    retrieve({}, callback);
   },
 };

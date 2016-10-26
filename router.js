@@ -1,5 +1,5 @@
 const express = require('express');
-const legislation = require('./controllers/legislation');
+const LegislationController = require('./controllers/LegislationController');
 
 const routerClass = express.Router;
 const router = routerClass();
@@ -8,11 +8,11 @@ const router = routerClass();
 // Routes
 // =========================
 module.exports = function route(app) {
-  router.post('/:legislationName', legislation.createLegislation);
+  router.post('/:legislationType', LegislationController.createLegislation);
   // Get all legislation data
-  router.get('/', legislation.getCompleteLegislation);
+  router.get('/', LegislationController.getCompleteLegislation);
 
-  router.get('/:legislationName', legislation.getLegislationType);
+  router.get('/:legislationType', LegislationController.getLegislationType);
 
   // Set url for API group routes
   app.use('/v1', router);

@@ -12,17 +12,12 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "cheerio": "^0.22.0",
-    "co": "^4.6.0",
     "colors": "^1.1.2",
     "compression": "^1.6.2",
     "cors": "^2.8.1",
     "express": "^4.14.0",
-    "lodash": "^4.16.4",
     "mongodb": "^2.2.11",
-    "mongoose": "^4.6.5",
-    "mongoose-middleware": "^0.3.0",
     "morgan": "^1.7.0",
-    "q": "^1.4.1",
     "request": "^2.76.0",
     "serve-favicon": "^2.3.0"
   },
