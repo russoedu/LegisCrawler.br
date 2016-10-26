@@ -1,0 +1,37 @@
+{
+  "name": "legiscrap",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js;",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Eduardo Russo",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "cheerio": "^0.22.0",
+    "co": "^4.6.0",
+    "colors": "^1.1.2",
+    "compression": "^1.6.2",
+    "cors": "^2.8.1",
+    "express": "^4.14.0",
+    "lodash": "^4.16.4",
+    "mongodb": "^2.2.11",
+    "mongoose": "^4.6.5",
+    "mongoose-middleware": "^0.3.0",
+    "morgan": "^1.7.0",
+    "q": "^1.4.1",
+    "request": "^2.76.0",
+    "serve-favicon": "^2.3.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.0.0",
+    "eslint": "^3.8.1",
+    "eslint-config-airbnb-base": "^9.0.0",
+    "eslint-plugin-import": "^2.0.1",
+    "eslint-plugin-jsdoc": "^2.3.1",
+    "jsdoc": "^3.4.2"
+  }
+}

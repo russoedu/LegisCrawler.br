@@ -1,0 +1,17 @@
+{
+  "cors": {
+    "origin": [
+      "fabricadeaplicativos.com.br$",
+      "applink.com.br$",
+      "appfy.me$",
+      "nuvemdeapps.com.br$"
+    ]
+  },
+  "server": {
+    "port": 8080,
+    "logFormat": "combined"
+  },
+  "db": {
+    "url": "mongodb://localhost:27017/legiscrap"
+  }
+}
