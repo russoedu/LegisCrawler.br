@@ -1,56 +1,40 @@
 const Legislation = require('../models/Legislation.js');
 
 class LegislationController {
-  static createLegislation(req, res) {
+  static create(req, res) {
     if (req.get('Content-Type') === 'application/json') {
       const legislation = new Legislation(req.params.legislationType, req.body);
-      legislation.createLegislation((err, response) => {
-        if (err) {
-          res
-            .status(500)
-            .send(response);
-        } else {
-          res
-            .status(200)
-            .send(response);
-        }
-      });
-    } else {
-      res
-        .status(400)
-        .send({
-          error: 'Content must be a Json',
+      legislation.create()
+        .then((response) => {
+          res.status(200).json(response);
+        })
+        .catch((error) => {
+          res.status(500).json(error);
         });
+    } else {
+      res.status(400).json({ error: 'Content must be a Json' });
     }
   }
 
-  static getCompleteLegislation(req, res) {
-    Legislation.getAllLegislations((err, response) => {
-      if (err) {
-        res
-          .status(500)
-          .send(response);
-      } else {
-        res
-          .status(200)
-          .send(response);
-      }
-    });
+  static find(req, res) {
+    Legislation.find()
+      .then((response) => {
+        res.status(200).json(response);
+      })
+      .catch((error) => {
+        res.status(500).json(error);
+      });
   }
 
-  static getLegislationType(req, res) {
+  static findByLegislationType(req, res) {
     const legislation = new Legislation(req.params.legislationType);
-    legislation.getLegislationByName((err, response) => {
-      if (err) {
-        res
-          .status(500)
-          .send(response);
-      } else {
-        res
-          .status(200)
-          .send(response);
-      }
-    });
+    legislation.findByLegislationType()
+      .then((response) => {
+        res.status(500).send(response);
+      })
+      .catch((error) => {
+        res.status(500).json(error);
+      });
   }
 }
 

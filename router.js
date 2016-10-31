@@ -8,11 +8,11 @@ const router = routerClass();
 // Routes
 // =========================
 module.exports = function route(app) {
-  router.post('/:legislationType', LegislationController.createLegislation);
+  router.post('/:legislationType', LegislationController.create);
   // Get all legislation data
-  router.get('/', LegislationController.getCompleteLegislation);
+  router.get('/', LegislationController.find);
 
-  router.get('/:legislationType', LegislationController.getLegislationType);
+  router.get('/:legislationType', LegislationController.findByLegislationType);
 
   // Set url for API group routes
   app.use('/v1', router);

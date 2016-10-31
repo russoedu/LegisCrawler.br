@@ -2,7 +2,7 @@
   "cors": {
     "origin": [
       "fabricadeaplicativos.com.br$",
-      "applink.com.br$",
+      "appurl.com.br$",
       "appfy.me$",
       "nuvemdeapps.com.br$"
     ]
@@ -13,5 +13,11 @@
   },
   "db": {
     "url": "mongodb://localhost:27017/legiscrap"
-  }
+  },
+  "legislations": [
+    {
+      "name": "Constituição Federal",
+      "url": "http://www.planalto.gov.br/ccivil_03/Constituicao/Constituicao.htm"
+    }
+  ]
 }

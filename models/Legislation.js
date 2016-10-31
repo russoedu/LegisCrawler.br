@@ -1,4 +1,4 @@
-const db = require('../helpers/db');
+const Db = require('../helpers/Db');
 
 class Legislation {
   constructor(legislationType = null, legislationData = null) {
@@ -6,16 +6,34 @@ class Legislation {
     this.legislationData = legislationData;
   }
 
-  static getAllLegislations(callback) {
-    db.getDocuments(callback);
+  static find() {
+    return new Promise((resolve, reject) => {
+      Db.find({}).then((data) => {
+        resolve(data);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
   }
 
-  getLegislationByName(callback) {
-    db.getDocument(this.legislationType, callback);
+  findByLegislationType() {
+    return new Promise((resolve, reject) => {
+      Db.find({ legislationType: this.legislationType }).then((data) => {
+        resolve(data);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
   }
 
-  createLegislation(callback) {
-    db.insertDocument(this, callback);
+  create() {
+    return new Promise((resolve, reject) => {
+      Db.create(this).then((data) => {
+        resolve(data);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
   }
 }
 

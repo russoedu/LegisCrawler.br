@@ -2,16 +2,38 @@
   "cors": {
     "origin": [
       "fabricadeaplicativos.com.br$",
-      "applink.com.br$",
+      "appurl.com.br$",
       "appfy.me$",
       "nuvemdeapps.com.br$"
     ]
   },
   "server": {
-    "port": 8080,
+    "port": 3300,
     "logFormat": "combined"
   },
   "db": {
     "url": "mongodb://localhost:27017/legiscrap"
-  }
+  },
+  "legislations": [
+    {
+      "name": "Constituição Federal",
+      "url": "http://www.planalto.gov.br/ccivil_03/Constituicao/Constituicao.htm"
+    },
+    {
+      "name": "Código Civil",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/2002/L10406.htm"
+    },
+    {
+      "name": "Código Penal",
+      "url": "http://www.planalto.gov.br/CCIVIL_03/Decreto-Lei/Del2848.htm"
+    },
+    {
+      "name": "Estatuto da Advocacia e da Ordem dos Advogados do Brasil (OAB)",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L8906.htm"
+    },
+    {
+      "name": "Estatuto da Criança e do Adolescente",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L8069.htm"
+    }
+  ]
 }
