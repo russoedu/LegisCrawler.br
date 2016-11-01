@@ -7,6 +7,7 @@ const compress = require('compression');
 const colors = require('colors');
 
 const config = require('./config/config');
+const logger = require('./helpers/logger');
 
 const router = require('./router');
 
@@ -16,14 +17,14 @@ app
   .set('port', config.server.port)
   .use(compress())
   .use(favicon('./public/favicon.ico'))
-  .use(morgan(config.server.logFormat))
+  .use(morgan(config.logger.express))
   .use(bodyParser.json())
   .use(bodyParser.urlencoded({ extended: true }));
   // .use(cors(corsOptions));
 
 app.listen(config.server.port, () => {
-  console.log(colors.blue(`[express.server.port] ${app.get('port')}`));
-  console.log(colors.blue('[express.server.environment]', config.env));
+  logger.info(colors.blue('[express.server.environment]', config.env));
+  logger.info(colors.blue(`[express.server.port] ${app.get('port')}`));
 });
 
 router(app);

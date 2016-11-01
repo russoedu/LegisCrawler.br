@@ -1,12 +1,13 @@
 const MongoClient = require('mongodb').MongoClient;
 const config = require('../config/config');
+const logger = require('../helpers/logger');
 const colors = require('colors');
 
 function connect() {
   return new Promise((resolve, reject) => {
     MongoClient.connect(config.db.url, (connectionErr, db) => {
       if (connectionErr) {
-        console.error(colors.red('Error connecting to DB'));
+        logger.error(colors.red('DB connection'));
         reject(connectionErr);
       } else {
         resolve(db);

@@ -7,9 +7,12 @@
       "nuvemdeapps.com.br$"
     ]
   },
+  "logger": {
+    "express": "dev",
+    "winston": "info"
+  },
   "server": {
-    "port": 3300,
-    "logFormat": "combined"
+    "port": 3300
   },
   "db": {
     "url": "mongodb://localhost:27017/legiscrap"
