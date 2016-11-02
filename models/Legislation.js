@@ -1,8 +1,12 @@
 const Db = require('../helpers/Db');
 
 class Legislation {
-  constructor(legislationType = null, legislationData = null) {
+  constructor(
+      legislationType = null,
+      legislationUrl = null,
+      legislationData = null) {
     this.legislationType = legislationType;
+    this.legislationUrl = legislationUrl;
     this.legislationData = legislationData;
   }
 

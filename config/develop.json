@@ -19,23 +19,23 @@
   },
   "legislations": [
     {
-      "name": "Constituição Federal",
+      "type": "Constituição Federal",
       "url": "http://www.planalto.gov.br/ccivil_03/Constituicao/Constituicao.htm"
     },
     {
-      "name": "Código Civil",
+      "type": "Código Civil",
       "url": "http://www.planalto.gov.br/ccivil_03/Leis/2002/L10406.htm"
     },
     {
-      "name": "Código Penal",
+      "type": "Código Penal",
       "url": "http://www.planalto.gov.br/CCIVIL_03/Decreto-Lei/Del2848.htm"
     },
     {
-      "name": "Estatuto da Advocacia e da Ordem dos Advogados do Brasil (OAB)",
+      "type": "Estatuto da Advocacia e da Ordem dos Advogados do Brasil (OAB)",
       "url": "http://www.planalto.gov.br/ccivil_03/Leis/L8906.htm"
     },
     {
-      "name": "Estatuto da Criança e do Adolescente",
+      "type": "Estatuto da Criança e do Adolescente",
       "url": "http://www.planalto.gov.br/ccivil_03/Leis/L8069.htm"
     }
   ]

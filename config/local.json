@@ -19,8 +19,21 @@
   },
   "legislations": [
     {
-      "name": "Constituição Federal",
-      "url": "http://www.planalto.gov.br/ccivil_03/Constituicao/Constituicao.htm"
+      "type": "Código Penal",
+      "url": "http://www.planalto.gov.br/CCIVIL_03/Decreto-Lei/Del2848.htm",
+      "searchAttrib": "art"
+    }
+  ],
+  "unusedLegislations" : [
+    {
+      "type": "Constituição Federal",
+      "url": "http://www.planalto.gov.br/ccivil_03/Constituicao/Constituicao.htm",
+      "searchAttrib": "art"
+    },
+    {
+      "type": "Código Civil",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/2002/L10406.htm",
+      "searchAttrib": "art2"
     }
   ]
 }
