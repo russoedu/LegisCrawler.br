@@ -1,20 +1,24 @@
 const request = require('request-promise-native');
 const htmlparser = require('htmlparser2');
 const colors = require('colors');
+const LegislationCleaner = require('../helpers/LegislationCleaner');
+const LegislationParser = require('../helpers/LegislationParser');
 const logger = require('../helpers/logger');
 
 
 class LegislationGetter {
   static getLegislationText(legislation) {
-    const searchTag = 'div';
-    const ignoreTag = /strike|del/;
-    const searchAttrib = legislation.searchAttrib;
-    // const searchAttrib = /art[0-9]+[A-z]*/;
+    // Regular Expressions
+    // Used to capture bolds that are not part of articles
+    const ignoreTagRegEx = /b|strong/;
+    // Used to capture the begining of articles
+    const articleRegEx = /Art\. /;
+    // Used to check the end of a legislation, when the place and date is displayed
+    const finishedRegEx = /[A-Z]+.+, [0-9]+ de [a-z]+ de [0-9]+/;
 
-    let legislationData = '';
-    let searchTagCount = 0;
-    let isArticle = false;
-    let ignore = false;
+    const legislationData = [];
+    let isContent = false;
+    let ignoreContent = false;
     let article = '';
 
     return new Promise((resolve, reject) => {
@@ -25,52 +29,53 @@ class LegislationGetter {
       request(requestoptions)
       .then((html) => {
         const parser = new htmlparser.Parser({
-          onopentag(tag, attribs) {
-            console.log(`>>>${tag}<<<${ignoreTag.test(tag)}`);
-            if (tag === searchTag) {
-              searchTagCount += 1;
-              if (attribs !== undefined &&
-                 (attribs.id === searchAttrib)) {
-                isArticle = true;
-              }
-            } else if (ignoreTag.test(tag)) {
-              ignore = true;
+          onopentag(tag) {
+            if (ignoreTagRegEx.test(tag)) {
+              ignoreContent = true;
             }
           },
-          ontext(text) {
-            if (isArticle && ignore === false) {
-              let cleanText = text;
-              // Clean the text removing white spaces chars
-              cleanText = cleanText.replace(/\n+|\r+|\t+|\u00A0|\u0096/g, ' ');
-              // Clean the text removing double spaces chars
-              cleanText = cleanText.replace(/\s\s+/g, ' ');
-              // Clean the text removing comments
-              // cleanText = cleanText.replace(/\([^\)]*\)/, '');
+          ontext(dirtyText) {
+            if (!ignoreContent) {
+              const cleaner = new LegislationCleaner(dirtyText);
+              const text = cleaner.cleanText();
 
-              article += cleanText;
+              // Check if text is not empty and if the string begins with 'Art.'
+              if (text !== '' && (articleRegEx.test(text) || finishedRegEx.test(text))) {
+                // If 'isContent' was already set, it's a new article and we should store (push to
+                // legislationData array) this one that is finished and start a new empty article
+                if (isContent) {
+                  // const legislationParser = new LegislationParser(article);
+                  // legislationParser.getTextContent();
+                  legislationData.push(article);
+                  logger.debug(`article: ${colors.green(`${article}`)}`);
+                  article = text;
+                } else {
+                  // If 'isContent' is not set, it's the first article of the page
+                  article += text;
+                }
+                // From now on, isContent is set as true
+                isContent = true;
+              } else if (isContent) {
+                // Text don't begin with 'Art.' and 'isContent' is set, so, it's a content that
+                // belongs to an article that already has part of it's content in 'article' string
+                article += text;
+              }
             }
           },
           onclosetag(tag) {
-            if (tag === searchTag) {
-              searchTagCount -= 1;
-              if (searchTagCount === 0 && article !== '') {
-                legislationData += article;
-                isArticle = false;
-                article = '';
-              }
-            } else if (ignoreTag.test(tag)) {
-              ignore = false;
+            if (ignoreTagRegEx.test(tag)) {
+              ignoreContent = false;
             }
           },
         }, { decodeEntities: true });
         parser.write(html);
         parser.end();
 
-        logger.info(colors.green('SUCCESS retrieving data'));
+        // logger.debug(legislationData);
         resolve({
-          legislationType: legislation.type,
-          legislationUrl: legislation.url,
-          legislationData,
+          type: legislation.type,
+          url: legislation.url,
+          data: legislationData,
         }
         );
       })

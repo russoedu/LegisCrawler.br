@@ -9,6 +9,22 @@
   },
   "author": "Eduardo Russo",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/russoedu/legiscrap.git"
+  },
+  "author": "Moblets",
+  "homepage": "https://github.com/russoedu/legiscrap",
+  "keywords": [
+    "brazil",
+    "legislation",
+    "scrap",
+    "api",
+    "node",
+    "nodejs",
+    "javascript",
+    "mongodb"
+  ],
   "dependencies": {
     "body-parser": "^1.15.2",
     "colors": "^1.1.2",
