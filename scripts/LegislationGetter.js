@@ -16,9 +16,10 @@ class LegislationGetter {
     // Used to check the end of a legislation, when the place and date is displayed
     const finishedRegEx = /[A-Z]+.+, [0-9]+ de [a-z]+ de [0-9]+/;
 
-    const legislationData = [];
+    const data = {};
     let isContent = false;
     let ignoreContent = false;
+    let finished = false;
     let article = '';
 
     return new Promise((resolve, reject) => {
@@ -40,14 +41,19 @@ class LegislationGetter {
               const text = cleaner.cleanText();
 
               // Check if text is not empty and if the string begins with 'Art.'
-              if (text !== '' && (articleRegEx.test(text) || finishedRegEx.test(text))) {
+              if (!finished &&
+                  text !== '' &&
+                  (articleRegEx.test(text) || finishedRegEx.test(text))) {
                 // If 'isContent' was already set, it's a new article and we should store (push to
-                // legislationData array) this one that is finished and start a new empty article
+                // data array) this one that is finished and start a new empty article
+                if (finishedRegEx.test(text)) {
+                  finished = true;
+                }
                 if (isContent) {
-                  // const legislationParser = new LegislationParser(article);
-                  // legislationParser.getTextContent();
-                  legislationData.push(article);
-                  logger.debug(`article: ${colors.green(`${article}`)}`);
+                  const legislationParser = new LegislationParser(article);
+                  const content = legislationParser.getTextContent();
+                  data[content.number] = content.text;
+                  // logger.debug(`article: ${colors.green(`${article}`)}`);
                   article = text;
                 } else {
                   // If 'isContent' is not set, it's the first article of the page
@@ -55,7 +61,7 @@ class LegislationGetter {
                 }
                 // From now on, isContent is set as true
                 isContent = true;
-              } else if (isContent) {
+              } else if (!finished && isContent) {
                 // Text don't begin with 'Art.' and 'isContent' is set, so, it's a content that
                 // belongs to an article that already has part of it's content in 'article' string
                 article += text;
@@ -71,11 +77,11 @@ class LegislationGetter {
         parser.write(html);
         parser.end();
 
-        // logger.debug(legislationData);
+        // logger.debug(data);
         resolve({
           type: legislation.type,
           url: legislation.url,
-          data: legislationData,
+          data,
         }
         );
       })

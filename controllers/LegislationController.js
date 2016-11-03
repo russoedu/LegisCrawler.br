@@ -18,19 +18,32 @@ class LegislationController {
 
   static find(req, res) {
     Legislation.find()
-      .then((response) => {
-        res.status(200).json(response);
-      })
-      .catch((error) => {
-        res.status(500).json(error);
+    .then((responses) => {
+      const responseData = [];
+      responses.forEach((response) => {
+        responseData.push({
+          type: response.type,
+          url: response.url,
+          data: response.data,
+        });
       });
+      res.status(200).send(responseData);
+    })
+    .catch((error) => {
+      res.status(500).json(error);
+    });
   }
 
   static findByLegislationType(req, res) {
-    const legislation = new Legislation(req.params.legislationType);
+    const legislation = new Legislation(req.params.type);
     legislation.findByLegislationType()
       .then((response) => {
-        res.status(200).send(response);
+        const responseData = {
+          type: response[0].type,
+          url: response[0].url,
+          data: response[0].data,
+        };
+        res.status(200).send(responseData);
       })
       .catch((error) => {
         res.status(500).json(error);

@@ -2,12 +2,12 @@ const Db = require('../helpers/Db');
 
 class Legislation {
   constructor(
-      legislationType = null,
-      legislationUrl = null,
-      legislationData = null) {
-    this.legislationType = legislationType;
-    this.legislationUrl = legislationUrl;
-    this.legislationData = legislationData;
+      type = null,
+      url = null,
+      data = null) {
+    this.type = type;
+    this.url = url;
+    this.data = data;
   }
 
   static find() {
@@ -22,7 +22,7 @@ class Legislation {
 
   findByLegislationType() {
     return new Promise((resolve, reject) => {
-      Db.find({ legislationType: this.legislationType }).then((data) => {
+      Db.find({ type: this.type }).then((data) => {
         resolve(data);
       }).catch((error) => {
         reject(error);
