@@ -19,18 +19,21 @@
   },
   "legislations": [
     {
-      "type": "Código Penal",
-      "url": "http://www.planalto.gov.br/CCIVIL_03/Decreto-Lei/Del2848compilado.htm"
-    },
-    {
       "type": "Constituição Federal",
       "url": "http://www.planalto.gov.br/ccivil_03/Constituicao/ConstituicaoCompilado.htm",
       "searchAttrib": "art"
     },
     {
       "type": "Código Civil",
-      "url": "http://www.planalto.gov.br/ccivil_03/Leis/2002/L10406compilada.htm",
-      "searchAttrib": "art2"
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/2002/L10406compilada.htm"
+    },
+    {
+      "type": "Código de Processo Civil",
+      "url": "http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/L13105.htm"
+    },
+    {
+      "type": "Código Penal",
+      "url": "http://www.planalto.gov.br/CCIVIL_03/Decreto-Lei/Del2848compilado.htm"
     }
   ],
   "unusedLegislations" : [

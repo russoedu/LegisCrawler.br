@@ -14,11 +14,8 @@ const doubleSpaceRegEx = /\s\s+/g;
 const notArticleTitleRegEx = /^[A-Z ÁÉÍÓÚÀÈÌÒÙÇÃÕÄËÏÖÜÂÊÎÔÛ]+$/;
 
 class LegislationCleaner {
-  constructor(dirtyText) {
-    this.dirtyText = dirtyText;
-  }
-  cleanText() {
-    let text = this.dirtyText;
+  static cleanText(dirtyText) {
+    let text = dirtyText;
     text = text
       .replace(whiteSpacesRegEx, ' ')
       .replace(doubleSpaceRegEx, ' ')
@@ -33,6 +30,57 @@ class LegislationCleaner {
     }
 
     return text;
+  }
+
+  static cleanArticleNumber(dirtyTitle) {
+    const articleNumberRegEx = /(\d\.?\d*)([o|º])?(\-[A-z])?/;
+    const articleNumberOnlyRegEx = /(\d\.?\d*)/;
+
+    // Extract only the article title
+    let title = articleNumberRegEx.exec(dirtyTitle)[0];
+    title = title
+      // Remove the thousand separator (in Brazil, we use '.' to separate thousands and ',' to
+      // decimals)
+      .replace('.', '')
+      // Remove the order simbol
+      .replace('o', '')
+      // Remove the order simbol
+      .replace('o.', '')
+      // Remove the order simbol
+      .replace('º', '');
+
+    // Get only the numeric part of the title
+    const titleNum = articleNumberOnlyRegEx.exec(title)[0];
+
+    // Split the number to concatenate again with the order simbol
+    const titleSplit = title.split(titleNum);
+
+    // Add the order simbol
+    title = titleNum < 10 ? `${titleNum}º` : titleNum;
+    // Concatenate with the rest
+    title += titleSplit[1];
+
+    return title;
+  }
+
+  static cleanKnownSemanticErrors(type, number, text) {
+    let fixedText = text;
+    const knownErrors = [
+      {
+        type: 'Código Penal',
+        number: '129',
+        fix(tx) {
+          return tx.replace('121.Violência Doméstica § 9o', '121.§ 9o');
+        },
+      },
+    ];
+
+    knownErrors.forEach((error) => {
+      if (type === error.type && number === error.number) {
+        fixedText = error.fix(text);
+      }
+    });
+    return fixedText;
   }
 }
 module.exports = LegislationCleaner;

@@ -37,8 +37,7 @@ class LegislationGetter {
           },
           ontext(dirtyText) {
             if (!ignoreContent) {
-              const cleaner = new LegislationCleaner(dirtyText);
-              const text = cleaner.cleanText();
+              const text = LegislationCleaner.cleanText(dirtyText);
 
               // Check if text is not empty and if the string begins with 'Art.'
               if (!finished &&
@@ -50,10 +49,15 @@ class LegislationGetter {
                   finished = true;
                 }
                 if (isContent) {
-                  const legislationParser = new LegislationParser(article);
-                  const content = legislationParser.getTextContent();
+                  article = LegislationCleaner.cleanText(article);
+                  const legislationParser = new LegislationParser(legislation.type, article);
+                  const content = legislationParser.getStructuredArticle();
+
+                  // We are using an object so when a article is striked (overwritten by a new
+                  // article, the old one is overwritten by the new one and we don't need to take
+                  // care of it's semantic. Before it's inserted in the DB it's converted to an
+                  // array
                   data[content.number] = content.text;
-                  // logger.debug(`article: ${colors.green(`${article}`)}`);
                   article = text;
                 } else {
                   // If 'isContent' is not set, it's the first article of the page
@@ -77,16 +81,23 @@ class LegislationGetter {
         parser.write(html);
         parser.end();
 
-        // logger.debug(data);
+        const dataArray = [];
+        const dataKeys = Object.keys(data);
+        dataKeys.forEach((key) => {
+          dataArray.push({
+            number: key,
+            article: data[key],
+          });
+        });
         resolve({
           type: legislation.type,
           url: legislation.url,
-          data,
+          data: dataArray,
         }
         );
       })
       .catch((error) => {
-        logger.info(error);
+        logger.error(colors.red(error));
         reject(error);
       });
     });

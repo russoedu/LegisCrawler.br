@@ -8,6 +8,7 @@ class Legislation {
     this.type = type;
     this.url = url;
     this.data = data;
+    this.date = new Date();
   }
 
   static find() {
