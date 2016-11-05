@@ -8,8 +8,7 @@
     ]
   },
   "logger": {
-    "express": "dev",
-    "winston": "info"
+    "express": "dev"
   },
   "server": {
     "port": 3300

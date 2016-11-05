@@ -1,22 +1,10 @@
 const Legislation = require('../models/Legislation.js');
+const debug = require('debug')('api');
+const error = require('../helpers/error');
 
 class LegislationController {
-  static create(req, res) {
-    if (req.get('Content-Type') === 'application/json') {
-      const legislation = new Legislation(req.params.legislationType, req.body);
-      legislation.create()
-        .then((response) => {
-          res.status(200).json(response);
-        })
-        .catch((error) => {
-          res.status(500).json(error);
-        });
-    } else {
-      res.status(400).json({ error: 'Content must be a Json' });
-    }
-  }
-
   static find(req, res) {
+    debug('LegislationController.find');
     Legislation.find()
     .then((responses) => {
       const responseData = [];
@@ -27,14 +15,17 @@ class LegislationController {
           data: response.data,
         });
       });
+      debug(responseData);
       res.status(200).send(responseData);
     })
-    .catch((error) => {
-      res.status(500).json(error);
+    .catch((err) => {
+      error(`Could not retrieve ${req.params.type} data`, err);
+      res.status(500).json(err);
     });
   }
 
   static findByLegislationType(req, res) {
+    debug(`LegislationController.findByLegislationType(${req.params.type})`);
     const legislation = new Legislation(req.params.type);
     legislation.findByLegislationType()
       .then((response) => {
@@ -43,10 +34,12 @@ class LegislationController {
           url: response[0].url,
           data: response[0].data,
         };
+        debug(responseData);
         res.status(200).send(responseData);
       })
-      .catch((error) => {
-        res.status(500).json(error);
+      .catch((err) => {
+        error(`Could not retrieve ${req.params.type} data`, err);
+        res.status(500).json(err);
       });
   }
 }

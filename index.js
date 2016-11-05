@@ -1,15 +1,12 @@
 const express = require('express');
-const morgan = require('morgan');
-// const cors = require('cors');
 const bodyParser = require('body-parser');
 const favicon = require('serve-favicon');
 const compress = require('compression');
-const colors = require('colors');
-
+const chalk = require('chalk');
 const config = require('./config/config');
-const logger = require('./helpers/logger');
-
+const log = require('./helpers/log');
 const router = require('./router');
+// const cors = require('cors');
 
 const app = express();
 
@@ -17,14 +14,13 @@ app
   .set('port', config.server.port)
   .use(compress())
   .use(favicon('./public/favicon.ico'))
-  .use(morgan(config.logger.express))
   .use(bodyParser.json())
   .use(bodyParser.urlencoded({ extended: true }));
   // .use(cors(corsOptions));
 
 app.listen(config.server.port, () => {
-  logger.info(colors.blue('[express.server.environment]', config.env));
-  logger.info(colors.blue(`[express.server.port] ${app.get('port')}`));
+  log(chalk.blue('[express.server.environment]', config.env));
+  log(chalk.blue(`[express.server.port] ${app.get('port')}`));
 });
 
 router(app);

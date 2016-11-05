@@ -1,16 +1,12 @@
 /* eslint no-restricted-modules: [0]  */
 const fs = require('fs');
-const colors = require('colors');
-const winston = require('winston');
-
+const chalk = require('chalk');
+const log = require('../helpers/log');
+const error = require('../helpers/error');
 
 const env = process.env.LEGISCRAP_ENVIRONMENT;
 
-const logger = new (winston.Logger)({
-  transports: [
-    new (winston.transports.Console)(),
-  ],
-});
+
 /**
  * Get the configuration
  * @return {JSON} The configuration JSON
@@ -19,17 +15,17 @@ function getConfig() {
   const confFile = `./config/${env}.json`;
   let config = {};
 
-  logger.info(colors.yellow(`[config.environment] ${env}`));
+  log(chalk.yellow(`[config.environment] ${env}`));
 
   try {
     config = JSON.parse(fs.readFileSync(confFile, 'utf8'));
     config.env = env;
-  } catch (e) {
-    logger.error(colors.red(`ERROR: [conf.readConfig] ${env} ${e}`));
+  } catch (err) {
+    error(`Could not read config file from environment ${env}`, err);
     return {};
   }
 
-  logger.info(colors.green('[conf.readConfig]', `config ${env} found`));
+  log(chalk.green('[conf.readConfig]', `config ${env} found`));
 
   return config;
 }

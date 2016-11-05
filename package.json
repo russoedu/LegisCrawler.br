@@ -7,13 +7,12 @@
     "start": "node index.js;",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Eduardo Russo",
+  "author": "Moblets",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/russoedu/legiscrap.git"
   },
-  "author": "Moblets",
   "homepage": "https://github.com/russoedu/legiscrap",
   "keywords": [
     "brazil",
@@ -26,10 +25,12 @@
     "mongodb"
   ],
   "dependencies": {
+    "better-log": "^1.3.3",
     "body-parser": "^1.15.2",
-    "colors": "^1.1.2",
+    "chalk": "^1.1.2",
     "compression": "^1.6.2",
     "cors": "^2.8.1",
+    "debug": "^2.2.0",
     "express": "^4.14.0",
     "htmlparser2": "^3.9.2",
     "mongodb": "^2.2.11",

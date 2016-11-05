@@ -8,8 +8,7 @@
     ]
   },
   "logger": {
-    "express": "combined",
-    "winston": "error"
+    "express": "combined"
   },
   "server": {
     "port": 80

@@ -1,9 +1,11 @@
 const request = require('request-promise-native');
+const log = require('../helpers/log');
+// const debug = require('debug')('scrap-getter');
 const htmlparser = require('htmlparser2');
-const colors = require('colors');
-const LegislationCleaner = require('../helpers/LegislationCleaner');
-const LegislationParser = require('../helpers/LegislationParser');
-const logger = require('../helpers/logger');
+const chalk = require('chalk');
+const LegislationCleaner = require('./LegislationCleaner');
+const Article = require('../helpers/Article');
+const LegislationParser = require('./LegislationParser');
 
 
 class LegislationGetter {
@@ -11,10 +13,12 @@ class LegislationGetter {
     // Regular Expressions
     // Used to capture bolds that are not part of articles
     const ignoreTagRegEx = /b|strong/;
-    // Used to capture the begining of articles
+    // Used do revert ignore on bold unique paragraphs
+    const uniqueParagraphRegEx = /\s?Parágrafo\súnico[\s-]*/;
+    // Used to capture the beginning of articles
     const articleRegEx = /Art\. /;
     // Used to check the end of a legislation, when the place and date is displayed
-    const finishedRegEx = /[A-Z]+.+, [0-9]+ de [a-z]+ de [0-9]+/;
+    const finishedRegEx = /[A-z]+.+,\s[0-9]+\sde\s[a-z]+\sde\s[0-9]+/;
 
     const data = {};
     let isContent = false;
@@ -36,7 +40,7 @@ class LegislationGetter {
             }
           },
           ontext(dirtyText) {
-            if (!ignoreContent) {
+            if (!ignoreContent || dirtyText.match(uniqueParagraphRegEx) !== null) {
               const text = LegislationCleaner.cleanText(dirtyText);
 
               // Check if text is not empty and if the string begins with 'Art.'
@@ -57,7 +61,10 @@ class LegislationGetter {
                   // article, the old one is overwritten by the new one and we don't need to take
                   // care of it's semantic. Before it's inserted in the DB it's converted to an
                   // array
-                  data[content.number] = content.text;
+                  data[content.number] = {
+                    text: content.text,
+                    paragraphs: content.paragraphs,
+                  };
                   article = text;
                 } else {
                   // If 'isContent' is not set, it's the first article of the page
@@ -81,14 +88,8 @@ class LegislationGetter {
         parser.write(html);
         parser.end();
 
-        const dataArray = [];
-        const dataKeys = Object.keys(data);
-        dataKeys.forEach((key) => {
-          dataArray.push({
-            number: key,
-            article: data[key],
-          });
-        });
+        const dataArray = Article.objectToArray(data);
+
         resolve({
           type: legislation.type,
           url: legislation.url,
@@ -97,7 +98,7 @@ class LegislationGetter {
         );
       })
       .catch((error) => {
-        logger.error(colors.red(error));
+        log.error(chalk.red(error));
         reject(error);
       });
     });
