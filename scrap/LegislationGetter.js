@@ -41,7 +41,7 @@ class LegislationGetter {
           },
           ontext(dirtyText) {
             if (!ignoreContent || dirtyText.match(uniqueParagraphRegEx) !== null) {
-              const text = LegislationCleaner.cleanText(dirtyText);
+              const text = LegislationCleaner.preCleaning(dirtyText);
 
               // Check if text is not empty and if the string begins with 'Art.'
               if (!finished &&
@@ -53,7 +53,7 @@ class LegislationGetter {
                   finished = true;
                 }
                 if (isContent) {
-                  article = LegislationCleaner.cleanText(article);
+                  article = LegislationCleaner.preCleaning(article);
                   const legislationParser = new LegislationParser(legislation.type, article);
                   const content = legislationParser.getStructuredArticle();
 

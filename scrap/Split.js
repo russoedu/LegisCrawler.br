@@ -90,19 +90,19 @@ class Split {
         const number = LegislationCleaner.cleanParagraphNumber(textSpliter);
         if (i === 0) {
           // debug(`Art. ${articleNumber}: `.yellow + cleanPart);
-          response.text = LegislationCleaner.trim(cleanPart);
+          response.text = LegislationCleaner.postCleaning(cleanPart);
           response.number = articleNumber;
           response.paragraphs[i] = {
             number,
-            paragraph: LegislationCleaner.trim(dirtyPart),
+            paragraph: LegislationCleaner.postCleaning(dirtyPart),
           };
         } else {
-          response.paragraphs[i - 1].paragraph = LegislationCleaner.trim(cleanPart);
+          response.paragraphs[i - 1].paragraph = LegislationCleaner.postCleaning(cleanPart);
           response.paragraphs[i] = {
             number,
           };
           if (i < testMatches.length) {
-            response.paragraphs[i].paragraph = LegislationCleaner.trim(dirtyPart);
+            response.paragraphs[i].paragraph = LegislationCleaner.postCleaning(dirtyPart);
           }
         }
       }

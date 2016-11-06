@@ -20,9 +20,7 @@
     {
       "type": "Código Penal",
       "url": "http://www.planalto.gov.br/CCIVIL_03/Decreto-Lei/Del2848compilado.htm"
-    }
-  ],
-  "unusedLegislations": [
+    },
     {
       "type": "Constituição Federal",
       "url": "http://www.planalto.gov.br/ccivil_03/Constituicao/ConstituicaoCompilado.htm",
@@ -36,5 +34,7 @@
       "type": "Código de Processo Civil",
       "url": "http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/L13105.htm"
     }
+  ],
+  "unusedLegislations": [
   ]
 }

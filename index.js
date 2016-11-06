@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const favicon = require('serve-favicon');
 const compress = require('compression');
 const chalk = require('chalk');
+const morgan = require('morgan');
 const config = require('./config/config');
 const log = require('./helpers/log');
 const router = require('./router');
@@ -14,6 +15,8 @@ app
   .set('port', config.server.port)
   .use(compress())
   .use(favicon('./public/favicon.ico'))
+  .use(morgan(config.logger.express))
+
   .use(bodyParser.json())
   .use(bodyParser.urlencoded({ extended: true }));
   // .use(cors(corsOptions));

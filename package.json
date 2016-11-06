@@ -27,7 +27,7 @@
   "dependencies": {
     "better-log": "^1.3.3",
     "body-parser": "^1.15.2",
-    "chalk": "^1.1.2",
+    "chalk": "^1.1.3",
     "compression": "^1.6.2",
     "cors": "^2.8.1",
     "debug": "^2.2.0",
@@ -35,10 +35,9 @@
     "htmlparser2": "^3.9.2",
     "mongodb": "^2.2.11",
     "morgan": "^1.7.0",
-    "request": "^2.76.0",
+    "request": "^2.78.0",
     "request-promise-native": "^1.0.3",
-    "serve-favicon": "^2.3.0",
-    "winston": "^2.2.0"
+    "serve-favicon": "^2.3.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.0.0",

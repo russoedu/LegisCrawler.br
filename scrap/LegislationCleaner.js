@@ -1,8 +1,46 @@
-// const debug = require('debug')('scrap-cleaner');
-// const chalk = require('chalk');
+const debug = require('debug')('scrap-cleaner');
+const chalk = require('chalk');
+const knownSemanticErrors = require('./knownSemanticErrors');
 
+/**
+ * Gets an article or paragraph number only
+ * @private
+ * @param  {String} dirtyText        The full text
+ * @param  {Object} regEx            The regular expression with the article or paragraph
+ * @param  {String} cleanCapGroups   The capturing groups that exclude the thousands separator and
+ *                                   the ordinal chars
+ * @param  {String} numberCapGroups  The capturing groups to get only the numeric part
+ * @param  {String} lettersCapGroups The capturing groups to get only the text part of the article
+ *                                   number
+ * @return {String}                  The "number only" of the article or paragraph (it may contain
+ *                                   letters – ex: 103-A – and ordinal chars – ex: 1º)
+ */
+function getNumber(dirtyText, regEx, cleanCapGroups, numberCapGroups, lettersCapGroups) {
+  // Extract only the content title that will be used for the cleaning
+  let content = regEx.exec(dirtyText)[0];
+
+  // Get only the numeric part of the content
+  content = content.replace(regEx, numberCapGroups) < 10 ?
+            content.replace(regEx, cleanCapGroups)
+                   .replace(regEx, `${numberCapGroups}º${lettersCapGroups}`) :
+            content.replace(regEx, cleanCapGroups)
+                   .replace(regEx, `${numberCapGroups}${lettersCapGroups}`);
+
+  // debug(`dirtyText = "${chalk.yellow(dirtyText)}"
+  //               getNumber = "${chalk.green(content)}"`);
+  return content;
+}
+/**
+ * Class
+ */
 class LegislationCleaner {
-  static cleanText(dirtyText) {
+  /**
+   * Pre cleaning function removes all double spaces and text things tha shoudn't be there
+   * @static
+   * @param  {Strign} dirtyText The full text
+   * @return {Strign}           The clean text
+   */
+  static preCleaning(dirtyText) {
     // Regular Expressions
     // Used to fix a semantic error that puts a bold in 'A' from 'Art'
     const brokenArticleRegEx = /^rt.\s[0-9]+/;
@@ -33,102 +71,85 @@ class LegislationCleaner {
     return text;
   }
 
-  static trim(dirtyText) {
+  /**
+   * Post cleaning function trims the text and add line breaks before items
+   * @static
+   * @param  {String} originsText The text already cleaned by preCleaning
+   * @return {String}             The trimmed text with line breaks on items
+   */
+  static postCleaning(originsText) {
     const beginningTrimRegEx = /^\s/g;
     const endTrimRegEx = /\s$/g;
+    // Capturing groups 1       2    3                   4
+    const itemsRegEx = /(:|;|\.)(\s?)([a-z]\)|[A-Z]+\s\-)(\s?)/g;
 
-    let text = dirtyText;
+    let text = originsText;
     text = text
-      .replace(beginningTrimRegEx)
-      .replace(endTrimRegEx);
+      .replace(beginningTrimRegEx, '')
+      .replace(endTrimRegEx, '')
+      .replace(itemsRegEx, '$1\n$3$4');
 
     return text;
   }
+  /**
+   * Cleans the article number
+   * @static
+   * @param  {Strign} dirtyText The article text
+   * @return {Strign}           The clean article number
+   */
+  static cleanArticleNumber(dirtyText) {
+    // Capturing groups  1      2    3       4
+    const numberRegEx = /(\d)\.?(\d*)(o|º|°)?(\-[A-z])?/;
+    // #-A => Exclude the thousands separator and the ordinal
+    const cleanCapGroups = '$1$2$4';
+    // #   => Only the numeric part
+    const numberCapGroups = '$1$2';
+    // -A  => Only the letter part
+    const lettersCapGroups = '$4';
 
-  static cleanArticleNumber(dirtyNumber) {
-    const articleNumberRegEx = /(\d\.?\d*)(o|º|°)?(\-[A-z])?/;
-    const articleNumberOnlyRegEx = /(\d\.?\d*)/;
-
-    // Extract only the article title
-    let article = articleNumberRegEx.exec(dirtyNumber)[0];
-    article = article
-      // Remove the thousand separator (in Brazil, we use '.' to separate thousands and ',' to
-      // decimals)
-      .replace('.', '')
-      // Remove possible order simbols
-      .replace('o', '')
-      .replace('o.', '')
-      .replace('°', '')
-      .replace('º', '');
-
-    // Get only the numeric part of the article
-    const articleNum = articleNumberOnlyRegEx.exec(article)[0];
-
-    // Split the number to concatenate again with the order simbol
-    const articleSplit = article.split(articleNum);
-
-    // Add the order simbol
-    article = articleNum < 10 ? `${articleNum}º` : articleNum;
-    // Concatenate with the rest
-    article += articleSplit[1];
-    // debug(`dirtyNumber = "${chalk.yellow(dirtyNumber)}"
-    //             cleanNumber = "${chalk.green(article)}"`);
-    return article;
+    return getNumber(dirtyText, numberRegEx, cleanCapGroups, numberCapGroups, lettersCapGroups);
   }
 
-  static cleanParagraphNumber(dirtyNumber) {
-    const paragraphNumberRegEx = /\d+(º|o|°)?(\-[A-z])?/;
+  /**
+   * Cleans the paragraph number
+   * @static
+   * @param  {Strign} dirtyText The paragraph text
+   * @return {Strign}           The clean paragraph number
+   */
+  static cleanParagraphNumber(dirtyText) {
     const uniqueParagraphRegEx = /Parágrafo\súnico/;
-    const paragraphNumberOnlyRegEx = /(\d\.?\d*)/;
-
-    const testMatches = dirtyNumber.match(uniqueParagraphRegEx);
+    const testMatches = dirtyText.match(uniqueParagraphRegEx);
     if (testMatches !== null) {
       return 'Parágrafo único';
     }
 
-    // Extract only the paragraph title
-    let paragraph = paragraphNumberRegEx.exec(dirtyNumber)[0];
-    paragraph = paragraph
-      // Remove the thousand separator (in Brazil, we use '.' to separate thousands and ',' to
-      // decimals)
-      .replace('.', '')
-      // Remove possible order simbols
-      .replace('o', '')
-      .replace('o.', '')
-      .replace('°', '')
-      .replace('º', '');
+    // Capturing groups  1    2       3
+    const numberRegEx = /(\d)+(º|o|°)?(\-[A-z])?/;
+    // #-A => Exclude the thousands separator and the ordinal
+    const cleanCapGroups = '$1$3';
+    // #   => Only the numeric part
+    const numberCapGroups = '$1';
+    // -A  => Only the letter part
+    const lettersCapGroups = '$3';
 
-    // Get only the numeric part of the paragraph
-    const paragraphNum = paragraphNumberOnlyRegEx.exec(paragraph)[0];
-
-    // Split the number to concatenate again with the order simbol
-    const paragraphSplit = paragraph.split(paragraphNum);
-
-    // Add the order simbol
-    paragraph = paragraphNum < 10 ? `§ ${paragraphNum}º` : `§ ${paragraphNum}`;
-    // Concatenate with the rest
-    paragraph += paragraphSplit[1];
-    // debug(`dirtyNumber = "${chalk.yellow(dirtyNumber)}"
-    //             cleanNumber = "${chalk.green(paragraph)}"`);
-    return paragraph;
+    return getNumber(dirtyText, numberRegEx, cleanCapGroups, numberCapGroups, lettersCapGroups);
   }
 
+  /**
+   * Some texts don't follow the patterns and need to be treated individually
+   * @static
+   * @param  {String} type   The type of legislation
+   * @param  {String} number The article number
+   * @param  {String} text   The article text
+   * @return {String}        The article text corrected
+   */
   static cleanKnownSemanticErrors(type, number, text) {
     let fixedText = text;
-    const knownErrors = [
-      {
-        type: 'Código Penal',
-        number: '129',
-        fix(tx) {
-          return tx.replace('121.Violência Doméstica § 9o', '121.§ 9o');
-        },
-      },
-    ];
 
-    knownErrors.forEach((error) => {
+    knownSemanticErrors.forEach((error) => {
       if (type === error.type && number === error.number) {
         fixedText = error.fix(text);
-        // debug(`dirtyText = "${chalk.yellow(text)}"\ncleanText = "${chalk.green(fixedText)}"`);
+        debug(`dirtyText = "${chalk.yellow(text)}"\ncleanText = "${chalk.green(fixedText)}"`);
       }
     });
     return fixedText;
