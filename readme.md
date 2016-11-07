@@ -5,6 +5,12 @@ Brazilian legislation scraper
 ##About
 LegiScrap was created to organize Brazilian legislation and create a comprehensive API to get it.
 
+##Configuration
+
+###Database
+
+The scrap gets the data and can be stored in files or on Mongo DB. Choose on of these options in the config/db/type.
+
 ##Debugging
 LegiScrap uses (debug)[https://github.com/visionmedia/debug] for debugging.
 

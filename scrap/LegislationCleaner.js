@@ -31,7 +31,7 @@ function getNumber(dirtyText, regEx, cleanCapGroups, numberCapGroups, lettersCap
   return content;
 }
 /**
- * Class
+ * @class
  */
 class LegislationCleaner {
   /**

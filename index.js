@@ -16,7 +16,7 @@ app
   .use(compress())
   .use(favicon('./public/favicon.ico'))
   .use(morgan(config.logger.express))
-
+  .use(express.static('public'))
   .use(bodyParser.json())
   .use(bodyParser.urlencoded({ extended: true }));
   // .use(cors(corsOptions));

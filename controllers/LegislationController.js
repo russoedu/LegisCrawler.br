@@ -6,17 +6,9 @@ class LegislationController {
   static find(req, res) {
     debug('LegislationController.find');
     Legislation.find()
-    .then((responses) => {
-      const responseData = [];
-      responses.forEach((response) => {
-        responseData.push({
-          type: response.type,
-          url: response.url,
-          data: response.data,
-        });
-      });
-      debug(responseData);
-      res.status(200).send(responseData);
+    .then((response) => {
+      debug(typeof response);
+      res.status(200).send(response);
     })
     .catch((err) => {
       error(`Could not retrieve ${req.params.type} data`, err);
@@ -29,13 +21,8 @@ class LegislationController {
     const legislation = new Legislation(req.params.type);
     legislation.findByLegislationType()
       .then((response) => {
-        const responseData = {
-          type: response[0].type,
-          url: response[0].url,
-          data: response[0].data,
-        };
-        debug(responseData);
-        res.status(200).send(responseData);
+        debug(response);
+        res.status(200).send(response);
       })
       .catch((err) => {
         error(`Could not retrieve ${req.params.type} data`, err);

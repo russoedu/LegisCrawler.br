@@ -14,6 +14,7 @@
     "port": 3300
   },
   "db": {
+    "type": "file",
     "url": "mongodb://localhost:27017/legiscrap"
   },
   "legislations": [
