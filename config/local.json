@@ -14,26 +14,145 @@
     "port": 3300
   },
   "db": {
-    "type": "file",
+    "type": "mongo",
     "url": "mongodb://localhost:27017/legiscrap"
   },
   "legislations": [
     {
-      "type": "Código Penal",
-      "url": "http://www.planalto.gov.br/CCIVIL_03/Decreto-Lei/Del2848compilado.htm"
-    },
-    {
       "type": "Constituição Federal",
-      "url": "http://www.planalto.gov.br/ccivil_03/Constituicao/ConstituicaoCompilado.htm",
-      "searchAttrib": "art"
+      "url": "http://www.planalto.gov.br/ccivil_03/Constituicao/Constituicao.htm"
     },
     {
       "type": "Código Civil",
-      "url": "http://www.planalto.gov.br/ccivil_03/Leis/2002/L10406compilada.htm"
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/2002/L10406.htm"
     },
     {
       "type": "Código de Processo Civil",
       "url": "http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/L13105.htm"
+    },
+    {
+      "type": "Código Penal",
+      "url": "http://www.planalto.gov.br/CCIVIL_03/Decreto-Lei/Del2848.htm"
+    },
+    {
+      "type": "Código de Processo Penal",
+      "url": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del3689.htm"
+    },
+    {
+      "type": "Código Tributário Nacional",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L5172.htm"
+    },
+    {
+      "type": "Consolidação das Leis do Trabalho",
+      "url": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del5452.htm"
+    },
+    {
+      "type": "Código de Defesa do Consumidor",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L8078.htm"
+    },
+    {
+      "type": "Código de Trânsito Brasileiro",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L9503.htm"
+    },
+    {
+      "type": "Código Eleitoral",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L4737.htm"
+    },
+    {
+      "type": "Código Florestal",
+      "url": "http://www.planalto.gov.br/ccivil_03/_Ato2011-2014/2012/Lei/L12651.htm"
+    },
+    {
+      "type": "Código de Águas",
+      "url": "http://www.planalto.gov.br/ccivil_03/decreto/D24643.htm"
+    },
+    {
+      "type": "Código de Minas",
+      "url": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del0227.htm"
+    },
+    {
+      "type": "Código Penal Militar",
+      "url": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del1001.htm"
+    },
+    {
+      "type": "Código de Processo Penal Militar",
+      "url": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del1002.htm"
+    },
+    {
+      "type": "Código Brasileiro de Aeronáutica",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L7565.htm"
+    },
+    {
+      "type": "Código Brasileiro de Telecomunicações",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L4117.htm"
+    },
+    {
+      "type": "Código Comercial",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/LIM/LIM556.htm"
+    },
+    {
+      "type": "Estatuto da Advocacia e da Ordem dos Advogados do Brasil (OAB)",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L8906.htm"
+    },
+    {
+      "type": "Estatuto da Criança e do Adolescente",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L8069.htm"
+    },
+    {
+      "type": "Estatuto da Cidade",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/LEIS_2001/L10257.htm"
+    },
+    {
+      "type": "Estatuto de Defesa do Torcedor",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/2003/L10.671.htm"
+    },
+    {
+      "type": "Estatuto do Desarmamento",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/2003/L10.826.htm"
+    },
+    {
+      "type": "Estatuto do Estrangeiro",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L6815.htm"
+    },
+    {
+      "type": "Estatuto do Idoso",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/2003/L10.741.htm"
+    },
+    {
+      "type": "Estatuto da Igualdade Racial",
+      "url": "http://www.planalto.gov.br/ccivil_03/_Ato2007-2010/2010/Lei/L12288.htm"
+    },
+    {
+      "type": "Estatuto do Índio",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L6001.htm"
+    },
+    {
+      "type": "Estatuto da Juventude",
+      "url": "http://www.planalto.gov.br/CCIVIL_03/_Ato2011-2014/2013/Lei/L12852.htm"
+    },
+    {
+      "type": "Estatuto dos Militares",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L6880.htm"
+    },
+    {
+      "type": "Estatuto dos Museus",
+      "url": "http://www.planalto.gov.br/ccivil_03/_Ato2007-2010/2009/Lei/L11904.htm"
+    },
+    {
+      "type": "Estatuto Nacional da Microempresa e da Empresa de Pequeno Porte",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/LCP/Lcp123.htm"
+    },
+    {
+      "type": "Estatuto da Pessoa com Deficiência",
+      "url": "http://www.planalto.gov.br/CCIVIL_03/_Ato2015-2018/2015/Lei/L13146.htm"
+    },
+    {
+      "type": "Estatuto dos Refugiados",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L9474.htm"
+    },
+    {
+      "type": "Estatuto da Terra",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L4504.htm"
     }
   ],
   "unusedLegislations": [
