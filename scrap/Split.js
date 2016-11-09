@@ -1,37 +1,7 @@
-const LegislationCleaner = require('./LegislationCleaner');
+const Cleaner = require('./Cleaner');
 const debug = require('debug')('split');
 
 class Split {
-/**
- * Breakes the article into it's number and it's text
- * @param  {String} type    The type of the legislation that will be splited
- * @param  {String} article The article full content
- * @return {Object}         Object with number and text
- * @example
- * {
- *   number: '1º',
- *   text: 'Os menores de 18 anos são penalmente inimputáveis, ficando sujeitos às normas
- *          estabelecidas na legislação especial.'
- * }
- */
-  static articleText(type, article) {
-    const articleNumberDefRegEx = /\s?(Art.)\s[0-9.?]+([o|º|o.])?\s?(-|\.)?(\s|[A-Z]+\.\s)?/;
-
-  // Get only the article numeric part
-    const splitedArticle = articleNumberDefRegEx.exec(article);
-    const articleSpliter = splitedArticle[0];
-
-    const number = LegislationCleaner.cleanArticleNumber(articleSpliter);
-    let text = article.split(articleSpliter)[1];
-
-  // There are some semantic errors that don't have any pattern, so we need to fix them manually
-    text = LegislationCleaner.cleanKnownSemanticErrors(type, number, text);
-    return {
-      number,
-      text,
-    };
-  }
-
   /**
    * Split the article text into text and the paragraphs
   * @param  {String} type    The type of the legislation that will be splited
@@ -87,22 +57,22 @@ class Split {
       if (dirtyPart) {
           // In the first iteration, the splited part is the article text
         workText = dirtyPart;
-        const number = LegislationCleaner.cleanParagraphNumber(textSpliter);
+        const number = Cleaner.cleanParagraphNumber(textSpliter);
         if (i === 0) {
           // debug(`Art. ${articleNumber}: `.yellow + cleanPart);
-          response.text = LegislationCleaner.postCleaning(cleanPart);
+          response.text = Cleaner.postCleaning(cleanPart);
           response.number = articleNumber;
           response.paragraphs[i] = {
             number,
-            paragraph: LegislationCleaner.postCleaning(dirtyPart),
+            paragraph: Cleaner.postCleaning(dirtyPart),
           };
         } else {
-          response.paragraphs[i - 1].paragraph = LegislationCleaner.postCleaning(cleanPart);
+          response.paragraphs[i - 1].paragraph = Cleaner.postCleaning(cleanPart);
           response.paragraphs[i] = {
             number,
           };
           if (i < testMatches.length) {
-            response.paragraphs[i].paragraph = LegislationCleaner.postCleaning(dirtyPart);
+            response.paragraphs[i].paragraph = Cleaner.postCleaning(dirtyPart);
           }
         }
       }

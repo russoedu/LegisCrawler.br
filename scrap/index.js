@@ -6,6 +6,7 @@ const debug = require('debug')('index');
 // const Legislation = require('../models/Legislation');
 const Scraper = require('./Scraper');
 const Cleaner = require('./Cleaner');
+const Parser = require('./Parser');
 
 const legislations = config.legislations;
 const quantity = legislations.length;
@@ -24,7 +25,9 @@ legislations.forEach((legislation) => {
       return cleanText;
     })
     .then((cleanText) => {
-      debug(cleanText);
+      // debug(chalk.blue(cleanText));
+      const parsedText = Parser.getArticles(cleanText);
+      debug(parsedText);
     })
     // Save organized legislation
     .then(() => {

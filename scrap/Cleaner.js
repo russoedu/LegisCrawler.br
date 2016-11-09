@@ -42,13 +42,15 @@ class Cleaner {
    */
   static cleanText(dirtyText) {
     // Regular Expressions
-    const commentRegEx = /\(.*\)/;
-    const notArticleTitleRegEx = /^[A-Z\sÁÉÍÓÚÀÈÌÒÙÇÃÕÄËÏÖÜÂÊÎÔÛ]+$/;
+    const commentRegEx = /\(.*|\n.*\)/gm;
+    const notArticleTitleRegEx = /^[A-Z\sÁÉÍÓÚÀÈÌÒÙÇÃÕÄËÏÖÜÂÊÎÔÛ]+$/gm;
     const tabOrStrangeSpaceRegEx = /\t|\u00A0|\u0096/g;
-    const returnRegEx = /(\n+\s+)|(\r+\s+)|\n+|\r+/g;
     const brokenArticleRegEx = /^(rt.\s[0-9]+)/;
+    const returnRegEx = /(\n+\s+)|(\r+\s+)|\n+|\r+/g;
+    const endOfLegislation = /^.+,\s[0-9]+\sde\s[A-z]+\sde\s[0-9]+([\n.\s\S]*)/gm;
+    const beginingOfLegislation = /(Art[\.\s\-]+1[\s\S]+)/gm;
 
-    const text = dirtyText
+    let text = dirtyText
       // Clean comments from the text
       .replace(commentRegEx, '')
       // Clean capitalized titles from the text
@@ -57,13 +59,16 @@ class Cleaner {
       .replace(tabOrStrangeSpaceRegEx, ' ')
       // Clean multiple returns and spaces after returns
       .replace(returnRegEx, '\n')
+      // Clean everything from the "Place / date" text, that ends the legislation
+      .replace(endOfLegislation, '')
       // Used to fix a semantic error that puts a bold in 'A' from 'Art'
       // TODO move this replace to another place
       .replace(brokenArticleRegEx, 'A$1');
 
-    // debug(`dirtyText = "${chalk.yellow(dirtyText)}"
-    //             cleanText = "${chalk.green(text)}"`);
-    debug(`cleanText = "${chalk.green(text)}"`);
+    // Clean everything before the first article
+    text = text.match(beginingOfLegislation)[0];
+    debug(text);
+
     return text;
   }
 
