@@ -2,11 +2,11 @@ const MongoClient = require('mongodb').MongoClient;
 const fs = require('fs');
 const config = require('../config/config');
 const error = require('../helpers/error');
-const debug = require('debug')('DB');
+const debug = require('debug')('db');
 
 const FILE = 'file';
 const MONGO = 'mongo';
-const publicFolder = `${__dirname}/../public`;
+const publicFolder = `${__dirname}/../public/v1`;
 
 function connect() {
   return new Promise((resolve, reject) => {
@@ -22,88 +22,101 @@ function connect() {
   });
 }
 
+function createFile(data, name) {
+  return new Promise((resolve, reject) => {
+    const file = name;
+    fs.writeFile(`${publicFolder}/${file}`, JSON.stringify(data), (err) => {
+      if (err) {
+        error('Error saving file', err);
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
+function createMongo(data) {
+  return new Promise((resolve, reject) => {
+    connect()
+      .then((db) => {
+        db.collection('legislations').insertOne(data).then((result) => {
+          db.close();
+          debug(result);
+          resolve(result);
+        })
+      .catch((err) => {
+        error('error inserting data on DB', err);
+        reject(err);
+      });
+      }).catch((err) => {
+        reject(err);
+      });
+  });
+}
+
 
 module.exports = class Db {
-  static create(item, dbType = FILE) {
+  static create(data, name = null, dbType = FILE) {
     return new Promise((resolve, reject) => {
+      let func = {};
       if (dbType === FILE) {
-        const file = item.type;
-        fs.writeFile(`${publicFolder}/${file}.json`, JSON.stringify(item), (err) => {
-          if (err) {
-            error('Error saving file', err);
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
+        func = createFile;
       } else if (dbType === MONGO) {
-        connect()
-          .then((db) => {
-            db.collection('legislations').insertOne(item).then((data) => {
-              db.close();
-              debug(data);
-              resolve(data);
-            })
-          .catch((err) => {
-            error('error inserting data on DB', err);
-            reject(err);
-          });
-          }).catch((err) => {
-            reject(err);
-          });
+        func = createMongo;
       } else {
         reject('No db defined');
       }
+      func(data, name)
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((err) => {
+          reject(err);
+        });
     });
   }
 
   static find(query, dbType) {
     return new Promise((resolve, reject) => {
       if (dbType === FILE) {
-        if (query.type === undefined) {
-          fs.readFile(`${publicFolder}/complete.json`, (completeErr, data) => {
-            if (completeErr) {
-              error('complete file not found', completeErr);
-
-              fs.readdir(publicFolder, (err, files) => {
-                if (err) {
-                  error('error reading folder', err);
-                  reject(err);
+        // Verify if a specific file was requested
+        if (Object.keys(query).length === 0) {
+          // Check if the complete file exists
+          if (fs.existsSync(`${publicFolder}/complete.json`)) {
+            resolve('complete.json');
+          } else {
+            // Create and serve the complete file
+            fs.readdir(publicFolder, (err, files) => {
+              if (err) {
+                error('error reading folder', err);
+                reject(err);
+              }
+              const resp = [];
+              // Read the public folder and join all existing .json files
+              files.forEach((fileName) => {
+                const file = `${publicFolder}/${fileName}`;
+                const jsonRegEx = /\.json/;
+                debug(`${file}  ${file.match(jsonRegEx)}`);
+                if (file.match(jsonRegEx) !== null) {
+                  resp.push(JSON.parse(fs.readFileSync(file)));
                 }
-                const resp = [];
-                files.forEach((fileName) => {
-                  const file = `${publicFolder}/${fileName}`;
-                  const jsonRegEx = /\.json/;
-                  debug(`${file}  ${file.match(jsonRegEx)}`);
-                  if (file.match(jsonRegEx) !== null) {
-                    resp.push(JSON.parse(fs.readFileSync(file)));
-                  }
-                  debug(resp.length);
-                });
-                debug(`=>>>>>>>>>>>>>>>>>>${resp.length}`);
-                // debug(resp);
-                fs.writeFile(`${publicFolder}/complete.json`, JSON.stringify(resp), (writeErr) => {
-                  if (writeErr) {
-                    error('Error saving complete file', writeErr);
-                  }
-                });
-                resolve(resp);
+                debug(resp.length);
               });
-            } else {
-              debug(JSON.parse(data));
-              resolve(JSON.parse(data));
-            }
-          });
+              // Create the complete.json file
+              fs.writeFile(`${publicFolder}/complete.json`, JSON.stringify(resp), (writeErr) => {
+                if (writeErr) {
+                  error('Error saving complete file', writeErr);
+                }
+              });
+              resolve('complete.json');
+            });
+          }
+        } else if (fs.existsSync(`${publicFolder}/${query.type}.json`)) {
+          resolve(`${query.type}.json`);
         } else {
-          debug(`${publicFolder}/${query.type}.json`);
-          fs.readFile(`${publicFolder}/${query.type}.json`, (err, data) => {
-            if (err) {
-              error('error reading file', err);
-              reject(err);
-            }
-            debug(JSON.stringify(JSON.parse(data)));
-            resolve(JSON.parse(data));
-          });
+          error('[ERROR] reading file', `${query.type} not found on server`);
+          reject({ error: `${query.type} could not be found` });
         }
       } else if (dbType === MONGO) {
         connect().then((db) => {

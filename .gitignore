@@ -15,4 +15,4 @@ pids
 node_modules
 
 # Generated json files
-public/*.json
+public/v1

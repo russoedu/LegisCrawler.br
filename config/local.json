@@ -14,14 +14,16 @@
     "port": 3300
   },
   "db": {
-    "type": "mongo",
+    "type": "file",
     "url": "mongodb://localhost:27017/legiscrap"
   },
   "legislations": [
     {
       "type": "Constituição Federal",
       "url": "http://www.planalto.gov.br/ccivil_03/Constituicao/Constituicao.htm"
-    },
+    }
+  ],
+  "unusedLegislations": [
     {
       "type": "Código Civil",
       "url": "http://www.planalto.gov.br/ccivil_03/Leis/2002/L10406.htm"
@@ -154,7 +156,5 @@
       "type": "Estatuto da Terra",
       "url": "http://www.planalto.gov.br/ccivil_03/Leis/L4504.htm"
     }
-  ],
-  "unusedLegislations": [
   ]
 }

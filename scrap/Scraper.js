@@ -5,7 +5,7 @@ const chalk = require('chalk');
 const debug = require('debug')('scraper');
 
 class Scraper {
-  static getLegislationText(legislation) {
+  static scrapPage(legislation) {
     log(chalk.yellow(`🔗   [START] Scrap ${legislation.type}`));
     // Used to capture bolds that are not part of articles
     const ignoreTagRegEx = /b|strong/;

@@ -4,15 +4,20 @@ const error = require('../helpers/error');
 
 class LegislationController {
   static find(req, res) {
-    debug('LegislationController.find');
+    debug('LegislationController.find()');
     Legislation.find()
     .then((response) => {
       debug(typeof response);
-      res.status(200).send(response);
+      debug(response);
+      if (typeof response === 'string') {
+        res.redirect(response);
+      } else {
+        res.status(200).send(response);
+      }
     })
     .catch((err) => {
       error(`Could not retrieve ${req.params.type} data`, err);
-      res.status(500).json(err);
+      res.status(400).json(err);
     });
   }
 
@@ -21,12 +26,15 @@ class LegislationController {
     const legislation = new Legislation(req.params.type);
     legislation.findByLegislationType()
       .then((response) => {
-        debug(response);
-        res.status(200).send(response);
+        if (typeof response === 'string') {
+          res.redirect(response);
+        } else {
+          res.status(200).send(response);
+        }
       })
       .catch((err) => {
         error(`Could not retrieve ${req.params.type} data`, err);
-        res.status(500).json(err);
+        res.status(400).json(err);
       });
   }
 }

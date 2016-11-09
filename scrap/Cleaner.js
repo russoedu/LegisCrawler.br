@@ -1,4 +1,4 @@
-const debug = require('debug')('scrap-cleaner');
+const debug = require('debug')('cleaner');
 const chalk = require('chalk');
 const knownSemanticErrors = require('./knownSemanticErrors');
 
@@ -33,41 +33,37 @@ function getNumber(dirtyText, regEx, cleanCapGroups, numberCapGroups, lettersCap
 /**
  * @class
  */
-class LegislationCleaner {
+class Cleaner {
   /**
    * Pre cleaning function removes all double spaces and text things tha shoudn't be there
    * @static
    * @param  {Strign} dirtyText The full text
    * @return {Strign}           The clean text
    */
-  static preCleaning(dirtyText) {
+  static cleanText(dirtyText) {
     // Regular Expressions
-    // Used to fix a semantic error that puts a bold in 'A' from 'Art'
-    const brokenArticleRegEx = /^rt.\s[0-9]+/;
-    // Used to clean comments from the text
     const commentRegEx = /\(.*\)/;
-    // Used to clean the text removing white spaces chars
-    const whiteSpacesRegEx = /\n+|\r+|\t+|\u00A0|\u0096|\s/g;
-    // Used to clean the text removing double spaces chars
-    const doubleSpaceRegEx = /\s\s+/g;
-    // Used to clean titles from the text
     const notArticleTitleRegEx = /^[A-Z\sÁÉÍÓÚÀÈÌÒÙÇÃÕÄËÏÖÜÂÊÎÔÛ]+$/;
+    const tabOrStrangeSpaceRegEx = /\t|\u00A0|\u0096/g;
+    const returnRegEx = /(\n+\s+)|(\r+\s+)|\n+|\r+/g;
+    const brokenArticleRegEx = /^(rt.\s[0-9]+)/;
 
-    let text = dirtyText;
-    text = text
-      .replace(whiteSpacesRegEx, ' ')
-      .replace(doubleSpaceRegEx, ' ')
+    const text = dirtyText
+      // Clean comments from the text
+      .replace(commentRegEx, '')
+      // Clean capitalized titles from the text
       .replace(notArticleTitleRegEx, '')
-      .replace(commentRegEx, '');
+      // Clean tab and strange spaces chars
+      .replace(tabOrStrangeSpaceRegEx, ' ')
+      // Clean multiple returns and spaces after returns
+      .replace(returnRegEx, '\n')
+      // Used to fix a semantic error that puts a bold in 'A' from 'Art'
+      // TODO move this replace to another place
+      .replace(brokenArticleRegEx, 'A$1');
 
-    // Clean text if it is only a space char
-    text = text === ' ' ? '' : text;
-
-    if (brokenArticleRegEx.test(text)) {
-      text = `A${text}`;
-    }
     // debug(`dirtyText = "${chalk.yellow(dirtyText)}"
     //             cleanText = "${chalk.green(text)}"`);
+    debug(`cleanText = "${chalk.green(text)}"`);
     return text;
   }
 
@@ -155,4 +151,4 @@ class LegislationCleaner {
     return fixedText;
   }
 }
-module.exports = LegislationCleaner;
+module.exports = Cleaner;

@@ -1,36 +1,44 @@
 const config = require('../config/config');
 const log = require('../helpers/log');
-const debug = require('debug')('scrap');
 const error = require('../helpers/error');
 const chalk = require('chalk');
+const debug = require('debug')('index');
 // const Legislation = require('../models/Legislation');
 const Scraper = require('./Scraper');
+const Cleaner = require('./Cleaner');
 
 const legislations = config.legislations;
 const quantity = legislations.length;
-let scraped = 0;
+let finished = 0;
 
 const plural = legislations.length === 1 ? '' : 's';
-log(chalk.blue(`🔍   [START] ${quantity} legislation${plural} to organize`));
+log(chalk.blue(`🔍   [START] ${quantity} legislation${plural} to capture and organize`));
 
 legislations.forEach((legislation) => {
   log(chalk.yellow(`🚚   [START] ${legislation.type}`));
 
-  Scraper.getLegislationText(legislation)
-    .then((gottenLegislation) => {
-      scraped += 1;
-      debug(gottenLegislation);
+  Scraper
+    .scrapPage(legislation)
+    .then((scrapedLegislation) => {
+      const cleanText = Cleaner.cleanText(scrapedLegislation);
+      return cleanText;
+    })
+    .then((cleanText) => {
+      debug(cleanText);
+    })
+    // Save organized legislation
+    .then(() => {
       log(chalk.green(`👍  [FINISH] ${legislation.type}`));
-
+      finished += 1;
       // const legis = new Legislation(
-      //     gottenLegislation.type,
-      //     gottenLegislation.url,
-      //     gottenLegislation.data
+      //     scrapedLegislation.type,
+      //     scrapedLegislation.url,
+      //     scrapedLegislation.data
       //   );
       //
       // legis.create();
-      if (quantity === scraped) {
-        log(chalk.bold.cyan('✨  [FINISH] All legislations organized 🏁 '));
+      if (quantity === finished) {
+        log(chalk.bold.cyan('✨  [FINISH] All legislations captured and organized ✨  '));
       }
     })
     .catch((err) => {
