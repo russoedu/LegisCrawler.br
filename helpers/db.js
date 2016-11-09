@@ -25,7 +25,7 @@ function connect() {
 function createFile(data, name) {
   return new Promise((resolve, reject) => {
     const file = name;
-    fs.writeFile(`${publicFolder}/${file}`, JSON.stringify(data), (err) => {
+    fs.writeFile(`${publicFolder}/${file}.json`, JSON.stringify(data), (err) => {
       if (err) {
         error('Error saving file', err);
         reject(err);
@@ -57,12 +57,12 @@ function createMongo(data) {
 
 
 module.exports = class Db {
-  static create(data, name = null, dbType = FILE) {
+  static create(data, name = null) {
     return new Promise((resolve, reject) => {
       let func = {};
-      if (dbType === FILE) {
+      if (config.db.type === FILE) {
         func = createFile;
-      } else if (dbType === MONGO) {
+      } else if (config.db.type === MONGO) {
         func = createMongo;
       } else {
         reject('No db defined');
@@ -77,9 +77,9 @@ module.exports = class Db {
     });
   }
 
-  static find(query, dbType) {
+  static find(query) {
     return new Promise((resolve, reject) => {
-      if (dbType === FILE) {
+      if (config.db.type === FILE) {
         // Verify if a specific file was requested
         if (Object.keys(query).length === 0) {
           // Check if the complete file exists
@@ -101,6 +101,7 @@ module.exports = class Db {
                 if (file.match(jsonRegEx) !== null) {
                   resp.push(JSON.parse(fs.readFileSync(file)));
                 }
+                // debug(JSON.parse(fs.readFileSync(file)));
                 debug(resp.length);
               });
               // Create the complete.json file
@@ -118,7 +119,7 @@ module.exports = class Db {
           error('[ERROR] reading file', `${query.type} not found on server`);
           reject({ error: `${query.type} could not be found` });
         }
-      } else if (dbType === MONGO) {
+      } else if (config.db.type === MONGO) {
         connect().then((db) => {
           db.collection('legislations').find(query).toArray().then((data) => {
             db.close();

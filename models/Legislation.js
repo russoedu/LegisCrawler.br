@@ -1,6 +1,5 @@
 const Db = require('../helpers/Db');
 const debug = require('debug')('DB');
-const config = require('../config/config');
 
 class Legislation {
   constructor(
@@ -15,7 +14,7 @@ class Legislation {
 
   static find() {
     return new Promise((resolve, reject) => {
-      Db.find({}, config.db.type).then((data) => {
+      Db.find({}).then((data) => {
         resolve(data);
       }).catch((error) => {
         reject(error);
@@ -25,7 +24,7 @@ class Legislation {
 
   findByLegislationType() {
     return new Promise((resolve, reject) => {
-      Db.find({ type: this.type }, config.db.type).then((data) => {
+      Db.find({ type: this.type }).then((data) => {
         debug(data);
         resolve(data);
       }).catch((error) => {
@@ -36,7 +35,7 @@ class Legislation {
 
   create() {
     return new Promise((resolve, reject) => {
-      Db.create(this, config.db.type).then((data) => {
+      Db.create(this, this.type).then((data) => {
         resolve(data);
       }).catch((error) => {
         reject(error);

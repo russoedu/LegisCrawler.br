@@ -6,9 +6,8 @@ const debug = require('debug')('scraper');
 
 class Scraper {
   static scrapPage(legislation) {
-    log(chalk.yellow(`🔗   [START] Scrap ${legislation.type}`));
     // Used to capture bolds that are not part of articles
-    const ignoreTagRegEx = /b|strong/;
+    const ignoreTagRegEx = /b|strong|strike/;
     // Used do revert ignore on bold used on some unique paragraphs
     const uniqueParagraphRegEx = /\s?Parágrafo\súnico[\s-]*/;
 
@@ -48,7 +47,6 @@ class Scraper {
         parser.end();
 
         debug(chalk.green(`crapedContent ${crapedContent}`));
-        log(chalk.green(`✅  [FINISH] Scrap ${legislation.type}`));
         resolve(crapedContent);
       })
       .catch((error) => {
