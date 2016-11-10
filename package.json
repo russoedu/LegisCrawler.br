@@ -7,7 +7,7 @@
     "start": "node index.js;",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Moblets",
+  "author": "Eduardo Russo",
   "license": "MIT",
   "repository": {
     "type": "git",
