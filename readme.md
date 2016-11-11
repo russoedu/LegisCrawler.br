@@ -1,4 +1,4 @@
-![](./public/logo.svg)
+![](./public/logo.png)
 
 > Crawler completo para a legislação brasileira
 
