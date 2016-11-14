@@ -1,18 +1,66 @@
-#LegiScrap
+![](./public/logo.png)
 
-Brazilian legislation scraper
+> Crawler completo para a legislação brasileira
 
-##About
-LegiScrap was created to organize Brazilian legislation and create a comprehensive API to get it.
+##Sobre
+LegisCrawler.br foi criado para capturar e organizar a legislação brasileira encontrada no [site do Planalto](planalto.gov.br) e entregar uma API com seus dados.
+
+A ferramenta é formada por duas partes, o crawler – que lê, captura e organiza os dados das legislações – e a API – que entrega os separados por legislação e artigo.
+
+##Instalação
+
+O sistema foi criado em [Node.js](https://nodejs.org/en/) utilizando ECMA 6, portanto deve usar [Node.js 6.5](https://kangax.github.io/compat-table/es6/#node65) em diante para funcionar corretamente.
+
+Para instalar, siga os próximos passos:
+
+```bash
+git clone git@github.com:russoedu/LegisCrawler.br.git
+cd LegisCrawler.br
+```
+
+Caso use o [Yarn](https://yarnpkg.com/), execute
+
+```bash
+yarn
+```
+Caso utilize [NPM](https://www.npmjs.com), execute
+
+```bash
+npm install
+```
+
+Esses comandos instalarão as dependências do projeto.
+
+##Configuração
+
+TODO
+Variáveis de ambiente
+Mongo / File
+Lista de legislações
+
+##Debug
+
+##Crawler
+node crawl
+
+##API
+npm start
+
+
+
+
+
+###Crawler
+
 
 ##Configuration
 
 ###Database
 
-The scrap gets the data and can be stored in files or on Mongo DB. Choose on of these options in the config/db/type.
+The crawler gets the data and can be stored in files or on Mongo DB. Choose on of these options in the config/db/type.
 
 ##Debugging
-LegiScrap uses (debug)[https://github.com/visionmedia/debug] for debugging.
+LegisCrawler uses (debug)[https://github.com/visionmedia/debug] for debugging.
 
 To debug the scrap utility, run:
 
