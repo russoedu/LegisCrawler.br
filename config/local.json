@@ -15,16 +15,18 @@
   },
   "db": {
     "type": "file",
-    "url": "mongodb://localhost:27017/legiscrap"
+    "url": "mongodb://localhost:27017/LegisCrawlerBr"
   },
   "legislations": [
     {
-      "type": "Estatuto Nacional da Microempresa e da Empresa de Pequeno Porte",
-      "url": "http://www.planalto.gov.br/ccivil_03/Leis/LCP/Lcp123.htm"
-    },
-    {
       "type": "Constituição Federal",
       "url": "http://www.planalto.gov.br/ccivil_03/Constituicao/Constituicao.htm"
+    }
+  ],
+  "unusedLegislations": [
+    {
+      "type": "Estatuto Nacional da Microempresa e da Empresa de Pequeno Porte",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/LCP/Lcp123.htm"
     },
     {
       "type": "Código Civil",
@@ -154,7 +156,5 @@
       "type": "Estatuto da Terra",
       "url": "http://www.planalto.gov.br/ccivil_03/Leis/L4504.htm"
     }
-  ],
-  "unusedLegislations": [
   ]
 }

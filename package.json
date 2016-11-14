@@ -1,5 +1,5 @@
 {
-  "name": "legiscrap",
+  "name": "LegisCrawler.br",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,9 +11,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/russoedu/legiscrap.git"
+    "url": "git+https://github.com/russoedu/LegisCrawler.br.git"
   },
-  "homepage": "https://github.com/russoedu/legiscrap",
+  "homepage": "https://github.com/russoedu/LegisCrawler.br",
   "keywords": [
     "brazil",
     "legislation",

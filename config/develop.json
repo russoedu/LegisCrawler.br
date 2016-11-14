@@ -15,7 +15,7 @@
   },
   "db": {
     "type": "file",
-    "url": "mongodb://localhost:27017/legiscrap"
+    "url": "mongodb://localhost:27017/LegisCrawlerBr"
   },
   "legislations": [
     {

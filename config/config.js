@@ -4,7 +4,7 @@ const chalk = require('chalk');
 const log = require('../helpers/log');
 const error = require('../helpers/error');
 
-const env = process.env.LEGISCRAP_ENVIRONMENT;
+const env = process.env.LEGISCRAWLERBR_ENVIRONMENT;
 
 
 /**

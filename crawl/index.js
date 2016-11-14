@@ -23,9 +23,9 @@ legislations.forEach((legislation) => {
   Scraper
     .scrapPage(legislation)
     .then((scrapedLegislation) => {
-      debug('cleanText', chalk.blue(scrapedLegislation));
+      // debug('cleanText', chalk.blue(scrapedLegislation));
       const cleanText = Cleaner.cleanText(scrapedLegislation);
-      debug('cleanText', chalk.red(cleanText));
+      // debug('cleanText', chalk.red(cleanText));
       log(chalk.green(`✅  [FINISH] Scrap ${legislation.type}`));
       return cleanText;
     })
@@ -33,18 +33,26 @@ legislations.forEach((legislation) => {
       log(chalk.yellow(`✂️   [START] Parse ${legislation.type}`));
       // debug(chalk.blue(cleanText));
       const parsedText = Parser.getArticles(cleanText);
-      // debug(parsedText);
+      // debug('parsedText', chalk.blue(parsedText));
       log(chalk.green(`✅  [FINISH] Parse ${legislation.type}`));
       return parsedText;
     })
-    // Save organized legislation
     .then((parsedText) => {
+      log(chalk.yellow(`✂️   [START] Structure ${legislation.type}`));
+      // const organizedArticles = Parser.getStructuredArticles(parsedText);
+      const organizedArticles = parsedText;
+      debug(parsedText);
+      log(chalk.green(`✅  [FINISH] Structure ${legislation.type}`));
+      return organizedArticles;
+    })
+    // Save organized legislation
+    .then((organizedArticles) => {
       log(chalk.green(`👍  [FINISH] ${legislation.type}`));
       finished += 1;
       const legis = new Legislation(
           legislation.type,
           legislation.url,
-          parsedText
+          organizedArticles
         );
 
       legis.create();

@@ -25,6 +25,7 @@ function connect() {
 function createFile(data, name) {
   return new Promise((resolve, reject) => {
     const file = name;
+    debug(data);
     fs.writeFile(`${publicFolder}/${file}.json`, JSON.stringify(data), (err) => {
       if (err) {
         error('DB', 'File could not be saved', err);
@@ -84,7 +85,7 @@ module.exports = class Db {
         if (Object.keys(query).length === 0) {
           // Check if the complete file exists
           if (fs.existsSync(`${publicFolder}/complete.json`)) {
-            resolve('complete.json');
+            resolve(`${publicFolder}/complete.json`);
           } else {
             // Create and serve the complete file
             fs.readdir(publicFolder, (err, files) => {
@@ -110,7 +111,7 @@ module.exports = class Db {
                   error('DB', 'Could not save complete file', writeErr);
                 }
               });
-              resolve('complete.json');
+              resolve(`${publicFolder}/complete.json`);
             });
           }
         } else if (fs.existsSync(`${publicFolder}/${query.type}.json`)) {

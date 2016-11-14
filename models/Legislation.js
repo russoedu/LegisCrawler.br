@@ -1,5 +1,5 @@
 const Db = require('../helpers/Db');
-const debug = require('debug')('DB');
+const debug = require('debug')('db');
 
 class Legislation {
   constructor(
@@ -34,6 +34,7 @@ class Legislation {
   }
 
   create() {
+    debug(this);
     return new Promise((resolve, reject) => {
       Db.create(this, this.type).then((data) => {
         resolve(data);
