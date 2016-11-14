@@ -16,7 +16,7 @@ class LegislationController {
       }
     })
     .catch((err) => {
-      error(`Could not retrieve ${req.params.type} data`, err);
+      error(req.params.type, 'Could not retrieve data', err);
       res.status(400).json(err);
     });
   }
@@ -33,7 +33,7 @@ class LegislationController {
         }
       })
       .catch((err) => {
-        error(`Could not retrieve ${req.params.type} data`, err);
+        error(req.params.type, 'Could not retrieve data', err);
         res.status(400).json(err);
       });
   }

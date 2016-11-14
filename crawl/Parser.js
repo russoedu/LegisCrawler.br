@@ -33,15 +33,19 @@ class Parser {
     const articleNums = text.match(articleRegEx);
     const lastOne = articleNums.length - 1;
     // const articleSpliter = splitedArticle[0];
-    debug(articleNums);
+    debug('articleNums', articleNums);
+    debug('cleanText: ', cleanText);
+
     articleNums.forEach((num, index) => {
       // The first split results in an empty string, so we need to treat it
       const nextNum = articleNums[index + 1];
+      debug('num: ', num);
       const numClean = Cleaner.cleanArticleNumber(num);
+      debug('nextNum: ', nextNum);
       const nextNumClean = nextNum ? Cleaner.cleanArticleNumber(nextNum) : '';
       const splitNextNum = text.split(nextNum);
       debug('numClean:', numClean, 'nextNumClean:', nextNumClean, 'index:', index,
-            'lastOne:', lastOne, 'splitNextNum.length', splitNextNum.length);
+            'lastOne:', lastOne, 'splitNextNum.length', splitNextNum.length, '\n\n\n------------');
 
       text = splitNextNum ? splitNextNum[splitNextNum.length - 1] : '';
       if (index === 0) {

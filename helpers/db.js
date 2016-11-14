@@ -12,7 +12,7 @@ function connect() {
   return new Promise((resolve, reject) => {
     MongoClient.connect(config.db.url, (connectionErr, db) => {
       if (connectionErr) {
-        error('DB connection could not be established', connectionErr);
+        error('DB', 'Connection could not be established', connectionErr);
         reject(connectionErr);
       } else {
         debug(db);
@@ -27,7 +27,7 @@ function createFile(data, name) {
     const file = name;
     fs.writeFile(`${publicFolder}/${file}.json`, JSON.stringify(data), (err) => {
       if (err) {
-        error('Error saving file', err);
+        error('DB', 'File could not be saved', err);
         reject(err);
       } else {
         resolve();
@@ -46,7 +46,7 @@ function createMongo(data) {
           resolve(result);
         })
       .catch((err) => {
-        error('error inserting data on DB', err);
+        error('DB', 'error inserting data', err);
         reject(err);
       });
       }).catch((err) => {
@@ -89,7 +89,7 @@ module.exports = class Db {
             // Create and serve the complete file
             fs.readdir(publicFolder, (err, files) => {
               if (err) {
-                error('error reading folder', err);
+                error('DB', 'Could not read folder', err);
                 reject(err);
               }
               const resp = [];
@@ -107,7 +107,7 @@ module.exports = class Db {
               // Create the complete.json file
               fs.writeFile(`${publicFolder}/complete.json`, JSON.stringify(resp), (writeErr) => {
                 if (writeErr) {
-                  error('Error saving complete file', writeErr);
+                  error('DB', 'Could not save complete file', writeErr);
                 }
               });
               resolve('complete.json');
@@ -116,7 +116,7 @@ module.exports = class Db {
         } else if (fs.existsSync(`${publicFolder}/${query.type}.json`)) {
           resolve(`${query.type}.json`);
         } else {
-          error('[ERROR] reading file', `${query.type} not found on server`);
+          error('DB', 'Could not read file', `${query.type} not found on server`);
           reject({ error: `${query.type} could not be found` });
         }
       } else if (config.db.type === MONGO) {
@@ -141,13 +141,15 @@ module.exports = class Db {
             }
           })
         .catch((err) => {
-          error('error retrieving data from DB', err);
+          error('DB', 'Could not retrieve data', err);
           reject(err);
         });
         }).catch((err) => {
+          error('DB', 'Could not stablish DB connection', err);
           reject(err);
         });
       } else {
+        error('DB', 'No DB defined', config.db.type);
         reject('No db defined');
       }
     });

@@ -21,7 +21,7 @@ function getConfig() {
     config = JSON.parse(fs.readFileSync(confFile, 'utf8'));
     config.env = env;
   } catch (err) {
-    error(`Could not read config file from environment ${env}`, err);
+    error('Config', `Could not read config file from environment ${env}`, err);
     return {};
   }
 

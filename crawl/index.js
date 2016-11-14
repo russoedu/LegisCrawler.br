@@ -1,6 +1,7 @@
 const config = require('../config/config');
 const log = require('../helpers/log');
 const error = require('../helpers/error');
+const finish = require('../helpers/finish');
 const chalk = require('chalk');
 const debug = require('debug')('index');
 const Legislation = require('../models/Legislation');
@@ -22,8 +23,9 @@ legislations.forEach((legislation) => {
   Scraper
     .scrapPage(legislation)
     .then((scrapedLegislation) => {
+      debug('cleanText', chalk.blue(scrapedLegislation));
       const cleanText = Cleaner.cleanText(scrapedLegislation);
-      // debug(cleanText);
+      debug('cleanText', chalk.red(cleanText));
       log(chalk.green(`✅  [FINISH] Scrap ${legislation.type}`));
       return cleanText;
     })
@@ -31,13 +33,10 @@ legislations.forEach((legislation) => {
       log(chalk.yellow(`✂️   [START] Parse ${legislation.type}`));
       // debug(chalk.blue(cleanText));
       const parsedText = Parser.getArticles(cleanText);
-      debug(parsedText);
+      // debug(parsedText);
       log(chalk.green(`✅  [FINISH] Parse ${legislation.type}`));
       return parsedText;
     })
-    // .then((parsedText) => {
-    //
-    // })
     // Save organized legislation
     .then((parsedText) => {
       log(chalk.green(`👍  [FINISH] ${legislation.type}`));
@@ -49,11 +48,9 @@ legislations.forEach((legislation) => {
         );
 
       legis.create();
-      if (quantity === finished) {
-        log(chalk.bold.cyan('✨  [FINISH] All legislations captured and organized ✨  '));
-      }
+      finish(quantity, finished);
     })
     .catch((err) => {
-      error('Could not reach legislation', err);
+      error(legislation.type, 'Could not reach legislation', err);
     });
 });

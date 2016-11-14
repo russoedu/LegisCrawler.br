@@ -1,6 +1,6 @@
 const htmlparser = require('htmlparser2');
 const request = require('request-promise-native');
-const log = require('../helpers/log');
+const error = require('../helpers/error');
 const chalk = require('chalk');
 const debug = require('debug')('scraper');
 
@@ -12,7 +12,7 @@ class Scraper {
     const uniqueParagraphRegEx = /\s?Parágrafo\súnico[\s-]*/;
 
     let useContent = false;
-    let crapedContent = '';
+    let scrapedContent = '';
 
     return new Promise((resolve, reject) => {
       const requestoptions = {
@@ -31,7 +31,7 @@ class Scraper {
           ontext(dirtyText) {
             if (useContent || uniqueParagraphRegEx.test(dirtyText)) {
               debug(chalk.blue(`captured ${dirtyText}`));
-              crapedContent += dirtyText;
+              scrapedContent += dirtyText;
             } else {
               debug(chalk.yellow(`ignored ${dirtyText}`));
             }
@@ -46,11 +46,11 @@ class Scraper {
         parser.write(html);
         parser.end();
 
-        debug(chalk.green(`crapedContent ${crapedContent}`));
-        resolve(crapedContent);
+        debug(chalk.green('scrapedContent', scrapedContent));
+        resolve(scrapedContent);
       })
-      .catch((error) => {
-        log.error(chalk.red(error));
+      .catch((err) => {
+        error(legislation.type, 'Could not scrap page', err);
         reject(error);
       });
     });

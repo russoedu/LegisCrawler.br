@@ -42,13 +42,13 @@ class Cleaner {
    */
   static cleanText(dirtyText) {
     // Regular Expressions
-    const commentRegEx = /\(.*|\n.*\)/gm;
+    const commentRegEx = /\((.*|\n.*)\)/gm;
     const notArticleTitleRegEx = /^[A-Z\sÁÉÍÓÚÀÈÌÒÙÇÃÕÄËÏÖÜÂÊÎÔÛ]+$/gm;
     const tabOrStrangeSpaceRegEx = /\t|\u00A0|\u0096/g;
     const brokenArticleRegEx = /^(rt.\s[0-9]+)/;
     const returnRegEx = /(\n+\s+)|(\r+\s+)|\n+|\r+/g;
     const endOfLegislation = /^.+,\s[0-9]+\sde\s[A-z]+\sde\s[0-9]+([\n.\s\S]*)/gm;
-    const beginingOfLegislation = /(Art[\.\s\-]+1[\s\S]+)/gm;
+    const beginingOfLegislation = /(Art[.\s-]+1[\s\S]+)/gm;
 
     let text = dirtyText
       // Clean comments from the text
@@ -81,8 +81,8 @@ class Cleaner {
   static postCleaning(originsText) {
     const beginningTrimRegEx = /^\s/g;
     const endTrimRegEx = /\s$/g;
-    // Capturing groups 1       2    3                   4
-    const itemsRegEx = /(:|;|\.)(\s?)([a-z]\)|[A-Z]+\s\-)(\s?)/g;
+    // Capturing groups 1       2    3                  4
+    const itemsRegEx = /(:|;|\.)(\s?)([a-z]\)|[A-Z]+\s-)(\s?)/g;
 
     let text = originsText;
     text = text
@@ -100,7 +100,7 @@ class Cleaner {
    */
   static cleanArticleNumber(dirtyText) {
     // Capturing groups  1      2    3       4
-    const numberRegEx = /(\d)\.?(\d*)(o|º|°)?(\-[A-z])?/;
+    const numberRegEx = /(\d)\.?(\d*)(o|º|°)?(-[A-z])?/;
     // #-A => Exclude the thousands separator and the ordinal
     const cleanCapGroups = '$1$2$4';
     // #   => Only the numeric part
