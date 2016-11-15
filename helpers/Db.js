@@ -85,8 +85,10 @@ module.exports = class Db {
         if (Object.keys(query).length === 0) {
           // Check if the complete file exists
           if (fs.existsSync(`${publicFolder}/complete.json`)) {
-            resolve(`${publicFolder}/complete.json`);
+            debug('complete exists');
+            resolve('complete.json');
           } else {
+            debug('complete don\'t exists');
             // Create and serve the complete file
             fs.readdir(publicFolder, (err, files) => {
               if (err) {
@@ -109,9 +111,10 @@ module.exports = class Db {
               fs.writeFile(`${publicFolder}/complete.json`, JSON.stringify(resp), (writeErr) => {
                 if (writeErr) {
                   error('DB', 'Could not save complete file', writeErr);
+                } else {
+                  resolve('complete.json');
                 }
               });
-              resolve(`${publicFolder}/complete.json`);
             });
           }
         } else if (fs.existsSync(`${publicFolder}/${query.type}.json`)) {

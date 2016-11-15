@@ -13,21 +13,12 @@ class Parser {
    * [
    *    {
    *      number: '1º',
-   *      article: 'Os menores de 18 anos são penalmente inimputáveis, ficando sujeitos às normas
-   *                estabelecidas na legislação especial.'
+   *      article: 'Os menores de 18 anos são penalmente inimputáveis, ficando sujeitos às …'
    *    },
    *    {
    *      number: '10',
-   *      article: 'É assegurada a \nparticipação dos trabalhadores e empregadores nos colegiados
-   *                dos órgãos públicos \nem que seus interesses profissionais ou previdenciários
-   *                sejam objeto de \ndiscussão e deliberação.\n'
-   *    },
-   *    {
-   *      ...
-   *    },
-   *    .
-   *    .
-   *    .
+   *      article: 'É assegurada a \nparticipação dos trabalhadores e empregadores nos …'
+   *    }
    * ]
    */
   static getArticles(cleanText) {

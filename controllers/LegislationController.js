@@ -26,6 +26,8 @@ class LegislationController {
     const legislation = new Legislation(req.params.type);
     legislation.findByLegislationType()
       .then((response) => {
+        debug(typeof response);
+        debug(response);
         if (typeof response === 'string') {
           res.redirect(response);
         } else {

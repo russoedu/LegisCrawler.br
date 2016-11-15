@@ -1,53 +1,56 @@
 const config = require('../config/config');
-const log = require('../helpers/log');
 const error = require('../helpers/error');
-const finish = require('../helpers/finish');
-const chalk = require('chalk');
-const debug = require('debug')('index');
+const Status = require('../helpers/Status');
 const Legislation = require('../models/Legislation');
 const Scraper = require('./Scraper');
 const Cleaner = require('./Cleaner');
 const Parser = require('./Parser');
+const debug = require('debug')('index');
 
 const legislations = config.legislations;
 const quantity = legislations.length;
 let finished = 0;
 
-const plural = legislations.length === 1 ? '' : 's';
-log(chalk.blue(`🔍   [START] ${quantity} legislation${plural} to capture and organize`));
+Status.startAll(quantity);
 
 legislations.forEach((legislation) => {
-  log(chalk.yellow(`🚚   [START] ${legislation.type}`));
-  log(chalk.yellow(`🌐   [START] Scrap ${legislation.type}`));
+  const status = new Status(legislation.type);
+  status.startProcessComplete();
 
+  status.startProcess('Scrap');
   Scraper
+    // Get the legislations from the URLs set in the config
     .scrapPage(legislation)
     .then((scrapedLegislation) => {
-      // debug('cleanText', chalk.blue(scrapedLegislation));
+      status.finishProcess();
+      return scrapedLegislation;
+    })
+    // Clean the text removing everithing that is not part of an article
+    .then((scrapedLegislation) => {
+      status.startProcess('Clean');
       const cleanText = Cleaner.cleanText(scrapedLegislation);
-      // debug('cleanText', chalk.red(cleanText));
-      log(chalk.green(`✅  [FINISH] Scrap ${legislation.type}`));
+      status.finishProcess();
       return cleanText;
     })
+    // Parte the content to extract Articles
     .then((cleanText) => {
-      log(chalk.yellow(`✂️   [START] Parse ${legislation.type}`));
-      // debug(chalk.blue(cleanText));
+      status.startProcess('Parse');
       const parsedText = Parser.getArticles(cleanText);
-      // debug('parsedText', chalk.blue(parsedText));
-      log(chalk.green(`✅  [FINISH] Parse ${legislation.type}`));
+      status.finishProcess();
       return parsedText;
     })
+    // Parte the content to atructure it with Paragraphs
     .then((parsedText) => {
-      log(chalk.yellow(`✂️   [START] Structure ${legislation.type}`));
+      status.startProcess('Structure');
       // const organizedArticles = Parser.getStructuredArticles(parsedText);
       const organizedArticles = parsedText;
       debug(parsedText);
-      log(chalk.green(`✅  [FINISH] Structure ${legislation.type}`));
+      status.finishProcess();
       return organizedArticles;
     })
-    // Save organized legislation
+    // Save the organized legislation
     .then((organizedArticles) => {
-      log(chalk.green(`👍  [FINISH] ${legislation.type}`));
+      status.startProcess('Save');
       finished += 1;
       const legis = new Legislation(
           legislation.type,
@@ -56,7 +59,10 @@ legislations.forEach((legislation) => {
         );
 
       legis.create();
-      finish(quantity, finished);
+      status.finishProcess();
+
+      status.finishProcessComplete();
+      Status.finishAll(quantity, finished);
     })
     .catch((err) => {
       error(legislation.type, 'Could not reach legislation', err);
