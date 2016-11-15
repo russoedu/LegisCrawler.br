@@ -26,19 +26,20 @@ class Parser {
     let text = cleanText;
     const articles = {};
     // Get only the article numeric part
-    const articleNums = text.match(articleRegEx);
+    const articlesMatch = text.match(articleRegEx);
 
-    // debug('articleNums', articleNums);
+    // debug('articlesMatch', articlesMatch);
     // debug('cleanText: ', cleanText);
 
-    articleNums.forEach((num, index) => {
+    articlesMatch.forEach((num, index) => {
       // The first split results in an empty string, so we need to treat it
-      const nextNum = articleNums[index + 1];
       // debug('num: ', num);
-      const numClean = Cleaner.cleanArticleNumber(num);
+      const nextNum = articlesMatch[index + 1];
       // debug('nextNum: ', nextNum);
+      const numClean = Cleaner.cleanArticleNumber(num);
+      // debug('numClean: ', numClean);
       const splitNextNum = text.split(nextNum);
-      // const lastOne = articleNums.length - 1;
+      // const lastOne = articlesMatch.length - 1;
       // const nextNumClean = nextNum ? Cleaner.cleanArticleNumber(nextNum) : '';
       // debug('numClean:', numClean, 'nextNumClean:', nextNumClean, 'index:', index,
       //       'lastOne:', lastOne, 'splitNextNum.length', splitNextNum.length);
@@ -50,72 +51,51 @@ class Parser {
         articles[numClean] = splitNextNum[0] ? splitNextNum[0] : text;
       }
     });
-    const parsedText = objectToArray(articles);
+    const parsedText = objectToArray(articles, 'article');
     // debug(parsedText);
     return parsedText;
   }
 
   static getStructuredArticles(articles) {
-    const numReEx = /(\.|:)((\s?§\s\d+(º|o|°)?\.?(\s?-)?[A-z]?\s?)|(\s?Parágrafo\súnico\s?-\s?))/gm;
+    const paragraphRegEx = /^((§\s\d+(º|o|°)?\.?(\s?-)?[A-z]?\s?)|(\s?Parágrafo\súnico\s?-\s?))/gm;
+    const articleDebug = 'a';
+    const arts = articles;
 
-    articles.forEach((art, index) => {
-      const workText = art.article;
-      debug(workText);
-      // const testMatches = workText.match(numReEx);
-      // if (testMatches === null) {
-      //   return null;
+    articles.forEach((art) => {
+      const article = art;
+      const text = art.article;
+      const paragrapsMatch = text.match(paragraphRegEx);
+      const splitedContent = text.split(paragraphRegEx);
+      article.article = Cleaner.postCleaning(splitedContent[0]);
+
+      if (art.number === articleDebug) {
+        debug('Art.', article.number);
+        debug(article.article);
+      }
+      let paragraphs = {};
+
+      if (paragrapsMatch !== null) {
+        paragrapsMatch.forEach((num, index) => {
+          const numClean = Cleaner.cleanParagraphNumber(num);
+          paragraphs[numClean] = Cleaner.postCleaning(splitedContent[(index + 1) * 6]);
+
+          if (art.number === articleDebug) {
+            debug('§', numClean);
+            debug(paragraphs[numClean]);
+          }
+        });
+      }
+      paragraphs = objectToArray(paragraphs, 'paragraph');
+      if (paragraphs.length > 0) {
+        article.paragraphs = paragraphs;
+      }
+      arts.art = article;
+      // if (art.number === articleDebug) {
+      //   debug(JSON.stringify(article));
       // }
-      //
-      // const response = {
-      //   text: '',
-      //   paragraphs: [],
-      // };
-      //
-      // // debug((`Type: ${type}`.blue));
-      // // debug(`Matches: ${testMatches} | Count: ${testMatches.length}`.green);
-      // for (let i = 0; i < testMatches.length; i += 1) {
-      //   // Get only the paragraph numeric part
-      //   workText.match(numReEx);
-      //   const splitedText = numReEx.exec(workText);
-      //   const textSpliter = splitedText[0];
-      //   const cleanPart = `${workText.split(textSpliter)[0]}.`;
-      //   const dirtyPart = workText.split(textSpliter)[1];
-      //
-      //   if (dirtyPart) {
-      //       // In the first iteration, the splited part is the article text
-      //     workText = dirtyPart;
-      //     const number = Cleaner.cleanParagraphNumber(textSpliter);
-      //     if (i === 0) {
-      //       // debug(`Art. ${articleNumber}: `.yellow + cleanPart);
-      //       response.text = Cleaner.postCleaning(cleanPart);
-      //       response.number = articleNumber;
-      //       response.paragraphs[i] = {
-      //         number,
-      //         paragraph: Cleaner.postCleaning(dirtyPart),
-      //       };
-      //     } else {
-      //       response.paragraphs[i - 1].paragraph = Cleaner.postCleaning(cleanPart);
-      //       response.paragraphs[i] = {
-      //         number,
-      //       };
-      //       if (i < testMatches.length) {
-      //         response.paragraphs[i].paragraph = Cleaner.postCleaning(dirtyPart);
-      //       }
-      //     }
-      //   }
-      // }
-      // debug(response);
-      // return response;
     });
-
-    // const articleParagraphs = Split.articleParagraphs(this.type, this.number, this.text);
-    // debug(articleParagraphs);
-    // if (articleParagraphs !== null) {
-    //   this.text = articleParagraphs.text;
-    //   this.paragraphs = articleParagraphs.paragraphs;
-    // }
-    // debug(this);
-    // return this;
+    // debug(arts);
+    return arts;
   }
 }
 

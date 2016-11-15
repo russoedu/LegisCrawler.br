@@ -27,8 +27,10 @@ legislations.forEach((legislation) => {
     })
     // Clean the text removing everithing that is not part of an article
     .then((scrapedLegislation) => {
+      debug(scrapedLegislation);
       status.startProcess('Clean');
       const cleanText = Cleaner.cleanText(scrapedLegislation);
+      debug(cleanText);
       status.finishProcess();
       return cleanText;
     })
@@ -42,9 +44,7 @@ legislations.forEach((legislation) => {
     // Parte the content to atructure it with Paragraphs
     .then((parsedText) => {
       status.startProcess('Structure');
-      // const organizedArticles = Parser.getStructuredArticles(parsedText);
-      const organizedArticles = parsedText;
-      debug(parsedText);
+      const organizedArticles = Parser.getStructuredArticles(parsedText);
       status.finishProcess();
       return organizedArticles;
     })

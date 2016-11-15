@@ -42,7 +42,7 @@ class Cleaner {
    */
   static cleanText(dirtyText) {
     // Regular Expressions
-    const commentRegEx = /\((.*|\n.*)\)/gm;
+    const commentRegEx = /\([^)]*\)/gm;
     const notArticleTitleRegEx = /^[A-Z\sÁÉÍÓÚÀÈÌÒÙÇÃÕÄËÏÖÜÂÊÎÔÛ]+$/gm;
     const tabOrStrangeSpaceRegEx = /\t|\u00A0|\u0096/g;
     const brokenArticleRegEx = /^(rt.\s[0-9]+)/;
@@ -67,6 +67,7 @@ class Cleaner {
 
     // Clean everything before the first article
     text = text.match(beginingOfLegislation)[0];
+    debug(dirtyText);
     debug(text);
 
     return text;
@@ -78,18 +79,22 @@ class Cleaner {
    * @param  {String} originsText The text already cleaned by preCleaning
    * @return {String}             The trimmed text with line breaks on items
    */
-  static postCleaning(originsText) {
-    const beginningTrimRegEx = /^\s/g;
-    const endTrimRegEx = /\s$/g;
-    // Capturing groups 1       2    3                  4
-    const itemsRegEx = /(:|;|\.)(\s?)([a-z]\)|[A-Z]+\s-)(\s?)/g;
+  static postCleaning(originalText) {
+    let text = originalText;
+    if (text !== undefined) {
+      debug('originalText: ', originalText);
+      const trimRegEx = /(^\s|\s$)/g;
+      // Capturing groups 1       2    3                  4
+      const itemsRegEx = /(:|;|\.)(\s*)([a-z]\)|[A-Z]+\s-)(\s?)/g;
+      const returnRegEx = /\n/g;
 
-    let text = originsText;
-    text = text
-      .replace(beginningTrimRegEx, '')
-      .replace(endTrimRegEx, '')
+      text = text
+      .replace(trimRegEx, '')
+      .replace(returnRegEx, ' ')
       .replace(itemsRegEx, '$1\n$3$4');
 
+      debug('cleanText   : ', text);
+    }
     return text;
   }
   /**
@@ -125,7 +130,7 @@ class Cleaner {
     }
 
     // Capturing groups  1    2       3
-    const numberRegEx = /(\d)+(º|o|°)?(\-[A-z])?/;
+    const numberRegEx = /(\d+)(º|o|°)?(-[A-z])?/;
     // #-A => Exclude the thousands separator and the ordinal
     const cleanCapGroups = '$1$3';
     // #   => Only the numeric part
@@ -150,7 +155,7 @@ class Cleaner {
     knownSemanticErrors.forEach((error) => {
       if (type === error.type && number === error.number) {
         fixedText = error.fix(text);
-        debug(`dirtyText = "${chalk.yellow(text)}"\ncleanText = "${chalk.green(fixedText)}"`);
+        // debug(`dirtyText = "${chalk.yellow(text)}"\ncleanText = "${chalk.green(fixedText)}"`);
       }
     });
     return fixedText;
