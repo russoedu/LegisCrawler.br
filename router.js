@@ -14,8 +14,9 @@ module.exports = function route(app) {
   .use(httpsRedirect)
   .use('/v1', router);
 
-  // Get all legislation data
-  router.get('/', LegislationController.find);
+  // Get the list of legislations
+  router.get('/', LegislationController.list);
 
-  router.get('/:type', LegislationController.findByLegislationType);
+  // Get a legislation
+  router.get('/:type', LegislationController.find);
 };

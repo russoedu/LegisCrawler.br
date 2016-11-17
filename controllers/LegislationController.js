@@ -3,9 +3,9 @@ const debug = require('debug')('api');
 const error = require('../helpers/error');
 
 class LegislationController {
-  static find(req, res) {
+  static list(req, res) {
     debug('LegislationController.find()');
-    Legislation.find()
+    Legislation.list()
     .then((response) => {
       debug(typeof response);
       debug(response);
@@ -21,10 +21,10 @@ class LegislationController {
     });
   }
 
-  static findByLegislationType(req, res) {
+  static find(req, res) {
     debug(`LegislationController.findByLegislationType(${req.params.type})`);
     const legislation = new Legislation(req.params.type);
-    legislation.findByLegislationType()
+    legislation.find()
       .then((response) => {
         debug(typeof response);
         debug(response);

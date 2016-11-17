@@ -12,9 +12,9 @@ class Legislation {
     this.date = new Date();
   }
 
-  static find() {
+  static list() {
     return new Promise((resolve, reject) => {
-      Db.find({}).then((data) => {
+      Db.list().then((data) => {
         resolve(data);
       }).catch((error) => {
         reject(error);
@@ -22,7 +22,7 @@ class Legislation {
     });
   }
 
-  findByLegislationType() {
+  find() {
     return new Promise((resolve, reject) => {
       Db.find({ type: this.type }).then((data) => {
         debug(data);

@@ -8,6 +8,11 @@ const FILE = 'file';
 const MONGO = 'mongo';
 const publicFolder = `${__dirname}/../public/v1`;
 
+const jsonRegEx = /\.json/;
+const sortPortuguese = function sortPortuguese(a, b) {
+  return a.localeCompare(b);
+};
+
 function connect() {
   return new Promise((resolve, reject) => {
     MongoClient.connect(config.db.url, (connectionErr, db) => {
@@ -90,6 +95,49 @@ module.exports = class Db {
     });
   }
 
+  static list() {
+    return new Promise((resolve, reject) => {
+      if (config.db.type === FILE) {
+        debug('oi');
+        fs.readdir(publicFolder, (err, files) => {
+          if (err) {
+            error('DB', 'Could not read folder', err);
+            reject(err);
+          }
+          const responseData = [];
+          files.forEach((fileName) => {
+            debug(fileName);
+            if (fileName.match(jsonRegEx) !== null && fileName !== 'complete.json') {
+              responseData.push(fileName.split(jsonRegEx)[0]);
+            }
+          });
+
+          resolve(responseData.sort(sortPortuguese));
+        });
+      } else if (config.db.type === MONGO) {
+        debug('mongoooo');
+        connect().then((db) => {
+          db.collection('legislations')
+            .find({}, { type: '' })
+            .toArray()
+            .then((data) => {
+              db.close();
+              debug(data);
+              const responseData = [];
+              data.forEach((response) => {
+                debug(response);
+                responseData.push(response.type);
+              });
+
+              resolve(responseData.sort(sortPortuguese));
+            });
+        });
+      } else {
+        error('DB', 'No DB defined', config.db.type);
+        reject('No db defined');
+      }
+    });
+  }
   static find(query) {
     return new Promise((resolve, reject) => {
       if (config.db.type === FILE) {
@@ -111,7 +159,6 @@ module.exports = class Db {
               // Read the public folder and join all existing .json files
               files.forEach((fileName) => {
                 const file = `${publicFolder}/${fileName}`;
-                const jsonRegEx = /\.json/;
                 debug(`${file}  ${file.match(jsonRegEx)}`);
                 if (file.match(jsonRegEx) !== null) {
                   resp.push(JSON.parse(fs.readFileSync(file)));
