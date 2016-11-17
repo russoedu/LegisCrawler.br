@@ -1,17 +1,10 @@
 {
-  "cors": {
-    "origin": [
-      "fabricadeaplicativos.com.br$",
-      "appurl.com.br$",
-      "appfy.me$",
-      "nuvemdeapps.com.br$"
-    ]
-  },
   "logger": {
     "express": "combined"
   },
   "server": {
-    "port": 80
+    "port": 80,
+    "sslPort": 443
   },
   "db": {
     "type": "file",
@@ -47,20 +40,12 @@
       "url": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del5452compilado.htm"
     },
     {
-      "type": "Código de Defesa do Consumidor",
-      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L8078compilado.htm"
-    },
-    {
       "type": "Código de Trânsito Brasileiro",
       "url": "http://www.planalto.gov.br/ccivil_03/Leis/L9503Compilado.htm"
     },
     {
       "type": "Código Eleitoral",
       "url": "http://www.planalto.gov.br/ccivil_03/Leis/L4737compilado.htm"
-    },
-    {
-      "type": "Código Florestal",
-      "url": "http://www.planalto.gov.br/ccivil_03/_Ato2011-2014/2012/Lei/L12651compilado.htm"
     },
     {
       "type": "Código de Águas",
@@ -71,16 +56,8 @@
       "url": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del0227compilado.htm"
     },
     {
-      "type": "Código Penal Militar",
-      "url": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del1001Compilado.htm"
-    },
-    {
       "type": "Código de Processo Penal Militar",
       "url": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del1002Compilado.htm"
-    },
-    {
-      "type": "Código Brasileiro de Aeronáutica",
-      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L7565compilado.htm"
     },
     {
       "type": "Código Brasileiro de Telecomunicações",
@@ -123,10 +100,6 @@
       "url": "http://www.planalto.gov.br/ccivil_03/_Ato2007-2010/2010/Lei/L12288.htm"
     },
     {
-      "type": "Estatuto do Índio",
-      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L6001.htm"
-    },
-    {
       "type": "Estatuto da Juventude",
       "url": "http://www.planalto.gov.br/CCIVIL_03/_Ato2011-2014/2013/Lei/L12852.htm"
     },
@@ -149,10 +122,32 @@
     {
       "type": "Estatuto dos Refugiados",
       "url": "http://www.planalto.gov.br/ccivil_03/Leis/L9474.htm"
+    }
+  ],
+  "unusedLegislations": [
+    {
+      "type": "Estatuto do Índio",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L6001.htm"
+    },
+    {
+      "type": "Código Penal Militar",
+      "url": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del1001Compilado.htm"
     },
     {
       "type": "Estatuto da Terra",
       "url": "http://www.planalto.gov.br/ccivil_03/Leis/L4504compilada.htm"
+    },
+    {
+      "type": "Código Florestal",
+      "url": "http://www.planalto.gov.br/ccivil_03/_Ato2011-2014/2012/Lei/L12651compilado.htm"
+    },
+    {
+      "type": "Código de Defesa do Consumidor",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L8078compilado.htm"
+    },
+    {
+      "type": "Código Brasileiro de Aeronáutica",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L7565compilado.htm"
     }
   ]
 }

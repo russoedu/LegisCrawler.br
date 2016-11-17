@@ -1,12 +1,4 @@
 {
-  "cors": {
-    "origin": [
-      "fabricadeaplicativos.com.br$",
-      "appurl.com.br$",
-      "appfy.me$",
-      "nuvemdeapps.com.br$"
-    ]
-  },
   "logger": {
     "express": "dev"
   },

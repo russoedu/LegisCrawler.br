@@ -10,7 +10,22 @@ const morgan = require('morgan');
 const config = require('./config/config');
 const log = require('./helpers/log');
 const router = require('./router');
-// const cors = require('cors');
+const cors = require('cors');
+
+const corsOptions = {
+  origin: '*',
+  credentials: true,
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'Content-Length',
+    'X-Requested-With',
+    'X-HTTP-Method-Override',
+  ],
+  methods: [
+    'GET', 'OPTIONS',
+  ],
+};
 
 const httpsOptions = {
   key: fs.readFileSync('./config/key.pem'),
@@ -25,8 +40,8 @@ app
   .use(morgan(config.logger.express))
   .use(express.static('public'))
   .use(bodyParser.json())
-  .use(bodyParser.urlencoded({ extended: true }));
-  // .use(cors(corsOptions));
+  .use(bodyParser.urlencoded({ extended: true }))
+  .use(cors(corsOptions));
 
 http.createServer(app).listen(config.server.port);
 https.createServer(httpsOptions, app).listen(config.server.sslPort);
