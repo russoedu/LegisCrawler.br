@@ -5,7 +5,7 @@ const Legislation = require('../models/Legislation');
 const Scraper = require('./Scraper');
 const Cleaner = require('./Cleaner');
 const Parser = require('./Parser');
-const debug = require('debug')('index');
+const debug = require('debug')('crawl');
 
 const legislations = config.legislations;
 const quantity = legislations.length;

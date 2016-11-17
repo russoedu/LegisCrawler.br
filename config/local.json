@@ -11,7 +11,8 @@
     "express": "dev"
   },
   "server": {
-    "port": 3300
+    "port": 3333,
+    "sslPort": 4433
   },
   "db": {
     "type": "file",

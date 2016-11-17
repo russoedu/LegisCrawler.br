@@ -15,7 +15,7 @@ function getConfig() {
   const confFile = `./config/${env}.json`;
   let config = {};
 
-  log(chalk.yellow(`[config.environment] ${env}`));
+  log(chalk.black.bgYellow(`  [config.environment] ${env}            `));
 
   try {
     config = JSON.parse(fs.readFileSync(confFile, 'utf8'));
@@ -25,7 +25,7 @@ function getConfig() {
     return {};
   }
 
-  log(chalk.green('[conf.readConfig]', `config ${env} found`));
+  log(chalk.black.bgGreen('  [conf.readConfig]', `config ${env} found  `));
 
   return config;
 }
