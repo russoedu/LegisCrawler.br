@@ -15,7 +15,7 @@ function connect() {
         error('DB', 'Connection could not be established', connectionErr);
         reject(connectionErr);
       } else {
-        debug(db);
+        // debug(db);
         resolve(db);
       }
     });
@@ -41,7 +41,19 @@ function createMongo(data) {
   return new Promise((resolve, reject) => {
     connect()
       .then((db) => {
-        db.collection('legislations').insertOne(data).then((result) => {
+        const query = {
+          type: data.type,
+        };
+        const options = {
+          upsert: true,
+          returnNewDocument: true,
+        };
+
+        db.collection('legislations').findOneAndUpdate(
+          query,
+          data,
+          options
+        ).then((result) => {
           db.close();
           debug(result);
           resolve(result);

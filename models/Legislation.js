@@ -1,5 +1,5 @@
 const Db = require('../helpers/Db');
-const debug = require('debug')('db');
+const debug = require('debug')('model');
 
 class Legislation {
   constructor(
