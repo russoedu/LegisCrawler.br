@@ -1,14 +1,8 @@
 const MongoClient = require('mongodb').MongoClient;
-const fs = require('fs');
 const config = require('../config/config');
 const error = require('../helpers/error');
 const debug = require('debug')('db');
 
-const FILE = 'file';
-const MONGO = 'mongo';
-const publicFolder = `${__dirname}/../public/v1`;
-
-const jsonRegEx = /\.json/;
 const sortPortuguese = function sortPortuguese(a, b) {
   return a.localeCompare(b);
 };
@@ -22,21 +16,6 @@ function connect() {
       } else {
         // debug(db);
         resolve(db);
-      }
-    });
-  });
-}
-
-function createFile(data, name) {
-  return new Promise((resolve, reject) => {
-    const file = name;
-    debug(data);
-    fs.writeFile(`${publicFolder}/${file}.json`, JSON.stringify(data), (err) => {
-      if (err) {
-        error('DB', 'File could not be saved', err);
-        reject(err);
-      } else {
-        resolve();
       }
     });
   });
@@ -63,10 +42,10 @@ function createMongo(data) {
           debug(result);
           resolve(result);
         })
-      .catch((err) => {
-        error('DB', 'error inserting data', err);
-        reject(err);
-      });
+          .catch((err) => {
+            error('DB', 'error inserting data', err);
+            reject(err);
+          });
       }).catch((err) => {
         reject(err);
       });
@@ -77,15 +56,7 @@ function createMongo(data) {
 module.exports = class Db {
   static create(data, name = null) {
     return new Promise((resolve, reject) => {
-      let func = {};
-      if (config.db.type === FILE) {
-        func = createFile;
-      } else if (config.db.type === MONGO) {
-        func = createMongo;
-      } else {
-        reject('No db defined');
-      }
-      func(data, name)
+      createMongo(data, name)
         .then((result) => {
           resolve(result);
         })
@@ -97,124 +68,62 @@ module.exports = class Db {
 
   static list() {
     return new Promise((resolve, reject) => {
-      if (config.db.type === FILE) {
-        debug('oi');
-        fs.readdir(publicFolder, (err, files) => {
-          if (err) {
-            error('DB', 'Could not read folder', err);
-            reject(err);
-          }
-          const responseData = [];
-          files.forEach((fileName) => {
-            debug(fileName);
-            if (fileName.match(jsonRegEx) !== null && fileName !== 'complete.json') {
-              responseData.push(fileName.split(jsonRegEx)[0]);
-            }
-          });
-
-          resolve(responseData.sort(sortPortuguese));
-        });
-      } else if (config.db.type === MONGO) {
-        debug('mongoooo');
-        connect().then((db) => {
-          db.collection('legislations')
-            .find({}, { type: '' })
-            .toArray()
-            .then((data) => {
-              db.close();
-              debug(data);
-              const responseData = [];
-              data.forEach((response) => {
-                debug(response);
-                responseData.push(response.type);
-              });
-
-              resolve(responseData.sort(sortPortuguese));
-            });
-        });
-      } else {
-        error('DB', 'No DB defined', config.db.type);
-        reject('No db defined');
-      }
-    });
-  }
-  static find(query) {
-    return new Promise((resolve, reject) => {
-      if (config.db.type === FILE) {
-        // Verify if a specific file was requested
-        if (Object.keys(query).length === 0) {
-          // Check if the complete file exists
-          if (fs.existsSync(`${publicFolder}/complete.json`)) {
-            debug('complete exists');
-            resolve('complete.json');
-          } else {
-            debug('complete don\'t exists');
-            // Create and serve the complete file
-            fs.readdir(publicFolder, (err, files) => {
-              if (err) {
-                error('DB', 'Could not read folder', err);
-                reject(err);
-              }
-              const resp = [];
-              // Read the public folder and join all existing .json files
-              files.forEach((fileName) => {
-                const file = `${publicFolder}/${fileName}`;
-                debug(`${file}  ${file.match(jsonRegEx)}`);
-                if (file.match(jsonRegEx) !== null) {
-                  resp.push(JSON.parse(fs.readFileSync(file)));
-                }
-                // debug(JSON.parse(fs.readFileSync(file)));
-                debug(resp.length);
-              });
-              // Create the complete.json file
-              fs.writeFile(`${publicFolder}/complete.json`, JSON.stringify(resp), (writeErr) => {
-                if (writeErr) {
-                  error('DB', 'Could not save complete file', writeErr);
-                } else {
-                  resolve('complete.json');
-                }
-              });
-            });
-          }
-        } else if (fs.existsSync(`${publicFolder}/${query.type}.json`)) {
-          resolve(`${query.type}.json`);
-        } else {
-          error('DB', 'Could not read file', `${query.type} not found on server`);
-          reject({ error: `${query.type} could not be found` });
-        }
-      } else if (config.db.type === MONGO) {
-        connect().then((db) => {
-          db.collection('legislations').find(query).toArray().then((data) => {
+      connect().then((db) => {
+        db.collection('legislations')
+          .find({}, {
+            type: '',
+          })
+          .toArray()
+          .then((data) => {
             db.close();
-            debug(data);
             const responseData = [];
             data.forEach((response) => {
               debug(response);
-              responseData.push({
-                type: response.type,
-                url: response.url,
-                data: response.data,
-                date: response.date,
-              });
+              responseData.push(response.type);
             });
-            if (responseData.length === 1) {
-              resolve(responseData[0]);
-            } else {
-              resolve(responseData);
-            }
-          })
+
+            resolve(responseData.sort(sortPortuguese));
+          });
+      })
         .catch((err) => {
-          error('DB', 'Could not retrieve data', err);
+          error(err);
           reject(err);
         });
-        }).catch((err) => {
-          error('DB', 'Could not stablish DB connection', err);
-          reject(err);
-        });
-      } else {
-        error('DB', 'No DB defined', config.db.type);
-        reject('No db defined');
-      }
     });
   }
-};
+
+  static find(query) {
+    debug(query);
+    return new Promise((resolve, reject) => {
+      connect().then((db) => {
+        db.collection('legislations').find(query).toArray().then((data) => {
+          db.close();
+          debug(data);
+          const responseData = [];
+          data.forEach((response) => {
+            debug(response);
+            responseData.push({
+              type: response.type,
+              url: response.url,
+              data: response.data,
+              date: response.date,
+            });
+          });
+          if (responseData.length === 1) {
+            resolve(responseData[0]);
+          } else {
+            resolve(responseData);
+          }
+        })
+          .catch((err) => {
+            error('DB', 'Could not retrieve data', err);
+            reject(err);
+          });
+      }).catch((err) => {
+        error('DB', 'Could not stablish DB connection', err);
+        reject(err);
+      });
+    });
+  }
+}
+;

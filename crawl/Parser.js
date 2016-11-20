@@ -1,8 +1,6 @@
 const debug = require('debug')('parser');
 const chalk = require('chalk');
 const Cleaner = require('./Cleaner');
-const objectToArray = require('../helpers/objectToArray');
-
 
 class Parser {
   /**
@@ -24,13 +22,13 @@ class Parser {
   static getArticles(cleanText) {
     const articleRegEx = /^(Art.)\s[0-9.?]+([o|º|o.])?\s?(-|\.)?(\s|[A-Z]+\.\s)?/gm;
     let text = cleanText;
-    const articles = {};
+    const articles = [];
     // Get only the article numeric part
     const articlesMatch = text.match(articleRegEx);
 
     // debug('articlesMatch', articlesMatch);
     // debug('cleanText: ', cleanText);
-
+    let order = 0;
     articlesMatch.forEach((num, index) => {
       // The first split results in an empty string, so we need to treat it
       // debug('num: ', num);
@@ -46,19 +44,26 @@ class Parser {
 
       text = splitNextNum ? splitNextNum[splitNextNum.length - 1] : '';
       if (index === 0) {
-        articles[numClean] = splitNextNum[0].split(num)[splitNextNum.length - 1];
+        articles[order] = {
+          number: numClean,
+          article: splitNextNum[0].split(num)[splitNextNum.length - 1],
+        };
       } else {
-        articles[numClean] = splitNextNum[0] ? splitNextNum[0] : text;
+        articles[order] = {
+          number: numClean,
+          article: splitNextNum[0] ? splitNextNum[0] : text,
+        };
       }
+      order += 1;
     });
-    const parsedText = objectToArray(articles, 'article');
+    // const parsedText = objectToArray(articles, 'article');
     // debug(parsedText);
-    return parsedText;
+    return articles;
   }
 
   static getStructuredArticles(articles) {
     const paragraphRegEx = /^((§\s\d+(º|o|°)?\.?(\s?-)?[A-z]?\s?)|(\s?Parágrafo\súnico\s?-\s?))/gm;
-    const articleDebug = 'a';
+    const articleDebug = '14';
     const arts = articles;
 
     articles.forEach((art) => {
@@ -66,33 +71,41 @@ class Parser {
       const text = art.article;
       const paragrapsMatch = text.match(paragraphRegEx);
       const splitedContent = text.split(paragraphRegEx);
+      let order = 0;
       article.article = Cleaner.postCleaning(splitedContent[0]);
 
       if (art.number === articleDebug) {
         debug('Art.', article.number);
         debug(article.article);
       }
-      let paragraphs = {};
+      const paragraphs = [];
 
       if (paragrapsMatch !== null) {
         paragrapsMatch.forEach((num, index) => {
           const numClean = Cleaner.cleanParagraphNumber(num);
-          paragraphs[numClean] = Cleaner.postCleaning(splitedContent[(index + 1) * 6]);
+          paragraphs[order] = {
+            number: numClean,
+            paragraph: Cleaner.postCleaning(splitedContent[(index + 1) * 6]),
+          };
 
           if (art.number === articleDebug) {
-            debug('§', numClean);
-            debug(paragraphs[numClean]);
+            debug(order);
+            debug(paragraphs[order]);
           }
+          order += 1;
         });
       }
-      paragraphs = objectToArray(paragraphs, 'paragraph');
+
+      if (art.number === articleDebug) {
+        debug(paragraphs);
+      }
       if (paragraphs.length > 0) {
         article.paragraphs = paragraphs;
       }
       arts.art = article;
-      // if (art.number === articleDebug) {
-      //   debug(JSON.stringify(article));
-      // }
+    // if (art.number === articleDebug) {
+    //   debug(JSON.stringify(article));
+    // }
     });
     // debug(arts);
     return arts;

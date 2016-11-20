@@ -7,7 +7,6 @@
     "sslPort": 4433
   },
   "db": {
-    "type": "file",
     "url": "mongodb://localhost:27017/LegisCrawlerBr"
   },
   "legislations": [

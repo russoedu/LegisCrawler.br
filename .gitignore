@@ -16,7 +16,3 @@ pids
 # NPM
 .npm
 node_modules
-
-# Generated json files
-public/v1/*
-!public/v1/.gitkeep
