@@ -1,7 +1,5 @@
 const express = require('express');
-// const https = require('https');
 const http = require('http');
-// const fs = require('fs');
 const bodyParser = require('body-parser');
 const favicon = require('serve-favicon');
 const compress = require('compression');
@@ -46,9 +44,7 @@ app
   .use(cors(corsOptions));
 
 http.createServer(app).listen(config.server.port);
-// https.createServer(httpsOptions, app).listen(config.server.sslPort);
 
 log(chalk.bgBlue(`  Express listening http  on ${config.server.port}       `));
-log(chalk.bgBlue(`  Express listening https on ${config.server.sslPort}       `));
 
 router(app);
