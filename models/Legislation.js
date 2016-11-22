@@ -2,10 +2,10 @@ const Db = require('../helpers/Db');
 const debug = require('debug')('model');
 
 class Legislation {
-  constructor(category = null, link = null, name = null, url = null, data = null) {
+  constructor(name = null, category = null, link = null, url = null, data = null) {
+    this.name = name;
     this.category = category;
     this.link = link;
-    this.name = name;
     this.url = url;
     this.data = data;
     this.date = new Date().toLocaleString(

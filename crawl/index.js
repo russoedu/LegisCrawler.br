@@ -53,9 +53,9 @@ legislations.forEach((legislation) => {
       status.startProcess('Save');
       finished += 1;
       const legis = new Legislation(
+        legislation.name,
         legislation.category,
         legislation.link,
-        legislation.name,
         legislation.url,
         organizedArticles
       );
