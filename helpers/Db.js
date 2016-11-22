@@ -21,46 +21,33 @@ function connect() {
   });
 }
 
-function createMongo(data) {
-  return new Promise((resolve, reject) => {
-    connect()
-      .then((db) => {
-        const query = {
-          type: data.type,
-        };
-        const options = {
-          upsert: true,
-          returnNewDocument: true,
-        };
-
-        db.collection('legislations').findOneAndUpdate(
-          query,
-          data,
-          options
-        ).then((result) => {
-          db.close();
-          debug(result);
-          resolve(result);
-        })
-          .catch((err) => {
-            error('DB', 'error inserting data', err);
-            reject(err);
-          });
-      }).catch((err) => {
-        reject(err);
-      });
-  });
-}
-
-
 module.exports = class Db {
-  static create(data, name = null) {
+  static create(data) {
     return new Promise((resolve, reject) => {
-      createMongo(data, name)
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((err) => {
+      connect()
+        .then((db) => {
+          const query = {
+            name: data.name,
+          };
+          const options = {
+            upsert: true,
+            returnNewDocument: true,
+          };
+
+          db.collection('legislations').findOneAndUpdate(
+            query,
+            data,
+            options
+          ).then((result) => {
+            db.close();
+            debug(result);
+            resolve(result);
+          })
+            .catch((err) => {
+              error('DB', 'error inserting data', err);
+              reject(err);
+            });
+        }).catch((err) => {
           reject(err);
         });
     });
@@ -71,7 +58,7 @@ module.exports = class Db {
       connect().then((db) => {
         db.collection('legislations')
           .find({}, {
-            type: '',
+            name: '',
           })
           .toArray()
           .then((data) => {
@@ -79,7 +66,11 @@ module.exports = class Db {
             const responseData = [];
             data.forEach((response) => {
               debug(response);
-              responseData.push(response.type);
+              responseData.push({
+                name: response.name,
+                link: response.link,
+                category: response.category,
+              });
             });
 
             resolve(responseData.sort(sortPortuguese));
@@ -103,7 +94,9 @@ module.exports = class Db {
           data.forEach((response) => {
             debug(response);
             responseData.push({
-              type: response.type,
+              category: response.category,
+              link: response.link,
+              name: response.name,
               url: response.url,
               data: response.data,
               date: response.date,

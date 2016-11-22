@@ -21,10 +21,10 @@ function getNumber(dirtyText, regEx, cleanCapGroups, numberCapGroups, lettersCap
 
   // Get only the numeric part of the content
   content = content.replace(regEx, numberCapGroups) < 10 ?
-            content.replace(regEx, cleanCapGroups)
-                   .replace(regEx, `${numberCapGroups}º${lettersCapGroups}`) :
-            content.replace(regEx, cleanCapGroups)
-                   .replace(regEx, `${numberCapGroups}${lettersCapGroups}`);
+    content.replace(regEx, cleanCapGroups)
+      .replace(regEx, `${numberCapGroups}º${lettersCapGroups}`) :
+    content.replace(regEx, cleanCapGroups)
+      .replace(regEx, `${numberCapGroups}${lettersCapGroups}`);
 
   // debug(`dirtyText = "${chalk.yellow(dirtyText)}"
   //               getNumber = "${chalk.green(content)}"`);
@@ -89,9 +89,9 @@ class Cleaner {
       const returnRegEx = /\n/g;
 
       text = text
-      .replace(trimRegEx, '')
-      .replace(returnRegEx, ' ')
-      .replace(itemsRegEx, '$1\n$3$4');
+        .replace(trimRegEx, '')
+        .replace(returnRegEx, ' ')
+        .replace(itemsRegEx, '$1\n$3$4');
 
       debug('cleanText   : ', text);
     }
@@ -144,18 +144,18 @@ class Cleaner {
   /**
    * Some texts don't follow the patterns and need to be treated individually
    * @static
-   * @param  {String} type   The type of legislation
+   * @param  {String} name   The name of the legislation
    * @param  {String} number The article number
    * @param  {String} text   The article text
    * @return {String}        The article text corrected
    */
-  static cleanKnownSemanticErrors(type, number, text) {
+  static cleanKnownSemanticErrors(name, number, text) {
     let fixedText = text;
 
     knownSemanticErrors.forEach((error) => {
-      if (type === error.type && number === error.number) {
+      if (name === error.name && number === error.number) {
         fixedText = error.fix(text);
-        // debug(`dirtyText = "${chalk.yellow(text)}"\ncleanText = "${chalk.green(fixedText)}"`);
+      // debug(`dirtyText = "${chalk.yellow(text)}"\ncleanText = "${chalk.green(fixedText)}"`);
       }
     });
     return fixedText;

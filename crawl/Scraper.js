@@ -20,39 +20,41 @@ class Scraper {
         encoding: 'latin1',
       };
       request(requestoptions)
-      .then((html) => {
-        const parser = new htmlparser.Parser({
-          onopentag(tag) {
-            if (ignoreTagRegEx.test(tag)) {
-              debug(chalk.yellow(`ignored tag: ${tag}`));
-              useContent = false;
-            }
-          },
-          ontext(dirtyText) {
-            if (useContent || uniqueParagraphRegEx.test(dirtyText)) {
-              debug(chalk.blue(`captured ${dirtyText}`));
-              scrapedContent += dirtyText;
-            } else {
-              debug(chalk.yellow(`ignored ${dirtyText}`));
-            }
-          },
-          onclosetag(tag) {
-            if (ignoreTagRegEx.test(tag)) {
-              debug(chalk.yellow(`finished ignored tag: ${tag}`));
-              useContent = true;
-            }
-          },
-        }, { decodeEntities: true });
-        parser.write(html);
-        parser.end();
+        .then((html) => {
+          const parser = new htmlparser.Parser({
+            onopentag(tag) {
+              if (ignoreTagRegEx.test(tag)) {
+                debug(chalk.yellow(`ignored tag: ${tag}`));
+                useContent = false;
+              }
+            },
+            ontext(dirtyText) {
+              if (useContent || uniqueParagraphRegEx.test(dirtyText)) {
+                debug(chalk.blue(`captured ${dirtyText}`));
+                scrapedContent += dirtyText;
+              } else {
+                debug(chalk.yellow(`ignored ${dirtyText}`));
+              }
+            },
+            onclosetag(tag) {
+              if (ignoreTagRegEx.test(tag)) {
+                debug(chalk.yellow(`finished ignored tag: ${tag}`));
+                useContent = true;
+              }
+            },
+          }, {
+            decodeEntities: true,
+          });
+          parser.write(html);
+          parser.end();
 
-        debug(chalk.green('scrapedContent', scrapedContent));
-        resolve(scrapedContent);
-      })
-      .catch((err) => {
-        error(legislation.type, 'Could not scrap page', err);
-        reject(error);
-      });
+          debug(chalk.green('scrapedContent', scrapedContent));
+          resolve(scrapedContent);
+        })
+        .catch((err) => {
+          error(legislation.name, 'Could not scrap page', err);
+          reject(error);
+        });
     });
   }
 }

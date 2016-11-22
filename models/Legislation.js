@@ -2,14 +2,17 @@ const Db = require('../helpers/Db');
 const debug = require('debug')('model');
 
 class Legislation {
-  constructor(
-      type = null,
-      url = null,
-      data = null) {
-    this.type = type;
+  constructor(category = null, link = null, name = null, url = null, data = null) {
+    this.category = category;
+    this.link = link;
+    this.name = name;
     this.url = url;
     this.data = data;
-    this.date = new Date();
+    this.date = new Date().toLocaleString(
+      'pt-BR',
+      {
+        timeZone: 'America/Sao_Paulo',
+      });
   }
 
   static list() {
@@ -24,7 +27,9 @@ class Legislation {
 
   find() {
     return new Promise((resolve, reject) => {
-      Db.find({ type: this.type }).then((data) => {
+      Db.find({
+        name: this.name,
+      }).then((data) => {
         debug(data);
         resolve(data);
       }).catch((error) => {
@@ -36,7 +41,7 @@ class Legislation {
   create() {
     debug(this);
     return new Promise((resolve, reject) => {
-      Db.create(this, this.type).then((data) => {
+      Db.create(this).then((data) => {
         resolve(data);
       }).catch((error) => {
         reject(error);

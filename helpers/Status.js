@@ -33,8 +33,8 @@ function getProcessIcon(process = null) {
   return icon;
 }
 class Status {
-  constructor(legislationType) {
-    this.legislationType = legislationType;
+  constructor(legislationName) {
+    this.legislationName = legislationName;
   }
 
   static startAll(quantity) {
@@ -45,34 +45,41 @@ class Status {
   startProcess(process = null) {
     this.process = process;
     const processIcon = getProcessIcon(this.process);
-    log(chalk.yellow(`${processIcon}   [START] ${this.process} ${this.legislationType}`));
+    log(chalk.yellow(`${processIcon}   [START] ${this.process} ${this.legislationName}`));
   }
   startProcessComplete() {
     const processIcon = getProcessIcon(this.process);
-    const spcs = spaces(this.legislationType);
-    log(chalk.black.bgYellow(`${processIcon}   [START] ${this.legislationType}${spcs}`));
+    const spcs = spaces(this.legislationName);
+    log(chalk.black.bgYellow(`${processIcon}   [START] ${this.legislationName}${spcs}`));
   }
 
   finishProcess() {
-    log(chalk.green(`✅  [FINISH] ${this.process} ${this.legislationType}`));
+    log(chalk.green(`✅  [FINISH] ${this.process} ${this.legislationName}`));
   }
 
   finishProcessComplete() {
-    const spcs = spaces(this.legislationType);
-    log(chalk.black.bgGreen.bold(`👍  [FINISH] ${this.legislationType}${spcs}`));
+    const spcs = spaces(this.legislationName);
+    log(chalk.black.bgGreen.bold(`👍  [FINISH] ${this.legislationName}${spcs}`));
   }
   // static startProcess
 
   static finishAll(quantity, finished) {
     if (quantity === finished) {
       log('');
-      log('✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨');
-      log('✨                                                                                         ✨');
-      log('✨                                                                                         ✨');
-      log(chalk.bold.cyan('✨                     [FINISH] All legislations captured and organized                    ✨'));
-      log('✨                                                                                         ✨');
-      log('✨                                                                                         ✨');
-      log('✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨');
+      log('✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ' +
+        '✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨');
+      log('✨                                                              ' +
+        '                           ✨');
+      log('✨                                                              ' +
+        '                           ✨');
+      log(chalk.bold.cyan('✨                     [FINISH] All legislations' +
+        ' captured and organized                    ✨'));
+      log('✨                                                              ' +
+        '                           ✨');
+      log('✨                                                              ' +
+        '                           ✨');
+      log('✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ' +
+        '✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨');
       log('');
     }
   }

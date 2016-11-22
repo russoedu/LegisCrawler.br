@@ -55,10 +55,6 @@ npm start
 
 ##Configuration
 
-###Database
-
-The crawler gets the data and can be stored in files or on Mongo DB. Choose on of these options in the config/db/type.
-
 ##Debugging
 LegisCrawler uses (debug)[https://github.com/visionmedia/debug] for debugging.
 

@@ -9,7 +9,7 @@ const chalk = require('chalk');
 const morgan = require('morgan');
 const config = require('./config/config');
 const log = require('./helpers/log');
-const router = require('./router');
+const router = require('./helpers/router');
 const cors = require('cors');
 
 const corsOptions = {
@@ -40,7 +40,9 @@ app
   .use(morgan(config.logger.express))
   .use(express.static('public'))
   .use(bodyParser.json())
-  .use(bodyParser.urlencoded({ extended: true }))
+  .use(bodyParser.urlencoded({
+    extended: true,
+  }))
   .use(cors(corsOptions));
 
 http.createServer(app).listen(config.server.port);

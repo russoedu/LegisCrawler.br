@@ -14,7 +14,7 @@ let finished = 0;
 Status.startAll(quantity);
 
 legislations.forEach((legislation) => {
-  const status = new Status(legislation.type);
+  const status = new Status(legislation.name);
   status.startProcessComplete();
 
   status.startProcess('Scrap');
@@ -53,10 +53,12 @@ legislations.forEach((legislation) => {
       status.startProcess('Save');
       finished += 1;
       const legis = new Legislation(
-          legislation.type,
-          legislation.url,
-          organizedArticles
-        );
+        legislation.category,
+        legislation.link,
+        legislation.name,
+        legislation.url,
+        organizedArticles
+      );
 
       legis.create();
       status.finishProcess();
@@ -65,6 +67,6 @@ legislations.forEach((legislation) => {
       Status.finishAll(quantity, finished);
     })
     .catch((err) => {
-      error(legislation.type, 'Could not reach legislation', err);
+      error(legislation.name, 'Could not reach legislation', err);
     });
 });
