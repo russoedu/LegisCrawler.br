@@ -1,7 +1,7 @@
 const express = require('express');
-const https = require('https');
+// const https = require('https');
 const http = require('http');
-const fs = require('fs');
+// const fs = require('fs');
 const bodyParser = require('body-parser');
 const favicon = require('serve-favicon');
 const compress = require('compression');
@@ -27,10 +27,10 @@ const corsOptions = {
   ],
 };
 
-const httpsOptions = {
-  key: fs.readFileSync('./config/key.pem'),
-  cert: fs.readFileSync('./config/cert.pem'),
-};
+// const httpsOptions = {
+//   key: fs.readFileSync('./config/key.pem'),
+//   cert: fs.readFileSync('./config/cert.pem'),
+// };
 
 const app = express();
 
@@ -46,7 +46,7 @@ app
   .use(cors(corsOptions));
 
 http.createServer(app).listen(config.server.port);
-https.createServer(httpsOptions, app).listen(config.server.sslPort);
+// https.createServer(httpsOptions, app).listen(config.server.sslPort);
 
 log(chalk.bgBlue(`  Express listening http  on ${config.server.port}       `));
 log(chalk.bgBlue(`  Express listening https on ${config.server.sslPort}       `));
