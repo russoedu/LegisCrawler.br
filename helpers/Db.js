@@ -4,7 +4,9 @@ const error = require('../helpers/error');
 const debug = require('debug')('db');
 
 const sortPortuguese = function sortPortuguese(a, b) {
-  return a.localeCompare(b);
+  debug(a.name);
+  debug(b.name);
+  return a.name.localeCompare(b.name);
 };
 
 function connect() {
@@ -59,9 +61,12 @@ module.exports = class Db {
         db.collection('legislations')
           .find({}, {
             name: '',
+            link: '',
+            category: '',
           })
           .toArray()
           .then((data) => {
+            debug(data);
             db.close();
             const responseData = [];
             data.forEach((response) => {
