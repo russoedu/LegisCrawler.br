@@ -8,7 +8,7 @@
   "db": {
     "url": "mongodb://localhost:27017/LegisCrawlerBr"
   },
-  "legislations": [
+  "legislationsOk": [
     {
       "category": "Constituição Federal",
       "link": "legislation",
@@ -178,13 +178,21 @@
       "url": "http://www.planalto.gov.br/ccivil_03/Leis/L9474.htm"
     }
   ],
-  "unusedLegislations": [
+  "legislations": [
+    {
+      "category": "Constituição Federal",
+      "link": "legislation",
+      "name": "Constituição Federal",
+      "url": "http://www.planalto.gov.br/ccivil_03/Constituicao/ConstituicaoCompilado.htm"
+    },
     {
       "category": "Código",
       "link": "category",
       "name": "Código de Defesa do Consumidor",
       "url": "http://www.planalto.gov.br/ccivil_03/Leis/L8078compilado.htm"
-    },
+    }
+  ],
+  "legislationTodo": [
     {
       "category": "Código",
       "link": "category",

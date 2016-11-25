@@ -9,62 +9,66 @@ const debug = require('debug')('crawl');
 
 const legislations = config.legislations;
 const quantity = legislations.length;
-let finished = 0;
+const finished = 0;
 
 Status.startAll(quantity);
 
 legislations.forEach((legislation) => {
-  const status = new Status(legislation.name);
+  const status = new Status(legislation.name, quantity);
   status.startProcessComplete();
 
   status.startProcess('Scrap');
   Scraper
     // Get the legislations from the URLs set in the config
     .scrapPage(legislation)
-    .then((scrapedLegislation) => {
+    .then((scrapedText) => {
       status.finishProcess();
-      return scrapedLegislation;
+      return scrapedText;
     })
     // Clean the text removing everithing that is not part of an article
-    .then((scrapedLegislation) => {
-      debug(scrapedLegislation);
+    .then((scrapedText) => {
+      // debug(scrapedText);
       status.startProcess('Clean');
-      const cleanText = Cleaner.cleanText(scrapedLegislation);
-      debug(cleanText);
+      const cleanText = Cleaner.cleanScrapedText(scrapedText);
+      // debug(cleanText);
       status.finishProcess();
       return cleanText;
     })
-    // Parte the content to extract Articles
+    // Parse the content to extract Articles
     .then((cleanText) => {
       status.startProcess('Parse');
-      const parsedText = Parser.getArticles(cleanText);
+      const articles = Parser.getArticles(cleanText);
+      // debug(articles);
       status.finishProcess();
-      return parsedText;
+      return articles;
     })
-    // Parte the content to atructure it with Paragraphs
-    .then((parsedText) => {
-      status.startProcess('Structure');
-      const organizedArticles = Parser.getStructuredArticles(parsedText);
+    // Clean articles
+    .then((articles) => {
+      status.startProcess('Clean');
+      // debug(articles);
+
+      const cleanArticles = Parser.cleanArticles(legislation.name, articles);
+      debug(cleanArticles);
       status.finishProcess();
-      return organizedArticles;
+      return cleanArticles;
     })
     // Save the organized legislation
-    .then((organizedArticles) => {
+    .then((cleanArticles) => {
       status.startProcess('Save');
-      finished += 1;
       const legis = new Legislation(
         legislation.name,
         legislation.category,
         legislation.link,
         legislation.url,
-        organizedArticles
+        cleanArticles
       );
 
+      // Save the lislation in the DB
       legis.create();
       status.finishProcess();
 
       status.finishProcessComplete();
-      Status.finishAll(quantity, finished);
+      status.finishAll();
     })
     .catch((err) => {
       error(legislation.name, 'Could not reach legislation', err);

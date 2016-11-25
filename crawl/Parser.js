@@ -20,95 +20,66 @@ class Parser {
    * ]
    */
   static getArticles(cleanText) {
-    const articleRegEx = /^(Art.)\s[0-9.?]+([o|º|o.])?\s?(-|\.)?(\s|[A-Z]+\.\s)?/gm;
+    const articleRegEx = /^(Art.)\s[0-9.?]+([o|º|o.|°])?\s?(-|\.)?(\s|[A-Z]+\.\s)?/gm;
     let text = cleanText;
     const articles = [];
     // Get only the article numeric part
     const articlesMatch = text.match(articleRegEx);
-
     // debug('articlesMatch', articlesMatch);
-    // debug('cleanText: ', cleanText);
+
     let order = 0;
     articlesMatch.forEach((num, index) => {
       // The first split results in an empty string, so we need to treat it
       // debug('num: ', num);
       const nextNum = articlesMatch[index + 1];
       // debug('nextNum: ', nextNum);
-      const numClean = Cleaner.cleanArticleNumber(num);
-      // debug('numClean: ', numClean);
+      const number = Cleaner.cleanArticleNumber(num);
+      // debug('number: ', number);
       const splitNextNum = text.split(nextNum);
       // const lastOne = articlesMatch.length - 1;
       // const nextNumClean = nextNum ? Cleaner.cleanArticleNumber(nextNum) : '';
-      // debug('numClean:', numClean, 'nextNumClean:', nextNumClean, 'index:', index,
+      // debug('number:', number, 'nextNumClean:', nextNumClean, 'index:', index,
       //       'lastOne:', lastOne, 'splitNextNum.length', splitNextNum.length);
 
       text = splitNextNum ? splitNextNum[splitNextNum.length - 1] : '';
       if (index === 0) {
+        // const article = Cleaner.postCleaning(splitNextNum[0].split(num)[splitNextNum.length - 1]);
+        const article = splitNextNum[0].split(num)[splitNextNum.length - 1];
         articles[order] = {
-          number: numClean,
-          article: splitNextNum[0].split(num)[splitNextNum.length - 1],
+          number,
+          article,
         };
       } else {
+        const article = splitNextNum[0] ? splitNextNum[0] : text;
+        debug(number, ': ', article);
         articles[order] = {
-          number: numClean,
-          article: splitNextNum[0] ? splitNextNum[0] : text,
+          number,
+          article,
         };
       }
       order += 1;
     });
     // const parsedText = objectToArray(articles, 'article');
-    // debug(parsedText);
+    debug(articles);
     return articles;
   }
 
-  static getStructuredArticles(articles) {
-    const paragraphRegEx = /^((§\s\d+(º|o|°)?\.?(\s?-)?[A-z]?\s?)|(\s?Parágrafo\súnico\s?-\s?))/gm;
-    const articleDebug = '14';
-    const arts = articles;
+  /**
+   * Some texts don't follow the patterns and need to be treated individually
+   * @static
+   * @param  {String} legislationName   The name of the legislation
+   * @param  {Array} dirtyArticles   Array of articles to be clean
+   * @return {Array}        Array of clean articles
+   */
+  static cleanArticles(legislationName, dirtyArticles) {
+    const articles = dirtyArticles;
 
-    articles.forEach((art) => {
-      const article = art;
-      const text = art.article;
-      const paragrapsMatch = text.match(paragraphRegEx);
-      const splitedContent = text.split(paragraphRegEx);
-      let order = 0;
-      article.article = Cleaner.postCleaning(splitedContent[0]);
-
-      if (art.number === articleDebug) {
-        debug('Art.', article.number);
-        debug(article.article);
-      }
-      const paragraphs = [];
-
-      if (paragrapsMatch !== null) {
-        paragrapsMatch.forEach((num, index) => {
-          const numClean = Cleaner.cleanParagraphNumber(num);
-          paragraphs[order] = {
-            number: numClean,
-            paragraph: Cleaner.postCleaning(splitedContent[(index + 1) * 6]),
-          };
-
-          if (art.number === articleDebug) {
-            debug(order);
-            debug(paragraphs[order]);
-          }
-          order += 1;
-        });
-      }
-
-      if (art.number === articleDebug) {
-        debug(paragraphs);
-      }
-      if (paragraphs.length > 0) {
-        article.paragraphs = paragraphs;
-      }
-      arts.art = article;
-    // if (art.number === articleDebug) {
-    //   debug(JSON.stringify(article));
-    // }
+    articles.forEach((article, index) => {
+      articles[index].article = Cleaner.cleanKnownSemanticErrors(legislationName, article);
+      articles[index].article = Cleaner.trimAndClean(article.article);
     });
-    // debug(arts);
-    return arts;
+
+    return articles;
   }
 }
 

@@ -33,8 +33,10 @@ function getProcessIcon(process = null) {
   return icon;
 }
 class Status {
-  constructor(legislationName) {
+  constructor(legislationName, quantity) {
     this.legislationName = legislationName;
+    this.quantity = quantity;
+    this.finished = 0;
   }
 
   static startAll(quantity) {
@@ -63,8 +65,8 @@ class Status {
   }
   // static startProcess
 
-  static finishAll(quantity, finished) {
-    if (quantity === finished) {
+  finishAll(finished) {
+    if (this.quantity === this.finished) {
       log('');
       log('✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ' +
         '✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨');
@@ -81,6 +83,8 @@ class Status {
       log('✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ' +
         '✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨');
       log('');
+    } else {
+      this.finished += 1;
     }
   }
 }

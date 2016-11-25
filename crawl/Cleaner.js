@@ -26,29 +26,36 @@ function getNumber(dirtyText, regEx, cleanCapGroups, numberCapGroups, lettersCap
     content.replace(regEx, cleanCapGroups)
       .replace(regEx, `${numberCapGroups}${lettersCapGroups}`);
 
-  // debug(`dirtyText = "${chalk.yellow(dirtyText)}"
-  //               getNumber = "${chalk.green(content)}"`);
   return content;
 }
+
+Array.prototype.indexOfArticle = function (number) {
+  for (let i = 0; i < this.length; i += 1) {
+    if (this[i].number === number) {
+      return i;
+    }
+  }
+  return -1;
+};
 /**
  * @class
  */
 class Cleaner {
   /**
-   * Pre cleaning function removes all double spaces and text things tha shoudn't be there
+   * Pre cleaning function removes all double spaces and text things that shoudn't be there
    * @static
    * @param  {Strign} dirtyText The full text
    * @return {Strign}           The clean text
    */
-  static cleanText(dirtyText) {
+  static cleanScrapedText(dirtyText) {
     // Regular Expressions
     const commentRegEx = /\([^)]*\)/gm;
     const notArticleTitleRegEx = /^[A-Z\sÁÉÍÓÚÀÈÌÒÙÇÃÕÄËÏÖÜÂÊÎÔÛ]+$/gm;
     const tabOrStrangeSpaceRegEx = /\t|\u00A0|\u0096/g;
     const brokenArticleRegEx = /^(rt.\s[0-9]+)/;
     const returnRegEx = /(\n+\s+)|(\r+\s+)|\n+|\r+/g;
-    const endOfLegislation = /^.+,\s[0-9]+\sde\s[A-z]+\sde\s[0-9]+([\n.\s\S]*)/gm;
     const beginingOfLegislation = /(Art[.\s-]+1[\s\S]+)/gm;
+    const endOfLegislation = /^.+,\s[0-9]+\sde\s[A-z]+\sde\s[0-9]+([\n.\s\S]*)/gm;
 
     let text = dirtyText
       // Clean comments from the text
@@ -67,8 +74,6 @@ class Cleaner {
 
     // Clean everything before the first article
     text = text.match(beginingOfLegislation)[0];
-    debug(dirtyText);
-    debug(text);
 
     return text;
   }
@@ -79,22 +84,28 @@ class Cleaner {
    * @param  {String} originsText The text already cleaned by preCleaning
    * @return {String}             The trimmed text with line breaks on items
    */
-  static postCleaning(originalText) {
+  static trimAndClean(originalText) {
     let text = originalText;
+    debug(text);
+
     if (text !== undefined) {
-      debug('originalText: ', originalText);
       const trimRegEx = /(^\s|\s$)/g;
+      const returnRegEx = /(\n(?!§))/g;
       // Capturing groups 1       2    3                  4
-      const itemsRegEx = /(:|;|\.)(\s*)([a-z]\)|[A-Z]+\s-)(\s?)/g;
-      const returnRegEx = /\n/g;
+      const itemsRegEx = /(:|;|\.)(\s*)([a-z]\)|[A-Z]+\s-)(\s*)/g;
+      //                         1    2                3
+      const paragraphRegEx = /^(§)\s(\d+)[ºo°]?[.\s]*(-[A-z])?[\s-.]*\s*/gm;
+      //                                    1               2
+      const uniqueParagraphRegEx = /[\s-\n]*([.:;])?[\s-\n]*(Parágrafo\súnico)[\s-.\n]*/;
 
       text = text
         .replace(trimRegEx, '')
         .replace(returnRegEx, ' ')
-        .replace(itemsRegEx, '$1\n$3$4');
-
-      debug('cleanText   : ', text);
+        .replace(itemsRegEx, '$1\n$3$4')
+        .replace(paragraphRegEx, Number('$2') < 10 ? '$1 $2º$3: ' : '$1 $2$3: ')
+        .replace(uniqueParagraphRegEx, '$1\n$2: ');
     }
+    debug(text);
     return text;
   }
   /**
@@ -104,8 +115,8 @@ class Cleaner {
    * @return {Strign}           The clean article number
    */
   static cleanArticleNumber(dirtyText) {
-    // Capturing groups  1      2    3       4
-    const numberRegEx = /(\d)\.?(\d*)(o|º|°)?(-[A-z])?/;
+    // Capturing groups  1      2    3         4
+    const numberRegEx = /(\d)\.?(\d*)(o|º|°|°)?(-[A-z])?/;
     // #-A => Exclude the thousands separator and the ordinal
     const cleanCapGroups = '$1$2$4';
     // #   => Only the numeric part
@@ -116,49 +127,49 @@ class Cleaner {
     return getNumber(dirtyText, numberRegEx, cleanCapGroups, numberCapGroups, lettersCapGroups);
   }
 
-  /**
-   * Cleans the paragraph number
-   * @static
-   * @param  {Strign} dirtyText The paragraph text
-   * @return {Strign}           The clean paragraph number
-   */
-  static cleanParagraphNumber(dirtyText) {
-    const uniqueParagraphRegEx = /Parágrafo\súnico/;
-    const testMatches = dirtyText.match(uniqueParagraphRegEx);
-    if (testMatches !== null) {
-      return 'Parágrafo único';
-    }
-
-    // Capturing groups  1    2       3
-    const numberRegEx = /(\d+)(º|o|°)?(-[A-z])?/;
-    // #-A => Exclude the thousands separator and the ordinal
-    const cleanCapGroups = '$1$3';
-    // #   => Only the numeric part
-    const numberCapGroups = '$1';
-    // -A  => Only the letter part
-    const lettersCapGroups = '$3';
-
-    return getNumber(dirtyText, numberRegEx, cleanCapGroups, numberCapGroups, lettersCapGroups);
-  }
+  // /**
+  //  * Cleans the paragraph number
+  //  * @static
+  //  * @param  {Strign} dirtyText The paragraph text
+  //  * @return {Strign}           The clean paragraph number
+  //  */
+  // static cleanParagraphNumber(dirtyText) {
+  //   const uniqueParagraphRegEx = /Parágrafo\súnico/;
+  //   const testMatches = dirtyText.match(uniqueParagraphRegEx);
+  //   if (testMatches !== null) {
+  //     return 'Parágrafo único';
+  //   }
+  //
+  //   // Capturing groups  1    2       3
+  //   const numberRegEx = /(\d+)(º|o|°)?(-[A-z])?/;
+  //   // #-A => Exclude the thousands separator and the ordinal
+  //   const cleanCapGroups = '$1$3';
+  //   // #   => Only the numeric part
+  //   const numberCapGroups = '$1';
+  //   // -A  => Only the letter part
+  //   const lettersCapGroups = '$3';
+  //
+  //   return getNumber(dirtyText, numberRegEx, cleanCapGroups, numberCapGroups, lettersCapGroups);
+  // }
 
   /**
    * Some texts don't follow the patterns and need to be treated individually
    * @static
-   * @param  {String} name   The name of the legislation
+   * @param  {String} legislation   The name of the legislation
    * @param  {String} number The article number
    * @param  {String} text   The article text
    * @return {String}        The article text corrected
    */
-  static cleanKnownSemanticErrors(name, number, text) {
-    let fixedText = text;
+  static cleanKnownSemanticErrors(legislationName, article) {
+    let cleanArticle = article.article;
 
-    knownSemanticErrors.forEach((error) => {
-      if (name === error.name && number === error.number) {
-        fixedText = error.fix(text);
-      // debug(`dirtyText = "${chalk.yellow(text)}"\ncleanText = "${chalk.green(fixedText)}"`);
-      }
-    });
-    return fixedText;
+    if (knownSemanticErrors[legislationName] !== undefined &&
+      knownSemanticErrors[legislationName][article.number] !== undefined) {
+      const errorFix = knownSemanticErrors[legislationName][article.number];
+      cleanArticle = errorFix(article.article);
+    }
+
+    return cleanArticle;
   }
 }
 module.exports = Cleaner;

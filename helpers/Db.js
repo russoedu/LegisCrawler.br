@@ -103,7 +103,7 @@ module.exports = class Db {
               link: response.link,
               name: response.name,
               url: response.url,
-              data: response.data,
+              articles: response.articles,
               date: response.date,
             });
           });

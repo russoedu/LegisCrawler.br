@@ -2,36 +2,36 @@ const Db = require('../helpers/Db');
 const debug = require('debug')('model');
 
 class Legislation {
-  constructor(name = null, category = null, link = null, url = null, data = null) {
+  constructor(name = null, category = null, link = null, url = null, articles = null) {
     this.name = name;
     this.category = category;
     this.link = link;
     this.url = url;
-    this.data = data;
     this.date = new Date().toLocaleString(
       'pt-BR',
       {
         timeZone: 'America/Sao_Paulo',
       });
+    this.articles = articles;
   }
 
   static list() {
     return new Promise((resolve, reject) => {
-      Db.list().then((data) => {
-        resolve(data);
+      Db.list().then((result) => {
+        resolve(result);
       }).catch((error) => {
         reject(error);
       });
     });
   }
 
-  find() {
+  static find(name) {
     return new Promise((resolve, reject) => {
       Db.find({
-        name: this.name,
-      }).then((data) => {
-        debug(data);
-        resolve(data);
+        name,
+      }).then((result) => {
+        debug(result);
+        resolve(result);
       }).catch((error) => {
         reject(error);
       });
@@ -41,8 +41,8 @@ class Legislation {
   create() {
     debug(this);
     return new Promise((resolve, reject) => {
-      Db.create(this).then((data) => {
-        resolve(data);
+      Db.create(this).then((result) => {
+        resolve(result);
       }).catch((error) => {
         reject(error);
       });

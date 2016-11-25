@@ -112,6 +112,12 @@
       "url": "http://www.planalto.gov.br/ccivil_03/Leis/LEIS_2001/L10257.htm"
     },
     {
+      "category": "Código",
+      "link": "category",
+      "name": "Código de Defesa do Consumidor",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L8078compilado.htm"
+    },
+    {
       "category": "Estatuto",
       "link": "category",
       "name": "Estatuto de Defesa do Torcedor",
@@ -179,12 +185,6 @@
     }
   ],
   "unusedLegislations": [
-    {
-      "category": "Código",
-      "link": "category",
-      "name": "Código de Defesa do Consumidor",
-      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L8078compilado.htm"
-    },
     {
       "category": "Código",
       "link": "category",
