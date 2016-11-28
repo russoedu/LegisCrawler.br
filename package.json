@@ -37,6 +37,7 @@
     "mongodb": "^2.2.11",
     "morgan": "^1.7.0",
     "node-cron": "^1.1.2",
+    "pmx": "^0.6.8",
     "request": "^2.78.0",
     "request-promise-native": "^1.0.3",
     "serve-favicon": "^2.3.0"
