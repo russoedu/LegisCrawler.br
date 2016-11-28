@@ -11,13 +11,12 @@ const Parser = require('./Parser');
 
 const legislations = config.legislations;
 const quantity = legislations.length;
-const finished = 0;
 
 
 function crawl(i, next) {
   Status.startAll(quantity);
   setTimeout(() => {
-    legislation = legislations[i];
+    const legislation = legislations[i];
 
     const status = new Status(legislation.name);
     status.startProcessComplete();
