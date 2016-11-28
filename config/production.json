@@ -3,7 +3,7 @@
     "express": "combined"
   },
   "server": {
-    "port": 80
+    "port": 8080
   },
   "db": {
     "url": "mongodb://localhost:27017/LegisCrawlerBr"
