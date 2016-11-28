@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Legiscrawler.br : Scrap para legislação completa encontrada no site planalto.gov.br ">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Legiscrawler.br</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/russoedu/LegisCrawler.br">View on GitHub</a>
+
+          <h1 id="project_title">Legiscrawler.br</h1>
+          <h2 id="project_tagline">Scrap para legislação completa encontrada no site planalto.gov.br </h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/russoedu/LegisCrawler.br/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/russoedu/LegisCrawler.br/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p><img src="https://github.com/russoedu/LegisCrawler.br/blob/develop/public/logo.png?raw=true" alt="LegisCrawler.br logo"></p>
+
+<blockquote>
+<p>Crawler completo para a legislação brasileira</p>
+</blockquote>
+
+<h2>
+<a id="sobre" class="anchor" href="#sobre" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Sobre</h2>
+
+<p>LegisCrawler.br foi criado para capturar e organizar a legislação brasileira encontrada no <a href="planalto.gov.br">site do Planalto</a> e entregar uma API com seus dados.</p>
+
+<p>A ferramenta é formada por duas partes, o crawler – que lê, captura e organiza os dados das legislações – e a API – que entrega os separados por legislação e artigo.</p>
+
+<h2>
+<a id="instalação" class="anchor" href="#instala%C3%A7%C3%A3o" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Instalação</h2>
+
+<p>O sistema foi criado em <a href="https://nodejs.org/en/">Node.js</a> utilizando ECMA 6, portanto deve usar <a href="https://kangax.github.io/compat-table/es6/#node65">Node.js 6.5</a> em diante para funcionar corretamente.</p>
+
+<p>Para instalar, siga os próximos passos:</p>
+
+<div class="highlight highlight-source-shell"><pre>git clone git@github.com:russoedu/LegisCrawler.br.git
+<span class="pl-c1">cd</span> LegisCrawler.br</pre></div>
+
+<p>Caso use o <a href="https://yarnpkg.com/">Yarn</a>, execute</p>
+
+<div class="highlight highlight-source-shell"><pre>yarn</pre></div>
+
+<p>Caso utilize <a href="https://www.npmjs.com">NPM</a>, execute</p>
+
+<div class="highlight highlight-source-shell"><pre>npm install</pre></div>
+
+<p>Esses comandos instalarão as dependências do projeto.</p>
+
+<h2>
+<a id="configuração" class="anchor" href="#configura%C3%A7%C3%A3o" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuração</h2>
+
+<p>TODO
+Variáveis de ambiente
+Mongo / File
+Lista de legislações</p>
+
+<h2>
+<a id="debug" class="anchor" href="#debug" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Debug</h2>
+
+<h2>
+<a id="crawler" class="anchor" href="#crawler" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Crawler</h2>
+
+<p>node crawl</p>
+
+<h2>
+<a id="api" class="anchor" href="#api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>API</h2>
+
+<p>npm start</p>
+
+<h3>
+<a id="crawler-1" class="anchor" href="#crawler-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Crawler</h3>
+
+<h2>
+<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration</h2>
+
+<h2>
+<a id="debugging" class="anchor" href="#debugging" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Debugging</h2>
+
+<p>LegisCrawler uses (debug)[<a href="https://github.com/visionmedia/debug">https://github.com/visionmedia/debug</a>] for debugging.</p>
+
+<p>To debug the scrap utility, run:</p>
+
+<div class="highlight highlight-source-shell"><pre>$ DEBUG=scrap,scrap-parser node scrap/index.js</pre></div>
+
+<p>The following debug options are set:
+1. scrap
+1. scrap-cleaner
+1. scrap-parser
+1. scrap-getter
+1. split</p>
+
+<p>To debug the API, run:</p>
+
+<div class="highlight highlight-source-shell"><pre>$ DEBUG=api,DB npm start</pre></div>
+
+<p>The following debug options are set:
+1. api
+1. DB</p>
+
+<p>Most debugs are commented in the code and you must uncomment the ones you want to debug.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Legiscrawler.br maintained by <a href="https://github.com/russoedu">russoedu</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
