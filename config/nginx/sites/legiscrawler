@@ -1,0 +1,6 @@
+server {
+	listen 80;
+  server_name legiscrawler.com.br www.legiscrawler.com.br;
+
+  return 307 https://russoedu.github.io/LegisCrawler.br;
+}
