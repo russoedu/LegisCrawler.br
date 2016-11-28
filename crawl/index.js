@@ -1,3 +1,4 @@
+const forLimit = require('for-limit');
 const config = require('../config/config');
 const error = require('../helpers/error');
 const Status = require('../helpers/Status');
@@ -13,8 +14,10 @@ const finished = 0;
 
 Status.startAll(quantity);
 
-legislations.forEach((legislation) => {
-  const status = new Status(legislation.name, quantity);
+function crawl(i, next) {
+  legislation = legislations[i];
+
+  const status = new Status(legislation.name);
   status.startProcessComplete();
 
   status.startProcess('Scrap');
@@ -68,9 +71,15 @@ legislations.forEach((legislation) => {
       status.finishProcess();
 
       status.finishProcessComplete();
-      status.finishAll();
+    // status.finishAll();
+    })
+    .then(() => {
+      Status.finishAll(quantity, i);
+      next();
     })
     .catch((err) => {
       error(legislation.name, 'Could not reach legislation', err);
     });
-});
+}
+
+forLimit(0, quantity, 3, crawl);
