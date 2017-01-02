@@ -63,25 +63,23 @@ class Status {
   }
   // static startProcess
 
-  static finishAll(quantity, i) {
-    if (quantity - 1 === i) {
-      log('');
-      log('✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ' +
-        '✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨');
-      log('✨                                                              ' +
-        '                           ✨');
-      log('✨                                                              ' +
-        '                           ✨');
-      log(chalk.bold.cyan('✨                     [FINISH] All legislations' +
-        ' captured and organized                    ✨'));
-      log('✨                                                              ' +
-        '                           ✨');
-      log('✨                                                              ' +
-        '                           ✨');
-      log('✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ' +
-        '✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨');
-      log('');
-    }
+  static finishAll() {
+    log('');
+    log('✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ' +
+      '✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨');
+    log('✨                                                              ' +
+      '                           ✨');
+    log('✨                                                              ' +
+      '                           ✨');
+    log(chalk.bold.cyan('✨                     [FINISH] All legislations' +
+      ' captured and organized                    ✨'));
+    log('✨                                                              ' +
+      '                           ✨');
+    log('✨                                                              ' +
+      '                           ✨');
+    log('✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ' +
+      '✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨');
+    log('');
   }
 }
 

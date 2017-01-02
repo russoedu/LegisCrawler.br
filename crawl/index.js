@@ -68,7 +68,7 @@ function crawl(i, next) {
         );
 
         // Save the lislation in the DB
-        legis.create();
+        legis.save();
         status.finishProcess();
 
         status.finishProcessComplete();
@@ -81,7 +81,7 @@ function crawl(i, next) {
       .catch((err) => {
         error(legislation.name, 'Could not reach legislation', err);
       });
-  }, 10000);
+  }, 10);
 }
 cron.schedule('0 0 4 1-31 * *', () => {
   forLimit(0, quantity, 3, crawl);

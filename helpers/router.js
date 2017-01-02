@@ -12,7 +12,7 @@ module.exports = function route(app) {
   router.get('/', LegislationController.list);
 
   // Get a legislation
-  router.get('/:name', LegislationController.find);
+  router.get('/:id', LegislationController.find);
 
   // Set url for API group routes
   app

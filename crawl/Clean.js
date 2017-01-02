@@ -1,4 +1,4 @@
-const debug = require('debug')('cleaner');
+const debug = require('debug')('clean');
 const chalk = require('chalk');
 const knownSemanticErrors = require('./knownSemanticErrors');
 
@@ -37,17 +37,29 @@ Array.prototype.indexOfArticle = function (number) {
   }
   return -1;
 };
+
+function toTitleCase(toTransform) {
+  return toTransform.replace(/\b([a-z])/g, (_, initial) => initial.toUpperCase()
+  );
+}
 /**
  * @class
  */
-class Cleaner {
+class Clean {
+  static breadCrumb(breadCrumb) {
+    const bc = breadCrumb.replace('\n', '')
+      .replace(/(\s|\n|\t)+(\s|\n|\t)/gm, '')
+      .split('>');
+
+    return (bc[bc.length - 1]);
+  }
   /**
    * Pre cleaning function removes all double spaces and text things that shoudn't be there
    * @static
    * @param  {Strign} dirtyText The full text
    * @return {Strign}           The clean text
    */
-  static cleanScrapedText(dirtyText) {
+  static scrapedText(dirtyText) {
     // Regular Expressions
     const commentRegEx = /\([^)]*\)/gm;
     const notArticleTitleRegEx = /^[A-Z\sÁÉÍÓÚÀÈÌÒÙÇÃÕÄËÏÖÜÂÊÎÔÛ]+$/gm;
@@ -84,7 +96,7 @@ class Cleaner {
    * @param  {String} originsText The text already cleaned by preCleaning
    * @return {String}             The trimmed text with line breaks on items
    */
-  static trimAndClean(originalText) {
+  static trim(originalText) {
     let text = originalText;
     debug(text);
 
@@ -114,7 +126,7 @@ class Cleaner {
    * @param  {Strign} dirtyText The article text
    * @return {Strign}           The clean article number
    */
-  static cleanArticleNumber(dirtyText) {
+  static articleNumber(dirtyText) {
     // Capturing groups  1      2    3         4
     const numberRegEx = /(\d)\.?(\d*)(o|º|°|°)?(-[A-z])?/;
     // #-A => Exclude the thousands separator and the ordinal
@@ -160,7 +172,7 @@ class Cleaner {
    * @param  {String} text   The article text
    * @return {String}        The article text corrected
    */
-  static cleanKnownSemanticErrors(legislationName, article) {
+  static knownSemanticErrors(legislationName, article) {
     let cleanArticle = article.article;
 
     if (knownSemanticErrors[legislationName] !== undefined &&
@@ -172,4 +184,4 @@ class Cleaner {
     return cleanArticle;
   }
 }
-module.exports = Cleaner;
+module.exports = Clean;

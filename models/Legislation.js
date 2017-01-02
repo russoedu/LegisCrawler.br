@@ -1,6 +1,8 @@
 const Db = require('../helpers/Db');
 const debug = require('debug')('model');
 
+const collection = 'legislations';
+
 class Legislation {
   constructor(name = null, category = null, link = null, url = null, articles = null) {
     this.name = name;
@@ -16,37 +18,38 @@ class Legislation {
   }
 
   static list() {
-    return new Promise((resolve, reject) => {
-      Db.list().then((result) => {
-        resolve(result);
-      }).catch((error) => {
-        reject(error);
-      });
-    });
+    return Db.find(
+      collection,
+      {
+        _id: '',
+        name: '',
+        link: '',
+        category: '',
+        url: '',
+        date: '',
+      }
+    );
   }
 
-  static find(name) {
-    return new Promise((resolve, reject) => {
-      Db.find({
-        name,
-      }).then((result) => {
-        debug(result);
-        resolve(result);
-      }).catch((error) => {
-        reject(error);
-      });
-    });
+  static find(id) {
+    return Db.find(
+      collection,
+      {
+        _id: '',
+        name: '',
+        link: '',
+        category: '',
+        url: '',
+        date: '',
+        articles: '',
+      },
+      id
+    );
   }
 
-  create() {
+  save() {
     debug(this);
-    return new Promise((resolve, reject) => {
-      Db.create(this).then((result) => {
-        resolve(result);
-      }).catch((error) => {
-        reject(error);
-      });
-    });
+    return Db.createOrUpdate(collection, this);
   }
 }
 

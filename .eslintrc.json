@@ -1,11 +1,20 @@
 {
   "extends": "airbnb-base",
-  "rules": {
+  "rules":
+  {
     "max-len": [
       "error",
       100,
       {
-        "ignoreRegExpLiterals": true
+        "ignoreRegExpLiterals": true,
+        "ignoreStrings": true
+      }
+    ],
+    "no-underscore-dangle": [
+      "error",
+      {
+        "allowAfterThis": true,
+        "allow": ["_id"]
       }
     ]
   }

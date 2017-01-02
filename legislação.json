@@ -1,0 +1,140 @@
+{
+  [
+    {
+    "nome": "contituição",
+    "link": "http://www.planalto.gov.br/ccivil_03/Constituicao/Constituicao.htm"
+    },
+    {
+      "nome": "Código de Processo Civil",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/L5869.htm"
+    },
+    {
+      "nome": "Código de Processo Civil",
+      "link": "http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/L13105.htm"
+    },
+    {
+      "nome": "Código Penal",
+      "link": "http://www.planalto.gov.br/CCIVIL_03/Decreto-Lei/Del2848.htm"
+    },
+    {
+      "nome": "Código de Processo Penal",
+      "link": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del3689.htm"
+    },
+    {
+      "nome": "Código Tributário Nacional",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/L5172.htm"
+    },
+    {
+      "nome": "Consolidação das Leis do Trabalho",
+      "link": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del5452.htm"
+    },
+    {
+      "nome": "Código de Defesa do Consumidor",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/L8078.htm"
+    },
+    {
+      "nome": "Código de Trânsito Brasileiro",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/L9503.htm"
+    },
+    {
+      "nome": "Código Eleitoral",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/L4737.htm"
+    },
+    {
+      "nome": "Código Florestal",
+      "link": "http://www.planalto.gov.br/ccivil_03/_Ato2011-2014/2012/Lei/L12651.htm"
+    },
+    {
+      "nome": "Código de Águas",
+      "link": "http://www.planalto.gov.br/ccivil_03/decreto/D24643.htm"
+    },
+    {
+      "nome": "Código de Minas",
+      "link": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del0227.htm"
+    },
+    {
+      "nome": "Código Penal Militar",
+      "link": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del1001.htm"
+    },
+    {
+      "nome": "Código de Processo Penal Militar",
+      "link": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del1002.htm"
+    },
+    {
+      "nome": "Código Brasileiro de Aeronáutica",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/L7565.htm"
+    },
+    {
+      "nome": "Código Brasileiro de Telecomunicações",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/L4117.htm"
+    },
+    {
+      "nome": "Código Comercial",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/LIM/LIM556.htm"
+    },
+    {
+      "nome": "Estatuto da Advocacia e da Ordem dos Advogados do Brasil (OAB)",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/L8906.htm"
+    },
+    {
+      "nome": "Estatuto da Criança e do Adolescente",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/L8069.htm"
+    },
+    {
+      "nome": "Estatuto da Cidade",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/LEIS_2001/L10257.htm"
+    },
+    {
+      "nome": "Estatuto de Defesa do Torcedor",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/2003/L10.671.htm"
+    },
+    {
+      "nome": "Estatuto do Desarmamento",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/2003/L10.826.htm"
+    },
+    {
+      "nome": "Estatuto do Estrangeiro",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/L6815.htm"
+    },
+    {
+      "nome": "Estatuto do Idoso",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/2003/L10.741.htm"
+    },
+    {
+      "nome": "Estatuto da Igualdade Racial",
+      "link": "http://www.planalto.gov.br/ccivil_03/_Ato2007-2010/2010/Lei/L12288.htm"
+    },
+    {
+      "nome": "Estatuto do Índio",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/L6001.htm"
+    },
+    {
+      "nome": "Estatuto da Juventude",
+      "link": "http://www.planalto.gov.br/CCIVIL_03/_Ato2011-2014/2013/Lei/L12852.htm"
+    },
+    {
+      "nome": "Estatuto dos Militares",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/L6880.htm"
+    },
+    {
+      "nome": "Estatuto dos Museus",
+      "link": "http://www.planalto.gov.br/ccivil_03/_Ato2007-2010/2009/Lei/L11904.htm"
+    },
+    {
+      "nome": "Estatuto Nacional da Microempresa e da Empresa de Pequeno Porte",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/LCP/Lcp123.htm"
+    },
+    {
+      "nome": "Estatuto da Pessoa com Deficiência",
+      "link": "http://www.planalto.gov.br/CCIVIL_03/_Ato2015-2018/2015/Lei/L13146.htm"
+    },
+    {
+      "nome": "Estatuto dos Refugiados",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/L9474.htm"
+    },
+    {
+      "nome": "Estatuto da Terra",
+      "link": "http://www.planalto.gov.br/ccivil_03/Leis/L4504.htm"
+    }
+  ]
+}

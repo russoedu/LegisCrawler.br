@@ -182,6 +182,36 @@
       "link": "category",
       "name": "Estatuto dos Refugiados",
       "url": "http://www.planalto.gov.br/ccivil_03/Leis/L9474.htm"
+    },
+    {
+      "category": "Código",
+      "link": "category",
+      "name": "Código Florestal",
+      "url": "http://www.planalto.gov.br/ccivil_03/_Ato2011-2014/2012/Lei/L12651compilado.htm"
+    },
+    {
+      "category": "Estatuto",
+      "link": "category",
+      "name": "Estatuto do Índio",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L6001.htm"
+    },
+    {
+      "category": "Estatuto",
+      "link": "category",
+      "name": "Estatuto da Terra",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L4504compilada.htm"
+    },
+    {
+      "category": "Código",
+      "link": "category",
+      "name": "Código Brasileiro de Aeronáutica",
+      "url": "http://www.planalto.gov.br/ccivil_03/Leis/L7565compilado.htm"
+    },
+    {
+      "category": "Código",
+      "link": "category",
+      "name": "Código Penal Militar",
+      "url": "http://www.planalto.gov.br/ccivil_03/Decreto-Lei/Del1001Compilado.htm"
     }
   ],
   "unusedLegislations": [

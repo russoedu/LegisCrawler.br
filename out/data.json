@@ -1,0 +1,423 @@
+{
+    "project": {},
+    "files": {
+        "config/config.js": {
+            "name": "config/config.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "crawl/Cleaner.js": {
+            "name": "crawl/Cleaner.js",
+            "modules": {},
+            "classes": {
+                "": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "crawl/Crawler.js": {
+            "name": "crawl/Crawler.js",
+            "modules": {
+                "Crawler": 1
+            },
+            "classes": {
+                "Crawler": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "crawl/Parser.js": {
+            "name": "crawl/Parser.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "models/Category.js": {
+            "name": "models/Category.js",
+            "modules": {
+                "Models": 1
+            },
+            "classes": {
+                "Category": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "Crawler": {
+            "name": "Crawler",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "": 1,
+                "Crawler": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "crawl/Crawler.js",
+            "line": 9,
+            "description": "Crawl urls for the desired content"
+        },
+        "Models": {
+            "name": "Models",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "Category": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "models/Category.js",
+            "line": 6,
+            "description": "Category Model Class"
+        }
+    },
+    "classes": {
+        "": {
+            "file": "crawl/Cleaner.js",
+            "line": 40,
+            "module": "Crawler"
+        },
+        "Crawler": {
+            "name": "Crawler",
+            "shortname": "Crawler",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Crawler",
+            "namespace": "",
+            "file": "crawl/Crawler.js",
+            "line": 9,
+            "description": "Crawl urls for the desired content"
+        },
+        "Category": {
+            "name": "Category",
+            "shortname": "Category",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Models",
+            "namespace": "",
+            "file": "models/Category.js",
+            "line": 6,
+            "description": "Category Model Class"
+        }
+    },
+    "elements": {},
+    "classitems": [
+        {
+            "file": "config/config.js",
+            "line": 10,
+            "description": "Get the configuration",
+            "return": {
+                "description": "The configuration JSON",
+                "type": "JSON"
+            },
+            "class": "Crawler"
+        },
+        {
+            "file": "crawl/Cleaner.js",
+            "line": 5,
+            "description": "Gets an article or paragraph number only",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "dirtyText",
+                    "description": "The full text",
+                    "type": "String"
+                },
+                {
+                    "name": "regEx",
+                    "description": "The regular expression with the article or paragraph",
+                    "type": "Object"
+                },
+                {
+                    "name": "cleanCapGroups",
+                    "description": "The capturing groups that exclude the thousands separator and\n                                  the ordinal chars",
+                    "type": "String"
+                },
+                {
+                    "name": "numberCapGroups",
+                    "description": "The capturing groups to get only the numeric part",
+                    "type": "String"
+                },
+                {
+                    "name": "lettersCapGroups",
+                    "description": "The capturing groups to get only the text part of the article\n                                  number",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The \"number only\" of the article or paragraph (it may contain\n                                  letters – ex: 103-A – and ordinal chars – ex: 1º)",
+                "type": "String"
+            },
+            "class": "Crawler"
+        },
+        {
+            "file": "crawl/Cleaner.js",
+            "line": 44,
+            "description": "Pre cleaning function removes all double spaces and text things that shoudn't be there",
+            "static": 1,
+            "params": [
+                {
+                    "name": "dirtyText",
+                    "description": "The full text",
+                    "type": "Strign"
+                }
+            ],
+            "return": {
+                "description": "The clean text",
+                "type": "Strign"
+            },
+            "class": "Crawler"
+        },
+        {
+            "file": "crawl/Cleaner.js",
+            "line": 81,
+            "description": "Post cleaning function trims the text and add line breaks before items",
+            "static": 1,
+            "params": [
+                {
+                    "name": "originsText",
+                    "description": "The text already cleaned by preCleaning",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The trimmed text with line breaks on items",
+                "type": "String"
+            },
+            "class": "Crawler"
+        },
+        {
+            "file": "crawl/Cleaner.js",
+            "line": 111,
+            "description": "Cleans the article number",
+            "static": 1,
+            "params": [
+                {
+                    "name": "dirtyText",
+                    "description": "The article text",
+                    "type": "Strign"
+                }
+            ],
+            "return": {
+                "description": "The clean article number",
+                "type": "Strign"
+            },
+            "class": "Crawler"
+        },
+        {
+            "file": "crawl/Cleaner.js",
+            "line": 155,
+            "description": "Some texts don't follow the patterns and need to be treated individually",
+            "static": 1,
+            "params": [
+                {
+                    "name": "legislation",
+                    "description": "The name of the legislation",
+                    "type": "String"
+                },
+                {
+                    "name": "number",
+                    "description": "The article number",
+                    "type": "String"
+                },
+                {
+                    "name": "text",
+                    "description": "The article text",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The article text corrected",
+                "type": "String"
+            },
+            "class": "Crawler"
+        },
+        {
+            "file": "crawl/Crawler.js",
+            "line": 15,
+            "description": "Crawler constructor sets the type object",
+            "itemtype": "method",
+            "name": "constructor",
+            "is_constructor": 1,
+            "class": "Crawler",
+            "module": "Crawler"
+        },
+        {
+            "file": "crawl/Crawler.js",
+            "line": 27,
+            "description": "Crawl Planalto's main page: http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1\nCapture all links and return the link and the title as a promise",
+            "itemtype": "method",
+            "name": "mainLegislationPage",
+            "static": 1,
+            "return": {
+                "description": "Array of legislations with name and link",
+                "type": "Promise"
+            },
+            "class": "Crawler",
+            "module": "Crawler"
+        },
+        {
+            "file": "crawl/Parser.js",
+            "line": 6,
+            "description": "Breakes the article into it's number and it's text",
+            "params": [
+                {
+                    "name": "cleanText",
+                    "description": "The text already cleanned to be parsed into articles",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "Array with each article object",
+                "type": "Array"
+            },
+            "example": [
+                "\n[\n   {\n     number: '1º',\n     article: 'Os menores de 18 anos são penalmente inimputáveis, ficando sujeitos às …'\n   },\n   {\n     number: '10',\n     article: 'É assegurada a \\nparticipação dos trabalhadores e empregadores nos …'\n   }\n]"
+            ],
+            "class": "Category",
+            "module": "Crawler"
+        },
+        {
+            "file": "crawl/Parser.js",
+            "line": 67,
+            "description": "Some texts don't follow the patterns and need to be treated individually",
+            "static": 1,
+            "params": [
+                {
+                    "name": "legislationName",
+                    "description": "The name of the legislation",
+                    "type": "String"
+                },
+                {
+                    "name": "dirtyArticles",
+                    "description": "Array of articles to be clean",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "Array of clean articles",
+                "type": "Array"
+            },
+            "class": "Category",
+            "module": "Crawler"
+        },
+        {
+            "file": "models/Category.js",
+            "line": 12,
+            "description": "Category constructor",
+            "itemtype": "method",
+            "name": "constructor",
+            "params": [
+                {
+                    "name": "name ",
+                    "description": "- The category name",
+                    "type": "String",
+                    "optional": true,
+                    "optdefault": " null"
+                },
+                {
+                    "name": "url ",
+                    "description": "- The category url",
+                    "type": "String",
+                    "optional": true,
+                    "optdefault": " null"
+                }
+            ],
+            "is_constructor": 1,
+            "class": "Category",
+            "module": "Models"
+        },
+        {
+            "file": "models/Category.js",
+            "line": 27,
+            "description": "List all categories",
+            "itemtype": "method",
+            "name": "list",
+            "return": {
+                "description": "Array with categories objects",
+                "type": "Array"
+            },
+            "static": 1,
+            "class": "Category",
+            "module": "Models"
+        },
+        {
+            "file": "models/Category.js",
+            "line": 45,
+            "description": "Get a category",
+            "itemtype": "method",
+            "name": "find",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The id of the category",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The category objects",
+                "type": "Object"
+            },
+            "static": 1,
+            "class": "Category",
+            "module": "Models"
+        },
+        {
+            "file": "models/Category.js",
+            "line": 65,
+            "description": "Save the category in the DB",
+            "itemtype": "method",
+            "name": "save",
+            "class": "Category",
+            "module": "Models"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type\nGet the configuration",
+            "line": " config/config.js:10"
+        },
+        {
+            "message": "Missing item type\nGets an article or paragraph number only",
+            "line": " crawl/Cleaner.js:5"
+        },
+        {
+            "message": "Missing item type\nPre cleaning function removes all double spaces and text things that shoudn't be there",
+            "line": " crawl/Cleaner.js:44"
+        },
+        {
+            "message": "Missing item type\nPost cleaning function trims the text and add line breaks before items",
+            "line": " crawl/Cleaner.js:81"
+        },
+        {
+            "message": "Missing item type\nCleans the article number",
+            "line": " crawl/Cleaner.js:111"
+        },
+        {
+            "message": "Missing item type\nSome texts don't follow the patterns and need to be treated individually",
+            "line": " crawl/Cleaner.js:155"
+        },
+        {
+            "message": "Missing item type\nBreakes the article into it's number and it's text",
+            "line": " crawl/Parser.js:6"
+        },
+        {
+            "message": "Missing item type\nSome texts don't follow the patterns and need to be treated individually",
+            "line": " crawl/Parser.js:67"
+        }
+    ]
+}

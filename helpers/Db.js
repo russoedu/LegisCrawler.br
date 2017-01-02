@@ -1,15 +1,11 @@
-const MongoClient = require('mongodb').MongoClient;
+const mongo = require('mongodb');
 const config = require('../config/config');
 const error = require('../helpers/error');
+const Order = require('../helpers/Order');
 const debug = require('debug')('db');
 
-const sortPortuguese = function sortPortuguese(a, b) {
-  debug(a.name);
-  debug(b.name);
-  return a.name.localeCompare(b.name);
-};
-
 function connect() {
+  const MongoClient = new mongo.MongoClient();
   return new Promise((resolve, reject) => {
     MongoClient.connect(config.db.url, (connectionErr, db) => {
       if (connectionErr) {
@@ -23,31 +19,36 @@ function connect() {
   });
 }
 
-module.exports = class Db {
-  static create(data) {
+class Db {
+  static createOrUpdate(collection, data) {
     return new Promise((resolve, reject) => {
       connect()
         .then((db) => {
           const query = {
             name: data.name,
+            level: data.level,
+            parent: data.parent,
           };
           const options = {
             upsert: true,
             returnNewDocument: true,
           };
 
-          db.collection('legislations').findOneAndUpdate(
+          db.collection(collection).findOneAndUpdate(
             query,
             data,
             options
-          ).then((result) => {
-            db.close();
-            debug(result);
-            resolve(result);
-          })
+          )
+            .then((result) => {
+              debug(result);
+              db.close();
+
+              resolve(result);
+            })
             .catch((err) => {
               error('DB', 'error inserting data', err);
               reject(err);
+              db.close();
             });
         }).catch((err) => {
           reject(err);
@@ -55,30 +56,25 @@ module.exports = class Db {
     });
   }
 
-  static list() {
+  static find(collection, filter, id = false) {
     return new Promise((resolve, reject) => {
+      const idObj = id ? new mongo.ObjectID(id) : {};
       connect().then((db) => {
-        db.collection('legislations')
-          .find({}, {
-            name: '',
-            link: '',
-            category: '',
-          })
+        db.collection(collection)
+          .find(
+            idObj,
+            filter
+        )
           .toArray()
-          .then((data) => {
-            debug(data);
+          .then((result) => {
+            debug(result);
             db.close();
-            const responseData = [];
-            data.forEach((response) => {
-              debug(response);
-              responseData.push({
-                name: response.name,
-                link: response.link,
-                category: response.category,
-              });
-            });
 
-            resolve(responseData.sort(sortPortuguese));
+            if (result.length === 1) {
+              resolve(result[0]);
+            } else {
+              resolve(result.sort(Order.portuguese));
+            }
           });
       })
         .catch((err) => {
@@ -87,41 +83,6 @@ module.exports = class Db {
         });
     });
   }
-
-  static find(query) {
-    debug(query);
-    return new Promise((resolve, reject) => {
-      connect().then((db) => {
-        db.collection('legislations').find(query).toArray().then((data) => {
-          db.close();
-          debug(data);
-          const responseData = [];
-          data.forEach((response) => {
-            debug(response);
-            responseData.push({
-              category: response.category,
-              link: response.link,
-              name: response.name,
-              url: response.url,
-              articles: response.articles,
-              date: response.date,
-            });
-          });
-          if (responseData.length === 1) {
-            resolve(responseData[0]);
-          } else {
-            resolve(responseData);
-          }
-        })
-          .catch((err) => {
-            error('DB', 'Could not retrieve data', err);
-            reject(err);
-          });
-      }).catch((err) => {
-        error('DB', 'Could not stablish DB connection', err);
-        reject(err);
-      });
-    });
-  }
 }
-;
+
+module.exports = Db;

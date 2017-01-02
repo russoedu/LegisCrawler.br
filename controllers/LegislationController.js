@@ -7,13 +7,8 @@ class LegislationController {
     debug('LegislationController.find()');
     Legislation.list()
       .then((response) => {
-        debug(typeof response);
         debug(response);
-        if (typeof response === 'string') {
-          res.redirect(response);
-        } else {
-          res.status(200).send(response);
-        }
+        res.status(200).send(response);
       })
       .catch((err) => {
         error(req.params.name, 'Could not retrieve data', err);
@@ -22,8 +17,8 @@ class LegislationController {
   }
 
   static find(req, res) {
-    debug(`LegislationController.find(${req.params.name})`);
-    Legislation.find(req.params.name)
+    debug(`LegislationController.find(${req.params.id})`);
+    Legislation.find(req.params.id)
       .then((response) => {
         debug(response);
         res.status(200).send(response);
