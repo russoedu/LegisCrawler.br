@@ -1,5 +1,5 @@
 const enumify = require('enumify');
-const Parse = require('../crawl/Parse');
+const Scrap = require('../crawl/Scrap');
 // const error = require('../helpers/error');
 // const debug = require('debug')('layout');
 
@@ -27,7 +27,7 @@ class Layout extends enumify.Enum {
    * }
    */
   static check(html) {
-    const layout = Parse.layout(html);
+    const layout = Scrap.layout(html);
     return Layout.enumValueOf(layout);
   }
 }

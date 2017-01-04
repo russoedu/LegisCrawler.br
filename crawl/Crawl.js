@@ -2,12 +2,12 @@ const request = require('request-promise-native');
 const debug = require('debug')('crawl');
 const Layout = require('../models/Layout');
 const error = require('../helpers/error');
-const Parse = require('./Parse');
+const Scrap = require('./Scrap');
 
 /**
  * Crawl urls for the desired content
  * @module Crawler
- * @class Crawler
+ * @class Crawl
  */
 class Crawl {
   /**
@@ -20,9 +20,9 @@ class Crawl {
    */
   static page(crawlUrl) {
     return new Promise((resolve, reject) => {
-      function respond(data, count) {
-        debug('respond', count, crawlUrl);
-        if (count === 0) {
+      function respond(data, processedListCounter) {
+        debug('respond', processedListCounter, crawlUrl);
+        if (processedListCounter === 0) {
           resolve(data);
         }
       }
@@ -32,15 +32,17 @@ class Crawl {
       };
       request(requestoptions)
         .then((html) => {
-          let legislationsResponse = [];
+          let legislations = [];
 
           const layout = Layout.check(html);
           // Verify the type of layout to use the correct parser
           if (layout === Layout.GENERAL_LIST) {
-            legislationsResponse = Parse.generalList(html);
+            legislations = Scrap.generalListCategories(html);
+          } else if (layout === Layout.DATES_LIST) {
+            legislations = Scrap.datesListCategories(html);
           }
 
-          return legislationsResponse;
+          return legislations;
         })
         .then((legislations) => {
           // Start processing the lists
@@ -122,7 +124,7 @@ module.exports = Crawl;
 //     };
 //     request(requestoptions)
 //       .then((html) => {
-//         const parser = new htmlparser.Parser({
+//         const parser = new htmlparser.Scrap({
 //           onopentag(tag, attribs) {
 //             // Check if the page processing is activated
 //             if (processing === true) {
@@ -181,7 +183,7 @@ module.exports = Crawl;
 //     };
 //     request(requestoptions)
 //     .then((html) => {
-//       const parser = new htmlparser.Parser({
+//       const parser = new htmlparser.Scrap({
 //         onopentag(tag, attribs) {
 //           if (tag === 'div' && attribs.id === 'portal-breadcrumbs') {
 //             processingBC = true;
