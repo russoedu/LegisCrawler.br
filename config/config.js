@@ -1,6 +1,5 @@
 /* eslint no-restricted-modules: [0]  */
 const fs = require('fs');
-const chalk = require('chalk');
 const log = require('../helpers/log');
 const error = require('../helpers/error');
 
@@ -15,7 +14,7 @@ function getConfig() {
   const confFile = `./config/${env}.json`;
   let config = {};
 
-  log(chalk.black.bgYellow(`  [config.environment] ${env}            `));
+  log(`⚙  [config.environment] ${env}`);
 
   try {
     config = JSON.parse(fs.readFileSync(confFile, 'utf8'));
@@ -25,7 +24,7 @@ function getConfig() {
     return {};
   }
 
-  log(chalk.black.bgGreen('  [conf.readConfig]', `config ${env} found  `));
+  log(`⚙  [conf.readConfig] config ${env} found`);
 
   return config;
 }

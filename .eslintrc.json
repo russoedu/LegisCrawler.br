@@ -14,7 +14,17 @@
       "error",
       {
         "allowAfterThis": true,
-        "allow": ["_id"]
+        "allow": [
+          "_id"
+        ]
+      }
+    ],
+    "no-extend-native": [
+      "error",
+      {
+        "exceptions": [
+          "Array"
+        ]
       }
     ]
   }

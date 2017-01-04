@@ -1,5 +1,4 @@
 const debug = require('debug')('clean');
-const chalk = require('chalk');
 const knownSemanticErrors = require('./knownSemanticErrors');
 
 /**
@@ -29,7 +28,7 @@ function getNumber(dirtyText, regEx, cleanCapGroups, numberCapGroups, lettersCap
   return content;
 }
 
-Array.prototype.indexOfArticle = function (number) {
+Array.prototype.indexOfArticle = function indexOfArticle(number) {
   for (let i = 0; i < this.length; i += 1) {
     if (this[i].number === number) {
       return i;
@@ -38,14 +37,20 @@ Array.prototype.indexOfArticle = function (number) {
   return -1;
 };
 
-function toTitleCase(toTransform) {
-  return toTransform.replace(/\b([a-z])/g, (_, initial) => initial.toUpperCase()
-  );
-}
+// function toTitleCase(toTransform) {
+//   return toTransform.replace(/\b([a-z])/g, (_, initial) => initial.toUpperCase()
+//   );
+// }
 /**
  * @class
  */
 class Clean {
+  static name(text) {
+    return text
+        .replace(/^\s|\s$/gm, '')
+        .replace(/\s{2,100}/gm, '')
+        .replace(/\n*(.)\n*/, '$1');
+  }
   static breadCrumb(breadCrumb) {
     const bc = breadCrumb.replace('\n', '')
       .replace(/(\s|\n|\t)+(\s|\n|\t)/gm, '')
