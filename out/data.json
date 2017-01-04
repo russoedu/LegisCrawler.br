@@ -8,8 +8,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "crawl/Cleaner.js": {
-            "name": "crawl/Cleaner.js",
+        "crawl/Clean.js": {
+            "name": "crawl/Clean.js",
             "modules": {},
             "classes": {
                 "": 1
@@ -17,21 +17,32 @@
             "fors": {},
             "namespaces": {}
         },
-        "crawl/Crawler.js": {
-            "name": "crawl/Crawler.js",
+        "crawl/Crawl.js": {
+            "name": "crawl/Crawl.js",
             "modules": {
                 "Crawler": 1
             },
             "classes": {
-                "Crawler": 1
+                "Crawl": 1
             },
             "fors": {},
             "namespaces": {}
         },
-        "crawl/Parser.js": {
-            "name": "crawl/Parser.js",
+        "crawl/Scrap.js": {
+            "name": "crawl/Scrap.js",
             "modules": {},
-            "classes": {},
+            "classes": {
+                "Scrap": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "helpers/Name.js": {
+            "name": "helpers/Name.js",
+            "modules": {},
+            "classes": {
+                "Name": 1
+            },
             "fors": {},
             "namespaces": {}
         },
@@ -45,6 +56,20 @@
             },
             "fors": {},
             "namespaces": {}
+        },
+        "models/Layout.js": {
+            "name": "models/Layout.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "models/Type.js": {
+            "name": "models/Type.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
         }
     },
     "modules": {
@@ -54,13 +79,15 @@
             "elements": {},
             "classes": {
                 "": 1,
-                "Crawler": 1
+                "Crawl": 1,
+                "Scrap": 1,
+                "Name": 1
             },
             "fors": {},
             "namespaces": {},
             "tag": "module",
-            "file": "crawl/Crawler.js",
-            "line": 9,
+            "file": "helpers/Name.js",
+            "line": 32,
             "description": "Crawl urls for the desired content"
         },
         "Models": {
@@ -80,13 +107,13 @@
     },
     "classes": {
         "": {
-            "file": "crawl/Cleaner.js",
-            "line": 40,
+            "file": "crawl/Clean.js",
+            "line": 44,
             "module": "Crawler"
         },
-        "Crawler": {
-            "name": "Crawler",
-            "shortname": "Crawler",
+        "Crawl": {
+            "name": "Crawl",
+            "shortname": "Crawl",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -94,9 +121,37 @@
             "extension_for": [],
             "module": "Crawler",
             "namespace": "",
-            "file": "crawl/Crawler.js",
-            "line": 9,
+            "file": "crawl/Crawl.js",
+            "line": 7,
             "description": "Crawl urls for the desired content"
+        },
+        "Scrap": {
+            "name": "Scrap",
+            "shortname": "Scrap",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Crawler",
+            "namespace": "",
+            "file": "crawl/Scrap.js",
+            "line": 9,
+            "description": "Scrap HTMLs to get specific content"
+        },
+        "Name": {
+            "name": "Name",
+            "shortname": "Name",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Crawler",
+            "namespace": "",
+            "file": "helpers/Name.js",
+            "line": 32,
+            "description": "Class to get the name of a legislation"
         },
         "Category": {
             "name": "Category",
@@ -117,17 +172,17 @@
     "classitems": [
         {
             "file": "config/config.js",
-            "line": 10,
+            "line": 9,
             "description": "Get the configuration",
             "return": {
                 "description": "The configuration JSON",
                 "type": "JSON"
             },
-            "class": "Crawler"
+            "class": "Crawl"
         },
         {
-            "file": "crawl/Cleaner.js",
-            "line": 5,
+            "file": "crawl/Clean.js",
+            "line": 4,
             "description": "Gets an article or paragraph number only",
             "access": "private",
             "tagname": "",
@@ -162,11 +217,11 @@
                 "description": "The \"number only\" of the article or paragraph (it may contain\n                                  letters – ex: 103-A – and ordinal chars – ex: 1º)",
                 "type": "String"
             },
-            "class": "Crawler"
+            "class": "Crawl"
         },
         {
-            "file": "crawl/Cleaner.js",
-            "line": 44,
+            "file": "crawl/Clean.js",
+            "line": 61,
             "description": "Pre cleaning function removes all double spaces and text things that shoudn't be there",
             "static": 1,
             "params": [
@@ -180,11 +235,11 @@
                 "description": "The clean text",
                 "type": "Strign"
             },
-            "class": "Crawler"
+            "class": "Crawl"
         },
         {
-            "file": "crawl/Cleaner.js",
-            "line": 81,
+            "file": "crawl/Clean.js",
+            "line": 98,
             "description": "Post cleaning function trims the text and add line breaks before items",
             "static": 1,
             "params": [
@@ -198,11 +253,11 @@
                 "description": "The trimmed text with line breaks on items",
                 "type": "String"
             },
-            "class": "Crawler"
+            "class": "Crawl"
         },
         {
-            "file": "crawl/Cleaner.js",
-            "line": 111,
+            "file": "crawl/Clean.js",
+            "line": 128,
             "description": "Cleans the article number",
             "static": 1,
             "params": [
@@ -216,11 +271,11 @@
                 "description": "The clean article number",
                 "type": "Strign"
             },
-            "class": "Crawler"
+            "class": "Crawl"
         },
         {
-            "file": "crawl/Cleaner.js",
-            "line": 155,
+            "file": "crawl/Clean.js",
+            "line": 172,
             "description": "Some texts don't follow the patterns and need to be treated individually",
             "static": 1,
             "params": [
@@ -244,35 +299,137 @@
                 "description": "The article text corrected",
                 "type": "String"
             },
-            "class": "Crawler"
+            "class": "Crawl"
         },
         {
-            "file": "crawl/Crawler.js",
-            "line": 15,
-            "description": "Crawler constructor sets the type object",
-            "itemtype": "method",
-            "name": "constructor",
-            "is_constructor": 1,
-            "class": "Crawler",
-            "module": "Crawler"
-        },
-        {
-            "file": "crawl/Crawler.js",
-            "line": 27,
+            "file": "crawl/Crawl.js",
+            "line": 13,
             "description": "Crawl Planalto's main page: http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1\nCapture all links and return the link and the title as a promise",
             "itemtype": "method",
             "name": "mainLegislationPage",
+            "params": [
+                {
+                    "name": "crawlUrl",
+                    "description": "Url to be crawled",
+                    "type": "String"
+                }
+            ],
             "static": 1,
             "return": {
                 "description": "Array of legislations with name and link",
                 "type": "Promise"
             },
-            "class": "Crawler",
+            "class": "Crawl",
             "module": "Crawler"
         },
         {
-            "file": "crawl/Parser.js",
-            "line": 6,
+            "file": "crawl/Crawl.js",
+            "line": 89,
+            "description": "Check the type of a legislation page",
+            "itemtype": "method",
+            "name": "checkType",
+            "static": 1,
+            "params": [
+                {
+                    "name": "checkUrl",
+                    "description": "The url that will be parsed and verified the Type",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "A Type (DATE or LEGISLATION)",
+                "type": "Promise"
+            },
+            "class": "Crawl",
+            "module": "Crawler"
+        },
+        {
+            "file": "crawl/Scrap.js",
+            "line": 15,
+            "description": "Scrap Layout.GENERAL_LIST HTML to get it's links and create a Category for each",
+            "itemtype": "method",
+            "name": "generalListCategories",
+            "static": 1,
+            "params": [
+                {
+                    "name": "html",
+                    "description": "The HTML that will be scraped",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "Array of 'Category' objects",
+                "type": "Array"
+            },
+            "class": "Scrap",
+            "module": "Crawler"
+        },
+        {
+            "file": "crawl/Scrap.js",
+            "line": 82,
+            "description": "Scrap Layout.COLUMNS_LIST HTML to get it's links and create a Category for each",
+            "itemtype": "method",
+            "name": "columnsListCategories",
+            "static": 1,
+            "params": [
+                {
+                    "name": "html",
+                    "description": "The HTML that will be scraped",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "Array of 'Category' objects",
+                "type": "Array"
+            },
+            "class": "Scrap",
+            "module": "Crawler"
+        },
+        {
+            "file": "crawl/Scrap.js",
+            "line": 149,
+            "description": "Scrap Layout.DATES_LIST HTML to get it's links and create a Category for each",
+            "itemtype": "method",
+            "name": "datesListCategories",
+            "static": 1,
+            "params": [
+                {
+                    "name": "html",
+                    "description": "The HTML that will be scraped",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "Array of 'Category' objects",
+                "type": "Array"
+            },
+            "class": "Scrap",
+            "module": "Crawler"
+        },
+        {
+            "file": "crawl/Scrap.js",
+            "line": 220,
+            "description": "Check the layout of an HTML",
+            "itemtype": "method",
+            "name": "layout",
+            "static": 1,
+            "params": [
+                {
+                    "name": "html",
+                    "description": "The HTML that will be parsed to discover the layout",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The Layout of the HTML ('GENERAL_LIST', 'COLUMNS_LIST'\n                 or 'DATES_LIST')",
+                "type": "String"
+            },
+            "class": "Scrap",
+            "module": "Crawler"
+        },
+        {
+            "file": "crawl/Scrap.js",
+            "line": 284,
             "description": "Breakes the article into it's number and it's text",
             "params": [
                 {
@@ -288,12 +445,12 @@
             "example": [
                 "\n[\n   {\n     number: '1º',\n     article: 'Os menores de 18 anos são penalmente inimputáveis, ficando sujeitos às …'\n   },\n   {\n     number: '10',\n     article: 'É assegurada a \\nparticipação dos trabalhadores e empregadores nos …'\n   }\n]"
             ],
-            "class": "Category",
+            "class": "Scrap",
             "module": "Crawler"
         },
         {
-            "file": "crawl/Parser.js",
-            "line": 67,
+            "file": "crawl/Scrap.js",
+            "line": 344,
             "description": "Some texts don't follow the patterns and need to be treated individually",
             "static": 1,
             "params": [
@@ -312,7 +469,50 @@
                 "description": "Array of clean articles",
                 "type": "Array"
             },
-            "class": "Category",
+            "class": "Scrap",
+            "module": "Crawler"
+        },
+        {
+            "file": "helpers/Name.js",
+            "line": 3,
+            "description": "Transform no accent, dash separated text in the correct legislation name",
+            "itemtype": "method",
+            "name": "correctImageName",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The original image file name",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The legislation name",
+                "type": "String"
+            },
+            "access": "private",
+            "tagname": "",
+            "class": "Name",
+            "module": "Crawler"
+        },
+        {
+            "file": "helpers/Name.js",
+            "line": 39,
+            "description": "Transform no accent, dash separated text in the correct legislation name",
+            "itemtype": "method",
+            "name": "fromImageUrl",
+            "params": [
+                {
+                    "name": "imageUrl",
+                    "description": "The original URL of the image",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The legislation name",
+                "type": "String"
+            },
+            "static": 1,
+            "class": "Name",
             "module": "Crawler"
         },
         {
@@ -343,7 +543,7 @@
         },
         {
             "file": "models/Category.js",
-            "line": 27,
+            "line": 35,
             "description": "List all categories",
             "itemtype": "method",
             "name": "list",
@@ -357,67 +557,94 @@
         },
         {
             "file": "models/Category.js",
-            "line": 45,
-            "description": "Get a category",
-            "itemtype": "method",
-            "name": "find",
-            "params": [
-                {
-                    "name": "id",
-                    "description": "The id of the category",
-                    "type": "Number"
-                }
-            ],
-            "return": {
-                "description": "The category objects",
-                "type": "Object"
-            },
-            "static": 1,
-            "class": "Category",
-            "module": "Models"
-        },
-        {
-            "file": "models/Category.js",
-            "line": 65,
+            "line": 67,
             "description": "Save the category in the DB",
             "itemtype": "method",
             "name": "save",
             "class": "Category",
+            "module": "Models"
+        },
+        {
+            "file": "models/Layout.js",
+            "line": 7,
+            "description": "Check the layout of an HTML",
+            "itemtype": "method",
+            "name": "check",
+            "static": 1,
+            "params": [
+                {
+                    "name": "html",
+                    "description": "The HTML that will be parsed to discover the layout",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The Layout object of the HTML",
+                "type": "Object"
+            },
+            "example": [
+                "\n{\n name: 'GENERAL_LIST',\n ordinal: 0\n}\nOR\n{\n name: 'COLUMNS_LIST',\n ordinal: 1\n}\nOR\n{\n name: 'DATES_LIST',\n ordinal: 2\n}"
+            ],
+            "class": "",
+            "module": "Models"
+        },
+        {
+            "file": "models/Type.js",
+            "line": 4,
+            "description": "Check the type of a legislation page",
+            "itemtype": "method",
+            "name": "type",
+            "static": 1,
+            "params": [
+                {
+                    "name": "checkUrl",
+                    "description": "The url that will be parsed and verified the Type",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The type of the url",
+                "type": "Object"
+            },
+            "example": [
+                "\n{\n name: 'LEGISLATION',\n ordinal: 0\n}\nOR\n{\n name: 'PDF',\n ordinal: 1\n}\nOR\n{\n name: 'DOC',\n ordinal: 2\n}\nOR\n{\n name: 'LIST',\n ordinal: 3\n}"
+            ],
+            "class": "",
             "module": "Models"
         }
     ],
     "warnings": [
         {
             "message": "Missing item type\nGet the configuration",
-            "line": " config/config.js:10"
+            "line": " config/config.js:9"
         },
         {
             "message": "Missing item type\nGets an article or paragraph number only",
-            "line": " crawl/Cleaner.js:5"
+            "line": " crawl/Clean.js:4"
         },
         {
             "message": "Missing item type\nPre cleaning function removes all double spaces and text things that shoudn't be there",
-            "line": " crawl/Cleaner.js:44"
+            "line": " crawl/Clean.js:61"
         },
         {
             "message": "Missing item type\nPost cleaning function trims the text and add line breaks before items",
-            "line": " crawl/Cleaner.js:81"
+            "line": " crawl/Clean.js:98"
         },
         {
             "message": "Missing item type\nCleans the article number",
-            "line": " crawl/Cleaner.js:111"
+            "line": " crawl/Clean.js:128"
         },
         {
             "message": "Missing item type\nSome texts don't follow the patterns and need to be treated individually",
-            "line": " crawl/Cleaner.js:155"
+            "line": " crawl/Clean.js:172"
         },
         {
             "message": "Missing item type\nBreakes the article into it's number and it's text",
-            "line": " crawl/Parser.js:6"
+            "line": " crawl/Scrap.js:284"
         },
         {
             "message": "Missing item type\nSome texts don't follow the patterns and need to be treated individually",
-            "line": " crawl/Parser.js:67"
+            "line": " crawl/Scrap.js:344"
         }
     ]
 }

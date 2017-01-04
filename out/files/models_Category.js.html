@@ -40,7 +40,9 @@
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/.html"></a></li>
                                 <li><a href="../classes/Category.html">Category</a></li>
-                                <li><a href="../classes/Crawler.html">Crawler</a></li>
+                                <li><a href="../classes/Crawl.html">Crawl</a></li>
+                                <li><a href="../classes/Name.html">Name</a></li>
+                                <li><a href="../classes/Scrap.html">Scrap</a></li>
                             </ul>
                 
                 
@@ -102,12 +104,20 @@ class Category {
    * @param {String} [url = null] - The category url
    * @constructor
    */
-  constructor(name = null, url = null) {
-    this.name = name;
-    this.url = url;
-    this.date = new Date().toLocaleString(&#x27;pt-BR&#x27;, {
-      timeZone: &#x27;America/Sao_Paulo&#x27;,
-    });
+  constructor(name = null, url = null, type = null) {
+    if (typeof name === &#x27;object&#x27;) {
+      Object.keys(name).forEach((key) =&gt; {
+        if (key === &#x27;type&#x27;) {
+          this[key] = name[key].name;
+        } else {
+          this[key] = name[key];
+        }
+      });
+    } else {
+      this.name = name;
+      this.url = url;
+      this.type = type.name || type;
+    }
   }
 
   /**
@@ -128,24 +138,18 @@ class Category {
     );
   }
 
-  /**
-   * Get a category
-   * @method find
-   * @param {Number} id The id of the category
-   * @return {Object} The category objects
-   * @static
-   */
-  static find(id) {
-    return Db.find(
-      collection,
-      id,
-      {
-        _id: &#x27;&#x27;,
-        name: &#x27;&#x27;,
-        url: &#x27;&#x27;,
-        date: &#x27;&#x27;,
-      }
-    );
+  static findByLevel(level = 0) {
+    return new Promise((resolve, reject) =&gt; {
+      Db.find(
+        collection,
+        level
+      ).then((category) =&gt; {
+        resolve(category);
+      })
+        .catch((err) =&gt; {
+          reject(err);
+        });
+    });
   }
 
   /**
@@ -153,8 +157,14 @@ class Category {
    * @method save
    */
   save() {
-    debug(this);
-    return Db.createOrUpdate(collection, this);
+    this.date = new Date().toLocaleString(&#x27;pt-BR&#x27;, {
+      timeZone: &#x27;America/Sao_Paulo&#x27;,
+    });
+    Db.createOrUpdate(collection, this).then((res) =&gt; {
+      if (res.value &amp;&amp; res.value._id) {
+        this._id = res.value._id;
+      }
+    });
   }
 }
 

@@ -2,7 +2,9 @@ YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
         "Category",
-        "Crawler",
+        "Crawl",
+        "Name",
+        "Scrap",
         null
     ],
     "modules": [

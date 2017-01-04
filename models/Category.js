@@ -28,11 +28,8 @@ class Category {
     } else {
       this.name = name;
       this.url = url;
-      this.type = type.name | type;
+      this.type = type.name || type;
     }
-    this.date = new Date().toLocaleString('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
-    });
   }
 
   /**
@@ -72,6 +69,9 @@ class Category {
    * @method save
    */
   save() {
+    this.date = new Date().toLocaleString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+    });
     Db.createOrUpdate(collection, this).then((res) => {
       if (res.value && res.value._id) {
         this._id = res.value._id;

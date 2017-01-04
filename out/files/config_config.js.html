@@ -40,7 +40,9 @@
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/.html"></a></li>
                                 <li><a href="../classes/Category.html">Category</a></li>
-                                <li><a href="../classes/Crawler.html">Crawler</a></li>
+                                <li><a href="../classes/Crawl.html">Crawl</a></li>
+                                <li><a href="../classes/Name.html">Name</a></li>
+                                <li><a href="../classes/Scrap.html">Scrap</a></li>
                             </ul>
                 
                 
@@ -86,7 +88,6 @@
     <pre class="code prettyprint linenums">
 /* eslint no-restricted-modules: [0]  */
 const fs = require(&#x27;fs&#x27;);
-const chalk = require(&#x27;chalk&#x27;);
 const log = require(&#x27;../helpers/log&#x27;);
 const error = require(&#x27;../helpers/error&#x27;);
 
@@ -101,7 +102,7 @@ function getConfig() {
   const confFile = &#x60;./config/${env}.json&#x60;;
   let config = {};
 
-  log(chalk.black.bgYellow(&#x60;  [config.environment] ${env}            &#x60;));
+  log(&#x60;⚙  [config.environment] ${env}&#x60;);
 
   try {
     config = JSON.parse(fs.readFileSync(confFile, &#x27;utf8&#x27;));
@@ -111,7 +112,7 @@ function getConfig() {
     return {};
   }
 
-  log(chalk.black.bgGreen(&#x27;  [conf.readConfig]&#x27;, &#x60;config ${env} found  &#x60;));
+  log(&#x60;⚙  [conf.readConfig] config ${env} found&#x60;);
 
   return config;
 }
