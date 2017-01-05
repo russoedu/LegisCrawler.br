@@ -38,8 +38,12 @@ class Crawl {
           // Verify the type of layout to use the correct parser
           if (layout === Layout.GENERAL_LIST) {
             legislations = Scrap.generalListCategories(html);
-          } else if (layout === Layout.DATES_LIST) {
-            legislations = Scrap.datesListCategories(html);
+          } else if (layout === Layout.IMAGES_LIST) {
+            legislations = Scrap.imagesListCategories(html);
+          // } else if (layout === Layout.COLUMNS_LIST) {
+          //   legislations = Scrap.columnsListCategories(html);
+          // } else {
+          //   error('Crawl', 'no layout found', layout);
           }
 
           return legislations;
@@ -63,10 +67,10 @@ class Crawl {
                   processedListCounter -= 1;
                   respond(legislations, processedListCounter);
                 }, (err) => {
-                  error(err);
+                  error('Crawl', 'recursion error', err);
                 })
                 .catch((err) => {
-                  error(err);
+                  error('Crawl', 'recursion error', err);
                 });
               // If the legislation type is not a list, respond with the legislations
               } else {

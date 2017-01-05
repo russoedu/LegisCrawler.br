@@ -388,9 +388,9 @@
         {
             "file": "crawl/Scrap.js",
             "line": 149,
-            "description": "Scrap Layout.DATES_LIST HTML to get it's links and create a Category for each",
+            "description": "Scrap Layout.IMAGES_LIST HTML to get it's links and create a Category for each",
             "itemtype": "method",
-            "name": "datesListCategories",
+            "name": "imagesListCategories",
             "static": 1,
             "params": [
                 {
@@ -421,7 +421,7 @@
                 }
             ],
             "return": {
-                "description": "The Layout of the HTML ('GENERAL_LIST', 'COLUMNS_LIST'\n                 or 'DATES_LIST')",
+                "description": "The Layout of the HTML ('GENERAL_LIST', 'COLUMNS_LIST'\n                 or 'IMAGES_LIST')",
                 "type": "String"
             },
             "class": "Scrap",
@@ -583,7 +583,7 @@
                 "type": "Object"
             },
             "example": [
-                "\n{\n name: 'GENERAL_LIST',\n ordinal: 0\n}\nOR\n{\n name: 'COLUMNS_LIST',\n ordinal: 1\n}\nOR\n{\n name: 'DATES_LIST',\n ordinal: 2\n}"
+                "\n{\n name: 'GENERAL_LIST',\n ordinal: 0\n}\nOR\n{\n name: 'COLUMNS_LIST',\n ordinal: 1\n}\nOR\n{\n name: 'IMAGES_LIST',\n ordinal: 2\n}"
             ],
             "class": "",
             "module": "Models"

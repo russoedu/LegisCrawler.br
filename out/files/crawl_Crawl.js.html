@@ -126,8 +126,8 @@ class Crawl {
           // Verify the type of layout to use the correct parser
           if (layout === Layout.GENERAL_LIST) {
             legislations = Scrap.generalListCategories(html);
-          } else if (layout === Layout.DATES_LIST) {
-            legislations = Scrap.datesListCategories(html);
+          } else if (layout === Layout.IMAGES_LIST) {
+            legislations = Scrap.imagesListCategories(html);
           }
 
           return legislations;

@@ -1,5 +1,5 @@
 const debug = require('debug')('name');
-
+// const diacriticsMap = require('./diacriticsMap');
 /**
  * Transform no accent, dash separated text in the correct legislation name
  * @method correctImageName
@@ -63,6 +63,15 @@ class Name {
 
     return name;
   }
+
+  // static slug(word) {
+  //   return word
+  //     .toLowerCase()
+  //     .replace(/-+/g, '')
+  //     .replace(/\s+/g, '-')
+  //     // .replace(/[^a-z0-9-]/g, '');
+  //     .replace(/[^\u0000-\u007E]/g, a => diacriticsMap[a] || a);
+  // }
 }
 
 module.exports = Name;

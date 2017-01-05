@@ -22,7 +22,7 @@ class Layout extends enumify.Enum {
    * }
    * OR
    * {
-   *  name: 'DATES_LIST',
+   *  name: 'IMAGES_LIST',
    *  ordinal: 2
    * }
    */
@@ -32,6 +32,6 @@ class Layout extends enumify.Enum {
   }
 }
 
-Layout.initEnum(['GENERAL_LIST', 'COLUMNS_LIST', 'DATES_LIST']);
+Layout.initEnum(['GENERAL_LIST', 'COLUMNS_LIST', 'IMAGES_LIST']);
 
 module.exports = Layout;

@@ -147,14 +147,14 @@ class Scrap {
   }
 
   /**
-   * Scrap Layout.DATES_LIST HTML to get it's links and create a Category for each
-   * @method datesListCategories
+   * Scrap Layout.IMAGES_LIST HTML to get it's links and create a Category for each
+   * @method imagesListCategories
    * @static
    * @param {String} html The HTML that will be scraped
    * @return {Array} Array of 'Category' objects
    */
-  static datesListCategories(html) {
-    debug('datesListCategories');
+  static imagesListCategories(html) {
+    debug('imagesListCategories');
     let processing = false;
     let captureImage = false;
 
@@ -223,7 +223,7 @@ class Scrap {
    * @static
    * @param {String} html The HTML that will be parsed to discover the layout
    * @return {String} The Layout of the HTML ('GENERAL_LIST', 'COLUMNS_LIST'
-   *                  or 'DATES_LIST')
+   *                  or 'IMAGES_LIST')
    */
   static layout(html) {
     debug('layout');
@@ -233,7 +233,7 @@ class Scrap {
     let countTds = false;
     let tdCounter = 0;
     let removeTd = true;
-    let response = 'DATES_LIST';
+    let response = 'IMAGES_LIST';
 
     const parser = new htmlparser.Parser({
       onopentag(tag, attribs) {

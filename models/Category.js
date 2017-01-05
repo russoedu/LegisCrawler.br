@@ -1,5 +1,6 @@
+const debug = require('debug')('category');
 const Db = require('../helpers/Db');
-const debug = require('debug')('model');
+const slug = require('slug');
 
 const collection = 'categories';
 
@@ -25,11 +26,14 @@ class Category {
           this[key] = name[key];
         }
       });
+      this.slug = slug(this.name, { lower: true });
     } else {
       this.name = name;
+      this.slug = slug(this.name, { lower: true });
       this.url = url;
       this.type = type.name || type;
     }
+    debug(this);
   }
 
   /**
