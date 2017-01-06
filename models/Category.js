@@ -26,7 +26,7 @@ class Category {
           this[key] = name[key];
         }
       });
-      this.slug = slug(this.name.replace(/\./g, '-', '-'), { lower: true });
+      this.slug = name.slug || slug(this.name.replace(/\./g, '-', '-'), { lower: true });
       debug(this.slug);
     } else {
       this.name = name;

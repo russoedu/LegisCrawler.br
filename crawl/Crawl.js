@@ -33,7 +33,7 @@ class Crawl {
       };
       request(requestoptions)
         .then((html) => {
-          let legislations = [];
+          let legislations = {};
 
           const layout = Layout.check(html);
           // Verify the type of layout to use the correct parser
@@ -46,24 +46,23 @@ class Crawl {
           } else {
             error('Crawl', 'no layout found', name);
           }
-
           return legislations;
         })
         .then((legislations) => {
           // Start processing the lists
-          let processedListCounter = legislations.length;
+          let processedListCounter = Object.keys(legislations).length;
           // If the legislations are empty, respond with the empty array
           if (processedListCounter === 0) {
             respond(legislations, processedListCounter);
           } else {
             // If there is data, process each one
-            legislations.forEach((legislation) => {
-              const parent = legislation;
-              // If the legislation type is list, call Crawl.page recursively and respond
-              if (legislation.type === 'LIST') {
-                Crawl.page(legislation.url, `${name}>${legislation.name}`)
+            Object.keys(legislations).forEach((lKey) => {
+              const parent = legislations[lKey];
+              // If the legislations type is list, call Crawl.page recursively and respond
+              if (legislations[lKey].type === 'LIST') {
+                Crawl.page(legislations[lKey].url, `${name}>${legislations[lKey].name}`)
                   .then((list) => {
-                    // debug(index, legislation.type, list.length);
+                    // debug(index, legislations.type, list.length);
                     parent.list = list;
                     processedListCounter -= 1;
                     respond(legislations, processedListCounter);

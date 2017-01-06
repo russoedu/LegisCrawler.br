@@ -5,6 +5,7 @@ const Fix = require('./Fix');
 const Category = require('../models/Category');
 const Type = require('../models/Type');
 const Name = require('../helpers/Name');
+const slug = require('slug');
 
 /**
  * Scrap HTMLs to get specific content
@@ -24,7 +25,7 @@ class Scrap {
     let processing = false;
     let captureText = false;
 
-    const categories = [];
+    const categories = {};
     let name;
     let url;
     let type;
@@ -54,12 +55,13 @@ class Scrap {
               name,
               url,
               type,
+              slug: slug(name.replace(/\./g, '-', '-'), { lower: true }),
             });
             if (type === Type.LIST) {
-              category.list = [];
+              category.list = {};
             }
 
-            categories.push(category);
+            categories[category.slug] = category;
           }
           captureText = false;
         }
@@ -93,7 +95,7 @@ class Scrap {
     let processingA = false;
     let captureText = false;
 
-    const categories = [];
+    const categories = {};
     let name;
     let url;
     let type;
@@ -131,12 +133,14 @@ class Scrap {
               name,
               url,
               type,
+              slug: slug(name.replace(/\./g, '-', '-'), { lower: true }),
             });
             if (type === Type.LIST) {
-              category.list = [];
+              category.list = {};
             }
 
-            categories.push(category);
+            categories[category.slug] = category;
+            // categories.push(category);
           }
           captureText = false;
         }
@@ -169,7 +173,7 @@ class Scrap {
     let processing = false;
     let captureImage = false;
 
-    const categories = [];
+    const categories = {};
     let name;
     let url;
     let type;
@@ -198,13 +202,15 @@ class Scrap {
                 name,
                 url,
                 type,
+                slug: slug(name.replace(/\./g, '-', '-'), { lower: true }),
               });
 
               if (type === Type.LIST) {
-                category.list = [];
+                category.list = {};
               }
 
-              categories.push(category);
+              categories[category.slug] = category;
+              // categories.push(category);
             }
           }
         }

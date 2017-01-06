@@ -16,8 +16,8 @@ Crawl.page(url, 'home')
       list: categories,
       url,
     };
-    debug(category);
     new Category(category).save();
+    debug(category.list['leis-ordinarias'].list['1988'].list['7-714-de-29-12-88']);
     Status.finishAll();
   })
   .catch((err) => {
