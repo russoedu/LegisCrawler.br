@@ -18,10 +18,11 @@ class Crawl {
    * @static
    * @return {Promise} Array of legislations with name and link
    */
-  static page(crawlUrl) {
+  static page(crawlUrl, name) {
+    debug(name, crawlUrl);
     return new Promise((resolve, reject) => {
       function respond(data, processedListCounter) {
-        debug('respond', processedListCounter, crawlUrl);
+        // debug('respond', processedListCounter, crawlUrl);
         if (processedListCounter === 0) {
           resolve(data);
         }
@@ -37,13 +38,13 @@ class Crawl {
           const layout = Layout.check(html);
           // Verify the type of layout to use the correct parser
           if (layout === Layout.GENERAL_LIST) {
-            legislations = Scrap.generalListCategories(html);
+            legislations = Scrap.generalListCategories(name, html);
           } else if (layout === Layout.IMAGES_LIST) {
-            legislations = Scrap.imagesListCategories(html);
-          // } else if (layout === Layout.COLUMNS_LIST) {
-          //   legislations = Scrap.columnsListCategories(html);
-          // } else {
-          //   error('Crawl', 'no layout found', layout);
+            legislations = Scrap.imagesListCategories(name, html);
+          } else if (layout === Layout.COLUMNS_LIST) {
+            legislations = Scrap.columnsListCategories(name, html);
+          } else {
+            error('Crawl', 'no layout found', name);
           }
 
           return legislations;
@@ -56,22 +57,22 @@ class Crawl {
             respond(legislations, processedListCounter);
           } else {
             // If there is data, process each one
-            legislations.forEach((legislation, index) => {
+            legislations.forEach((legislation) => {
               const parent = legislation;
               // If the legislation type is list, call Crawl.page recursively and respond
               if (legislation.type === 'LIST') {
-                Crawl.page(legislation.url)
-                .then((list) => {
-                  debug(index, legislation.type, list.length);
-                  parent.list = list;
-                  processedListCounter -= 1;
-                  respond(legislations, processedListCounter);
-                }, (err) => {
-                  error('Crawl', 'recursion error', err);
-                })
-                .catch((err) => {
-                  error('Crawl', 'recursion error', err);
-                });
+                Crawl.page(legislation.url, `${name}>${legislation.name}`)
+                  .then((list) => {
+                    // debug(index, legislation.type, list.length);
+                    parent.list = list;
+                    processedListCounter -= 1;
+                    respond(legislations, processedListCounter);
+                  }, (err) => {
+                    error('Crawl', `${name} recursion error`, err);
+                  })
+                  .catch((err) => {
+                    error('Crawl', `${name} recursion error`, err);
+                  });
               // If the legislation type is not a list, respond with the legislations
               } else {
                 processedListCounter -= 1;
@@ -81,7 +82,7 @@ class Crawl {
           }
         })
         .catch((err) => {
-          error('getPages', 'Could not scrap page', err);
+          error('getPages', `Could not scrap page ${name}`, err);
           reject(error);
         });
     });

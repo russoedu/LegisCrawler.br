@@ -47,9 +47,9 @@ Array.prototype.indexOfArticle = function indexOfArticle(number) {
 class Clean {
   static name(text) {
     return text
-        .replace(/^\s|\s$/gm, '')
-        .replace(/\s{2,100}/gm, '')
-        .replace(/\n*(.)\n*/, '$1');
+        .trim()
+        .replace(/\s\s+/gm, '')
+        .replace(/\n+/, ' ');
   }
   static breadCrumb(breadCrumb) {
     const bc = breadCrumb.replace('\n', '')

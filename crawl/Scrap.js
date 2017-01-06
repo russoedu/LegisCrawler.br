@@ -19,8 +19,8 @@ class Scrap {
    * @param {String} html The HTML that will be scraped
    * @return {Array} Array of 'Category' objects
    */
-  static generalListCategories(html) {
-    debug('generalListCategories');
+  static generalListCategories(origin, html) {
+    debug('generalListCategories', origin);
     let processing = false;
     let captureText = false;
 
@@ -47,7 +47,6 @@ class Scrap {
         if (processing === true && captureText) {
           name = Fix.name(text);
           url = Fix.url(url, name);
-          debug(text, url);
 
           if (name && url) {
             type = Fix.type(url, name, Type.check(url));
@@ -86,9 +85,12 @@ class Scrap {
    * @param {String} html The HTML that will be scraped
    * @return {Array} Array of 'Category' objects
    */
-  static columnsListCategories(html) {
-    debug('columnsListCategories');
+  static columnsListCategories(origin, html) {
+    debug('columnsListCategories', origin);
     let processing = false;
+    let processingTr = false;
+    let processingTd = false;
+    let processingA = false;
     let captureText = false;
 
     const categories = [];
@@ -103,10 +105,17 @@ class Scrap {
           processing = true;
         // Check if the page processing is activated
         } else if (processing) {
-          // add divs inside the capture div to the ignore counter
-          if (tag === 'a') {
+          // Reset 'td' and 'a' processign
+          if (tag === 'tr') {
+            processingTr = true;
+            processingTd = false;
+            processingA = false;
+          } else if (processingTr && tag === 'td') {
+            processingTd = true;
+          } else if (tag === 'a' && processingA === false && processingTd) {
             url = attribs.href;
             captureText = true;
+            processingA = true;
           }
         }
       },
@@ -114,10 +123,10 @@ class Scrap {
         if (processing === true && captureText === true) {
           name = Fix.name(text);
           url = Fix.url(url, name);
-          debug(text, url);
 
           if (name && url) {
             type = Fix.type(url, name, Type.check(url));
+            debug(name, type.name, url);
             category = new Category({
               name,
               url,
@@ -133,8 +142,10 @@ class Scrap {
         }
       },
       onclosetag(tag) {
-        if (tag === 'div' && processing) {
-          processing = false;
+        if (processing) {
+          if (tag === 'div') {
+            processing = false;
+          }
         }
       },
     }, {
@@ -153,8 +164,8 @@ class Scrap {
    * @param {String} html The HTML that will be scraped
    * @return {Array} Array of 'Category' objects
    */
-  static imagesListCategories(html) {
-    debug('imagesListCategories');
+  static imagesListCategories(origin, html) {
+    debug('imagesListCategories', origin);
     let processing = false;
     let captureImage = false;
 
@@ -181,7 +192,6 @@ class Scrap {
             name = Fix.name(Name.fromImageUrl(attribs.src));
             url = Fix.url(url, name);
 
-            debug(name, url);
             if (name && url) {
               type = Fix.type(url, name, Type.check(url));
               const category = new Category({
@@ -226,7 +236,6 @@ class Scrap {
    *                  or 'IMAGES_LIST')
    */
   static layout(html) {
-    debug('layout');
     // return new Promise((resolve, reject) => {
     let processing = false;
     let ignoreCount = 0;
@@ -277,7 +286,7 @@ class Scrap {
 
     parser.write(html);
     parser.end();
-    debug(response);
+
     return response;
   }
 

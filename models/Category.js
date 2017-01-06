@@ -26,14 +26,16 @@ class Category {
           this[key] = name[key];
         }
       });
-      this.slug = slug(this.name, { lower: true });
+      this.slug = slug(this.name.replace(/\./g, '-', '-'), { lower: true });
+      debug(this.slug);
     } else {
       this.name = name;
-      this.slug = slug(this.name, { lower: true });
+      this.slug = slug(this.name.replace(/\./g, '-', '-'), { lower: true });
+      debug(this.slug);
       this.url = url;
       this.type = type.name || type;
     }
-    debug(this);
+    // debug(this);
   }
 
   /**

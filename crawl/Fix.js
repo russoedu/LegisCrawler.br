@@ -1,9 +1,10 @@
 // const debug = require('debug')('fix');
 const Type = require('../models/Type');
+const Clean = require('./Clean');
 
 class Fix {
   static name(title) {
-    let response = title;
+    let response = Clean.name(title);
     if (title ===
       'http://www4.planalto.gov.br/legislacao/imagens/codigos/copy3_of_CdigodeProcessoCivil2015.png'
     ) {
