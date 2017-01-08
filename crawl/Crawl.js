@@ -84,9 +84,9 @@ class Crawl {
               // If the legislation type is not a list, respond with the legislations
               } else {
                 debug(legislations[lKey].slug);
-                SpiderStatus.legislationFinish();
                 List.save(legislations[lKey])
                   .then((list) => {
+                    SpiderStatus.legislationFinish(legislations[lKey].url);
                     const legislation = legislations[lKey];
                     legislation._id = list._id;
                     processedListCounter -= 1;

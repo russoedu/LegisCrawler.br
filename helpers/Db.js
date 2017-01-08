@@ -15,7 +15,7 @@ class Db {
           reject(connectionErr);
         } else {
           global.db = db;
-          log(`⚙  [DB.connect]         Success connecting to DB ${config.db.url}`);
+          log(`⚙  [DB.connect]           Success connecting to DB ${config.db.url}`);
           resolve('success');
         }
       });

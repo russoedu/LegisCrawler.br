@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 process.env.UV_THREADPOOL_SIZE = 128;
 
+const http = require('http');
 const debug = require('debug')('spider');
 const error = require('../helpers/error');
 const Db = require('../helpers/Db');
@@ -9,9 +10,14 @@ const Type = require('../models/Type');
 const List = require('../models/List');
 const Crawl = require('./Crawl');
 const SpiderStatus = require('../helpers/SpiderStatus');
+const log = require('../helpers/log');
+
+// Limit the number of simultaneous connections to avoid http 503 error
+http.globalAgent.maxSockets = 3;
 
 const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1';
-// const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1/leis-complementares-1';
+// const url = 'http://www4.planalto.gov.br/legislacao/' +
+//             'portal-legis/legislacao-1/leis-complementares-1';
 
 
 Db.connect()
@@ -40,7 +46,7 @@ Db.connect()
     SpiderStatus.finishAll(quantity);
   })
   .then(() => {
-    console.log('next final');
+    log('next final');
   })
   .then(() => {
     Db.close();
