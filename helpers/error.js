@@ -8,5 +8,5 @@ module.exports = function error(type, message, data) {
   log.error(chalk.red('#### error message start ####'));
   log.error(data);
   log.error(chalk.red('#### error message end ######'));
-  global.error = true;
+  process.exit();
 };

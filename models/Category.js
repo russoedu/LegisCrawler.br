@@ -1,5 +1,6 @@
 const debug = require('debug')('category');
 const Db = require('../helpers/Db');
+const error = require('../helpers/error');
 const slug = require('slug');
 
 const collection = 'categories';
@@ -65,6 +66,7 @@ class Category {
         resolve(category);
       })
         .catch((err) => {
+          error('Category', 'find error', err);
           reject(err);
         });
     });
@@ -78,10 +80,14 @@ class Category {
     this.date = new Date().toLocaleString('pt-BR', {
       timeZone: 'America/Sao_Paulo',
     });
-    Db.createOrUpdate(collection, this).then((res) => {
+    Db.createOrUpdate(collection, this)
+    .then((res) => {
       if (res.value && res.value._id) {
         this._id = res.value._id;
       }
+    })
+    .catch((err) => {
+      error('Category', 'find error', err);
     });
   }
 }

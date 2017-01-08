@@ -31,6 +31,10 @@ class Crawl {
 
       const requestoptions = {
         url: crawlUrl,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36',
+        },
+        timeout: 120 * 1000,
       };
       request(requestoptions)
         .then((html) => {
@@ -49,7 +53,7 @@ class Crawl {
           }
           return legislations;
         }, (err) => {
-          error(err);
+          error('Crawl', `request ${crawlUrl}`, err.statusCode);
           reject(err);
         })
         .then((legislations) => {
@@ -70,29 +74,31 @@ class Crawl {
                     parent.list = list;
                     processedListCounter -= 1;
                     respond(legislations, processedListCounter);
-                  }, (err) => {
-                    error('Crawl', `${name} recursion error`, err);
-                  })
-                  .catch((err) => {
-                    error('Crawl', `${name} recursion error`, err);
+                  // }, (err) => {
+                  //   error('Crawl', `${name} recursion error`, err);
                   });
+                  // .catch((err) => {
+                  //   error('Crawl', `${name} recursion error`, err);
+                  // });
               // If the legislation type is not a list, respond with the legislations
               } else {
                 debug(legislations[lKey].slug);
-                // List.save(legislations[lKey])
-                  // .then(() => {
-                processedListCounter -= 1;
-                respond(legislations, processedListCounter);
-                  // });
+                List.save(legislations[lKey])
+                  .then((list) => {
+                    const legislation = legislations[lKey];
+                    legislation._id = list._id;
+                    processedListCounter -= 1;
+                    respond(legislations, processedListCounter);
+                  });
               }
             });
           }
         }, (err) => {
-          error(err);
+          error('Crawl', 'legislations processing', err);
           reject(err);
         })
         .catch((err) => {
-          error('getPages', `Could not scrap page ${name}`, err);
+          error('getPages', `Could not reach ${crawlUrl}`, err);
           reject(error);
         });
     });

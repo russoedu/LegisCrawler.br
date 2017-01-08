@@ -6,7 +6,7 @@ const error = require('../helpers/error');
 const Status = require('../helpers/Status');
 const Legislation = require('../models/Legislation');
 const Scraper = require('./Scraper');
-const Cleaner = require('./Cleaner');
+const Clean = require('./Clean');
 const Parser = require('./Parser');
 
 const legislations = config.legislations;
@@ -33,7 +33,7 @@ function crawl(i, next) {
       .then((scrapedText) => {
         // debug(scrapedText);
         status.startProcess('Clean');
-        const cleanText = Cleaner.cleanScrapedText(scrapedText);
+        const cleanText = Clean.cleanScrapedText(scrapedText);
         // debug(cleanText);
         status.finishProcess();
         return cleanText;
