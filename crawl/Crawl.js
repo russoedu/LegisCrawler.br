@@ -4,6 +4,7 @@ const Layout = require('../models/Layout');
 const List = require('../models/List');
 const error = require('../helpers/error');
 const Scrap = require('./Scrap');
+const SpiderStatus = require('../helpers/SpiderStatus');
 
 /**
  * Crawl urls for the desired content
@@ -83,6 +84,7 @@ class Crawl {
               // If the legislation type is not a list, respond with the legislations
               } else {
                 debug(legislations[lKey].slug);
+                SpiderStatus.legislationFinish();
                 List.save(legislations[lKey])
                   .then((list) => {
                     const legislation = legislations[lKey];

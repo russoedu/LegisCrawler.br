@@ -41,6 +41,9 @@ class List {
       }
     );
   }
+  static count() {
+    return Db.count(collection);
+  }
 }
 
 module.exports = List;
