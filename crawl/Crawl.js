@@ -1,6 +1,7 @@
 const request = require('request-promise-native');
 const debug = require('debug')('crawl');
 const Layout = require('../models/Layout');
+const List = require('../models/List');
 const error = require('../helpers/error');
 const Scrap = require('./Scrap');
 
@@ -47,6 +48,9 @@ class Crawl {
             error('Crawl', 'no layout found', name);
           }
           return legislations;
+        }, (err) => {
+          error(err);
+          reject(err);
         })
         .then((legislations) => {
           // Start processing the lists
@@ -74,11 +78,18 @@ class Crawl {
                   });
               // If the legislation type is not a list, respond with the legislations
               } else {
+                debug(legislations[lKey].slug);
+                // List.save(legislations[lKey])
+                  // .then(() => {
                 processedListCounter -= 1;
                 respond(legislations, processedListCounter);
+                  // });
               }
             });
           }
+        }, (err) => {
+          error(err);
+          reject(err);
         })
         .catch((err) => {
           error('getPages', `Could not scrap page ${name}`, err);

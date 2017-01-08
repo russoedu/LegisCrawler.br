@@ -24,7 +24,7 @@ function getConfig() {
     return {};
   }
 
-  log(`⚙  [conf.readConfig] config ${env} found`);
+  log(`⚙  [conf.readConfig]    config ${env} found`);
 
   return config;
 }

@@ -81,6 +81,12 @@ class Status {
       '✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨');
     log('');
   }
+
+  static finishAllWithError() {
+    log('');
+    log(`😪  ${chalk.red('[ERROR] Could not create the legislations')}`);
+    log('');
+  }
 }
 
 module.exports = Status;
