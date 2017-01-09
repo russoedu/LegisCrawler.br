@@ -1,4 +1,5 @@
 const debug = require('debug')('crawl');
+const slug = require('slug');
 
 const Scrap = require('./Scrap');
 
@@ -22,7 +23,7 @@ class Crawl {
    * @static
    * @return {Promise} Array of legislations with name and link
    */
-  static page(crawlUrl, name) {
+  static page(crawlUrl, name = '') {
     debug(name, crawlUrl);
     return new Promise((resolve, reject) => {
       function respond(data, processedListCounter) {
@@ -47,13 +48,17 @@ class Crawl {
           } else {
             // If there is data, process each one
             Object.keys(categories).forEach((lKey) => {
-              const parent = categories[lKey];
+              const category = categories[lKey];
+              const catSlug = slug(category.name.replace(/\./g, '-', '-'), { lower: true });
+              const path = `${name}/${catSlug}`;
+              category.path = path;
+
               // If the categories type is list, call Crawl.page recursively and respond
-              if (categories[lKey].type === 'LIST') {
-                Crawl.page(categories[lKey].url, `${name}>${categories[lKey].name}`)
+              if (category.type === 'LIST') {
+                Crawl.page(category.url, path)
                   .then((list) => {
                     // debug(index, categories.type, list.length);
-                    parent.list = list;
+                    category.list = list;
                     processedListCounter -= 1;
                     respond(categories, processedListCounter);
                   }, (err) => {
@@ -64,7 +69,6 @@ class Crawl {
                   });
               // If the legislation type is not a list, respond with the categories
               } else {
-                const category = categories[lKey];
                 debug(category.slug);
 
                 Category.listSave(category)

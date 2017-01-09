@@ -7,7 +7,8 @@
       100,
       {
         "ignoreRegExpLiterals": true,
-        "ignoreStrings": true
+        "ignoreStrings": true,
+        "ignoreComments": true
       }
     ],
     "no-underscore-dangle": [

@@ -19,8 +19,7 @@ const SpiderStatus = require('../helpers/SpiderStatus');
 // Limit the number of simultaneous connections to avoid http 503 error
 
 const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1';
-// const url = 'http://www4.planalto.gov.br/legislacao/' +
-//             'portal-legis/legislacao-1/leis-complementares-1';
+// const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1/leis-complementares-1';
 
 
 class Spider {
@@ -28,7 +27,7 @@ class Spider {
     Db.connect()
     .then(() => {
       SpiderStatus.start(url);
-      return Crawl.page(url, 'home');
+      return Crawl.page(url);
     })
     .then((categories) => {
       if (global.error) {
@@ -39,6 +38,7 @@ class Spider {
           type: Type.LIST,
           layout: 'GENERAL_LIST',
           list: categories,
+          path: '/',
           url,
         };
         // debug(category);
