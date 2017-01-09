@@ -1,10 +1,10 @@
-const request = require('request-promise-native');
 const debug = require('debug')('crawl');
 
 const Scrap = require('./Scrap');
 
-const Legislation = require('../models/Legislation');
+const Category = require('../models/Category');
 
+const request = require('../helpers/request');
 const error = require('../helpers/error');
 const SpiderStatus = require('../helpers/SpiderStatus');
 
@@ -32,53 +32,47 @@ class Crawl {
         }
       }
 
-      const requestoptions = {
-        url: crawlUrl,
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36',
-        },
-        timeout: 120 * 1000,
-      };
-      request(requestoptions)
-        .then(html => Scrap.listCategories(name, html),
+      request(crawlUrl)
+        .then(html => Scrap.categories(html),
           (err) => {
-            error('Crawl', `request ${crawlUrl}`, err.statusCode);
+            error('Crawl', `request ${crawlUrl}`, err);
             reject(err);
           })
-        .then((legislations) => {
+        .then((categories) => {
           // Start processing the lists
-          let processedListCounter = Object.keys(legislations).length;
-          // If the legislations are empty, respond with the empty array
+          let processedListCounter = Object.keys(categories).length;
+          // If the categories are empty, respond with the empty array
           if (processedListCounter === 0) {
-            respond(legislations, processedListCounter);
+            respond(categories, processedListCounter);
           } else {
             // If there is data, process each one
-            Object.keys(legislations).forEach((lKey) => {
-              const parent = legislations[lKey];
-              // If the legislations type is list, call Crawl.page recursively and respond
-              if (legislations[lKey].type === 'LIST') {
-                Crawl.page(legislations[lKey].url, `${name}>${legislations[lKey].name}`)
+            Object.keys(categories).forEach((lKey) => {
+              const parent = categories[lKey];
+              // If the categories type is list, call Crawl.page recursively and respond
+              if (categories[lKey].type === 'LIST') {
+                Crawl.page(categories[lKey].url, `${name}>${categories[lKey].name}`)
                   .then((list) => {
-                    // debug(index, legislations.type, list.length);
+                    // debug(index, categories.type, list.length);
                     parent.list = list;
                     processedListCounter -= 1;
-                    respond(legislations, processedListCounter);
+                    respond(categories, processedListCounter);
                   }, (err) => {
                     error('Crawl', `${name} recursion error`, err);
                   })
                   .catch((err) => {
                     error('Crawl', `${name} recursion error`, err);
                   });
-              // If the legislation type is not a list, respond with the legislations
+              // If the legislation type is not a list, respond with the categories
               } else {
-                debug(legislations[lKey].slug);
-                Legislation.listSave(legislations[lKey])
+                const category = categories[lKey];
+                debug(category.slug);
+
+                Category.listSave(category)
                   .then((list) => {
-                    SpiderStatus.legislationFinish(legislations[lKey].url);
-                    const legislation = legislations[lKey];
-                    legislation._id = list._id;
+                    SpiderStatus.legislationFinish(category.url);
+                    category._id = list._id;
                     processedListCounter -= 1;
-                    respond(legislations, processedListCounter);
+                    respond(categories, processedListCounter);
                   });
               }
             });

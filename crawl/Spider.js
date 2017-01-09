@@ -10,50 +10,47 @@ const Scrap = require('./Scrap');
 
 const Category = require('../models/Category');
 const Type = require('../models/Type');
-const Legislation = require('../models/Legislation');
+// const Legislation = require('../models/Legislation');
 
 const error = require('../helpers/error');
 const Db = require('../helpers/Db');
 const SpiderStatus = require('../helpers/SpiderStatus');
-const log = require('../helpers/log');
 
 // Limit the number of simultaneous connections to avoid http 503 error
 
-const parallel = 5;
 const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1';
 // const url = 'http://www4.planalto.gov.br/legislacao/' +
 //             'portal-legis/legislacao-1/leis-complementares-1';
 
-http.globalAgent.maxSockets = parallel;
 
 class Spider {
-  static crawlLinks() {
+  static crawlLinks(parallel) {
     Db.connect()
-    // .then(() => {
-    //   SpiderStatus.start(url);
-    //   return Crawl.page(url, 'home');
-    // })
-    // .then((categories) => {
-    //   if (global.error) {
-    //     SpiderStatus.finishAllWithError();
-    //   } else {
-    //     const category = {
-    //       name: 'home',
-    //       type: Type.LIST,
-    //       layout: 'GENERAL_LIST',
-    //       list: categories,
-    //       url,
-    //     };
-    //     // debug(category);
-    //     new Category(category).save();
-    //   }
-    // })
-    .then(() => Legislation.listCount())
+    .then(() => {
+      SpiderStatus.start(url);
+      return Crawl.page(url, 'home');
+    })
+    .then((categories) => {
+      if (global.error) {
+        SpiderStatus.finishAllWithError();
+      } else {
+        const category = {
+          name: 'home',
+          type: Type.LIST,
+          layout: 'GENERAL_LIST',
+          list: categories,
+          url,
+        };
+        // debug(category);
+        new Category(category).save();
+      }
+    })
+    .then(() => Category.listCount())
     .then((quantity) => {
       debug(quantity);
       SpiderStatus.finishAll(quantity);
     })
-    .then(() => Legislation.list())
+    .then(() => Category.list())
     .then((legislations) => {
       Scrap.legislations(legislations, parallel);
     })
@@ -66,7 +63,24 @@ class Spider {
   }
 }
 
-Spider.crawlLinks();
-// cron.schedule('0 0 4 1-31 * *', () => {
-//   Spider.crawlLinks();
-// });
+let useSchedule = true;
+let parallel = 3;
+
+process.argv.forEach((arg, index) => {
+  if (arg === '--no-schedule') {
+    useSchedule = false;
+  } else if (arg === '--parallel') {
+    parallel = Number(process.argv[index + 1]);
+  }
+});
+
+
+http.globalAgent.maxSockets = parallel;
+if (useSchedule) {
+  SpiderStatus.cronSet();
+  cron.schedule('0 0 4 1-31 * *', () => {
+    Spider.crawlLinks(parallel);
+  });
+} else {
+  Spider.crawlLinks(parallel);
+}

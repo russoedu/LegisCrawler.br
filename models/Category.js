@@ -4,6 +4,7 @@ const error = require('../helpers/error');
 const slug = require('slug');
 
 const collection = 'categories';
+const listCollection = 'list';
 
 /**
  * Category Model Class
@@ -45,7 +46,7 @@ class Category {
    * @return {Array} Array with categories objects
    * @static
    */
-  static list() {
+  static get() {
     return Db.list(
       collection,
       {
@@ -77,18 +78,57 @@ class Category {
    * @method save
    */
   save() {
-    this.date = new Date().toLocaleString('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
+    return new Promise((resolve, reject) => {
+      this.date = new Date().toLocaleString('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+      });
+      Db.createOrUpdate(collection, this)
+        .then((res) => {
+          if (res.value && res.value._id) {
+            this._id = res.value._id;
+          }
+          resolve(this);
+        })
+        .catch((err) => {
+          error('Category', 'find error', err);
+          reject(err);
+        });
     });
-    Db.createOrUpdate(collection, this)
-    .then((res) => {
-      if (res.value && res.value._id) {
-        this._id = res.value._id;
+  }
+
+  static list() {
+    return Db.find(
+      listCollection,
+      {
+        _id: '',
+        name: '',
+        url: '',
+        type: '',
+        slug: '',
       }
-    })
-    .catch((err) => {
-      error('Category', 'find error', err);
-    });
+    );
+  }
+
+  static listSave(list) {
+    debug(list);
+    return new Promise((resolve, reject) =>
+       Db.createOrUpdate(listCollection, list)
+        .then((res) => {
+          if (res.value && res.value._id) {
+            this._id = res.value._id;
+          }
+          debug(this);
+          resolve(this);
+        })
+        .catch((err) => {
+          error('List', 'createOrUpdate', err);
+          reject(err);
+        })
+    );
+  }
+
+  static listCount() {
+    return Db.count(listCollection);
   }
 }
 

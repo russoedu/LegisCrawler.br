@@ -1,9 +1,8 @@
 const Db = require('../helpers/Db');
 const debug = require('debug')('model');
-const error = require('../helpers/error');
+// const error = require('../helpers/error');
 
 const collection = 'legislations';
-const listCollection = 'list';
 
 class Legislation {
   constructor(name = null, category = null, link = null, url = null, articles = null) {
@@ -38,41 +37,6 @@ class Legislation {
   save() {
     debug(this);
     return Db.createOrUpdate(collection, this);
-  }
-
-  static list() {
-    return Db.find(
-      listCollection,
-      {
-        _id: '',
-        name: '',
-        url: '',
-        type: '',
-        slug: '',
-      }
-    );
-  }
-
-  static listSave(list) {
-    debug(list);
-    return new Promise((resolve, reject) => {
-      Db.createOrUpdate(listCollection, list)
-        .then((res) => {
-          if (res.value && res.value._id) {
-            this._id = res.value._id;
-          }
-          debug(this);
-          resolve(this);
-        })
-        .catch((err) => {
-          error('List', 'createOrUpdate', err);
-          reject(err);
-        });
-    });
-  }
-
-  static listCount() {
-    return Db.count(collection);
   }
 }
 

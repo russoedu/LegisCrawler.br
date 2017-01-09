@@ -2,7 +2,6 @@ const debug = require('debug')('scrap');
 const forLimit = require('for-limit');
 const htmlparser = require('htmlparser2');
 const slug = require('slug');
-const request = require('request-promise-native');
 
 const Clean = require('./Clean');
 const Fix = require('./Fix');
@@ -15,18 +14,18 @@ const Legislation = require('../models/Legislation');
 const Name = require('../helpers/Name');
 const error = require('../helpers/error');
 // const log = require('../helpers/log');
+const request = require('../helpers/request');
 const ScrapStatus = require('../helpers/ScrapStatus');
 
 const priv = {
   /**
    * Scrap Layout.GENERAL_LIST HTML to get it's links and create a Category for each
-   * @method generalListCategories
+   * @method getGeneraCategoriesLinks
    * @private
    * @param {String} html The HTML that will be scraped
    * @return {Array} Array of 'Category' objects
    */
-  generalListCategories(origin, html) {
-    debug('generalListCategories', origin);
+  getGeneraCategoriesLinks(html) {
     let processing = false;
     let captureText = false;
 
@@ -87,13 +86,13 @@ const priv = {
 
   /**
    * Scrap Layout.COLUMNS_LIST HTML to get it's links and create a Category for each
-   * @method columnsListCategories
+   * @method getColumnCategoriesLinks
    * @private
    * @param {String} html The HTML that will be scraped
    * @return {Array} Array of 'Category' objects
    */
-  columnsListCategories(origin, html) {
-    debug('columnsListCategories', origin);
+  getColumnCategoriesLinks(html) {
+    debug('getColumnCategoriesLinks');
     let processing = false;
     let processingTr = false;
     let processingTd = false;
@@ -168,13 +167,13 @@ const priv = {
 
   /**
    * Scrap Layout.IMAGES_LIST HTML to get it's links and create a Category for each
-   * @method imagesListCategories
+   * @method getImageCategoriesLinks
    * @private
    * @param {String} html The HTML that will be scraped
    * @return {Array} Array of 'Category' objects
    */
-  imagesListCategories(origin, html) {
-    debug('imagesListCategories', origin);
+  getImageCategoriesLinks(html) {
+    debug('getImageCategoriesLinks');
     let processing = false;
     let captureImage = false;
 
@@ -458,6 +457,7 @@ const priv = {
 class Scrap {
   /**
    * Scrap a list of legislations and save each on on the legislations DB
+   * @method legislations
    * @param  {Array} legislations Array of legislations objects
    * @param  {Number} parallel    Number of parallel request executions
    * @return {Promise}            Promise with success response after all legislations has been
@@ -468,21 +468,30 @@ class Scrap {
     priv.legislationsLastIndex = legislations.length - 1;
     forLimit(0, priv.legislationsLastIndex, parallel, priv.legislation);
   }
-  static listCategories(name, html) {
-    const layout = Scrap.layout(html);
-    let legislations = {};
 
-    // Verify the type of layout to use the correct parser
+  /**
+  * Scrap the links of a category page from it's html
+  * @method categories
+  * @param  {String} name Array of legislations objects
+  * @param  {Number} parallel    Number of parallel request executions
+  * @return {Promise}            Promise with array of categories objects on success
+  *                              scraped
+   */
+  static categories(html) {
+    const layout = Scrap.layout(html);
+    let categories = {};
+
+    // Verify the type of layout to use the correct scraper
     if (Layout.enumValueOf(layout) === Layout.GENERAL_LIST) {
-      legislations = priv.generalListCategories(name, html);
+      categories = priv.getGeneraCategoriesLinks(html);
     } else if (Layout.enumValueOf(layout) === Layout.IMAGES_LIST) {
-      legislations = priv.imagesListCategories(name, html);
+      categories = priv.getImageCategoriesLinks(html);
     } else if (Layout.enumValueOf(layout) === Layout.COLUMNS_LIST) {
-      legislations = priv.columnsListCategories(name, html);
+      categories = priv.getColumnCategoriesLinks(html);
     } else {
-      error('Crawl', 'no layout found', name);
+      error('Crawl', 'no layout found', html);
     }
-    return legislations;
+    return categories;
   }
 
   /**

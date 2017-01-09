@@ -23,6 +23,10 @@ class SpiderStatus {
     this.name = name;
   }
 
+  static cronSet() {
+    log(chalk.blue('⏰  [CRON]                 Cron set to process everyday at 4:00 AM'));
+  }
+
   static start(url) {
     log(chalk.blue(`🕸  [START]                Spider initiated on ${url}`));
     process.stdout.write(chalk.green('👷  [WORKING]    '));
