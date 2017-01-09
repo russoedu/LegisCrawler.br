@@ -312,25 +312,6 @@ const priv = {
   },
 
   /**
-   * Some texts don't follow the patterns and need to be treated individually
-   * @method cleanArticles
-   * @private
-   * @param  {String} legislationName   The name of the legislation
-   * @param  {Array} dirtyArticles   Array of articles to be clean
-   * @return {Array}        Array of clean articles
-   */
-  cleanArticles(legislationName, dirtyArticles) {
-    const articles = dirtyArticles;
-
-    articles.forEach((article, index) => {
-      articles[index].article = Clean.knownSemanticErrors(legislationName, article);
-      articles[index].article = Clean.trim(article.article);
-    });
-
-    return articles;
-  },
-
-  /**
    * Breakes the article into it's number and it's text
    * @method getArticles
    * @static
@@ -391,20 +372,23 @@ const priv = {
     debug(articles);
     return articles;
   },
+
   /**
-   * @method crawlLegislation
+   * @method legislation
    * @private
    * @param {Number} i Iterator
    * @param {function} next forLimit next function
    */
-  crawlLegislation(i, next) {
+  legislation(i, next) {
     setTimeout(() => {
       const legislation = priv.legislations[i];
-      const status = new ScrapStatus(legislation.name);
+      const status = new ScrapStatus(legislation.name, legislation.url);
 
       status.startProcessComplete();
       status.startProcess('Scrap');
 
+      // TODO Check the type of legislation - some of them don't have articles
+      // http://www.planalto.gov.br/ccivil_03/_Ato2004-2006/2004/Msg/VET/VET-2-04.htm
       priv.page(legislation)
         // Get the legislations from the URLs set in the config
         .then((scrapedText) => {
@@ -433,7 +417,7 @@ const priv = {
           status.startProcess('Clean');
           // debug(articles);
 
-          const cleanArticles = priv.cleanArticles(legislation.name, articles);
+          const cleanArticles = Clean.articles(legislation.name, articles);
           debug(cleanArticles);
           status.finishProcess();
           return cleanArticles;
@@ -482,7 +466,7 @@ class Scrap {
   static legislations(legislations, parallel) {
     priv.legislations = legislations;
     priv.legislationsLastIndex = legislations.length - 1;
-    forLimit(0, priv.legislationsLastIndex, parallel, priv.crawlLegislation);
+    forLimit(0, priv.legislationsLastIndex, parallel, priv.legislation);
   }
   static listCategories(name, html) {
     const layout = Scrap.layout(html);

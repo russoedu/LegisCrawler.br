@@ -90,7 +90,6 @@ class Clean {
       .replace(brokenArticleRegEx, 'A$1');
 
     // Clean everything before the first article
-    console.log(text.match(beginingOfLegislation));
     text = text.match(beginingOfLegislation)[0];
 
     return text;
@@ -188,6 +187,25 @@ class Clean {
     }
 
     return cleanArticle;
+  }
+
+  /**
+   * Some texts don't follow the patterns and need to be treated individually
+   * @method articles
+   * @static
+   * @param  {String} legislationName   The name of the legislation
+   * @param  {Array} dirtyArticles   Array of articles to be clean
+   * @return {Array}        Array of clean articles
+   */
+  static articles(legislationName, dirtyArticles) {
+    const articles = dirtyArticles;
+
+    articles.forEach((article, index) => {
+      articles[index].article = Clean.knownSemanticErrors(legislationName, article);
+      articles[index].article = Clean.trim(article.article);
+    });
+
+    return articles;
   }
 }
 module.exports = Clean;

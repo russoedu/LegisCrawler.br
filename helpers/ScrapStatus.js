@@ -33,8 +33,9 @@ function getProcessIcon(process = null) {
   return icon;
 }
 class ScrapStatus {
-  constructor(legislationName) {
+  constructor(legislationName, legislationUrl) {
     this.legislationName = legislationName;
+    this.legislationUrl = legislationUrl;
   }
 
   static startAll(quantity) {
@@ -49,8 +50,10 @@ class ScrapStatus {
   }
   startProcessComplete() {
     const processIcon = getProcessIcon(this.process);
-    const spcs = spaces(this.legislationName);
+    let spcs = spaces(this.legislationName);
     log(chalk.black.bgYellow(`${processIcon}   [START] ${this.legislationName}${spcs}`));
+    spcs = spaces(this.legislationUrl);
+    log(chalk.black.bgYellow(`${processIcon}   [START] ${this.legislationUrl}${spcs}`));
   }
 
   finishProcess() {
