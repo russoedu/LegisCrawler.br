@@ -24,8 +24,8 @@ class SpiderStatus {
   }
 
   static start(url) {
-    log(chalk.blue(`🕸  [START]                Spider initiated on "${url}"`));
-    process.stdout.write(chalk.green('   [PROCESSING] '));
+    log(chalk.blue(`🕸  [START]                Spider initiated on ${url}`));
+    process.stdout.write(chalk.green('👷  [WORKING]    '));
   }
 
   static legislationFinish(url) {
@@ -37,23 +37,26 @@ class SpiderStatus {
       plural = 's';
     }
     process.stdout.clearLine();
+
     process.stdout.cursorTo(0);
-    process.stdout.write(chalk.green('   [PROCESSING] '));
+    process.stdout.write(chalk.green('👷  [WORKING]    '));
+
     process.stdout.cursorTo(15);
-    process.stdout.write(chalk.green(`${processedWithCommas()} link${plural} crawled\r`));
-    process.stdout.cursorTo(46);
+    process.stdout.write(chalk.green(`${processedWithCommas()} link${plural} crawled`));
+
+    process.stdout.cursorTo(45);
     process.stdout.write(chalk.yellow(` ${url}`));
   }
 
   static finishAll(legislationsQuantity) {
     const quantity = legislationsQuantity.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     log('');
-    log(chalk.blue(`🕸  [FINISH]              Scraped ${quantity} legislations`));
+    log(chalk.blue(`🕸  [FINISH]               Scraped ${quantity} legislations`));
   }
 
   static finishAllWithError() {
     log('');
-    log(`😪  ${chalk.red('[ERROR]            Could not crawl pages')}`);
+    log(`😪  ${chalk.red('     [ERROR]               Could not crawl pages')}`);
     log('');
   }
 }

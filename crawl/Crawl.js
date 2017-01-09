@@ -1,9 +1,11 @@
 const request = require('request-promise-native');
 const debug = require('debug')('crawl');
-const Layout = require('../models/Layout');
-const List = require('../models/List');
-const error = require('../helpers/error');
+
 const Scrap = require('./Scrap');
+
+const Legislation = require('../models/Legislation');
+
+const error = require('../helpers/error');
 const SpiderStatus = require('../helpers/SpiderStatus');
 
 /**
@@ -38,25 +40,11 @@ class Crawl {
         timeout: 120 * 1000,
       };
       request(requestoptions)
-        .then((html) => {
-          let legislations = {};
-
-          const layout = Layout.check(html);
-          // Verify the type of layout to use the correct parser
-          if (layout === Layout.GENERAL_LIST) {
-            legislations = Scrap.generalListCategories(name, html);
-          } else if (layout === Layout.IMAGES_LIST) {
-            legislations = Scrap.imagesListCategories(name, html);
-          } else if (layout === Layout.COLUMNS_LIST) {
-            legislations = Scrap.columnsListCategories(name, html);
-          } else {
-            error('Crawl', 'no layout found', name);
-          }
-          return legislations;
-        }, (err) => {
-          error('Crawl', `request ${crawlUrl}`, err.statusCode);
-          reject(err);
-        })
+        .then(html => Scrap.listCategories(name, html),
+          (err) => {
+            error('Crawl', `request ${crawlUrl}`, err.statusCode);
+            reject(err);
+          })
         .then((legislations) => {
           // Start processing the lists
           let processedListCounter = Object.keys(legislations).length;
@@ -75,16 +63,16 @@ class Crawl {
                     parent.list = list;
                     processedListCounter -= 1;
                     respond(legislations, processedListCounter);
-                  // }, (err) => {
-                  //   error('Crawl', `${name} recursion error`, err);
+                  }, (err) => {
+                    error('Crawl', `${name} recursion error`, err);
+                  })
+                  .catch((err) => {
+                    error('Crawl', `${name} recursion error`, err);
                   });
-                  // .catch((err) => {
-                  //   error('Crawl', `${name} recursion error`, err);
-                  // });
               // If the legislation type is not a list, respond with the legislations
               } else {
                 debug(legislations[lKey].slug);
-                List.save(legislations[lKey])
+                Legislation.listSave(legislations[lKey])
                   .then((list) => {
                     SpiderStatus.legislationFinish(legislations[lKey].url);
                     const legislation = legislations[lKey];

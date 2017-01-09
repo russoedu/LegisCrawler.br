@@ -1,26 +1,31 @@
 const debug = require('debug')('scrap');
+const forLimit = require('for-limit');
 const htmlparser = require('htmlparser2');
+const slug = require('slug');
+const request = require('request-promise-native');
+
 const Clean = require('./Clean');
 const Fix = require('./Fix');
-const Category = require('../models/Category');
-const Type = require('../models/Type');
-const Name = require('../helpers/Name');
-const slug = require('slug');
 
-/**
- * Scrap HTMLs to get specific content
- * @module Crawler
- * @class Scrap
- */
-class Scrap {
+const Category = require('../models/Category');
+const Layout = require('../models/Layout');
+const Type = require('../models/Type');
+const Legislation = require('../models/Legislation');
+
+const Name = require('../helpers/Name');
+const error = require('../helpers/error');
+// const log = require('../helpers/log');
+const ScrapStatus = require('../helpers/ScrapStatus');
+
+const priv = {
   /**
    * Scrap Layout.GENERAL_LIST HTML to get it's links and create a Category for each
    * @method generalListCategories
-   * @static
+   * @private
    * @param {String} html The HTML that will be scraped
    * @return {Array} Array of 'Category' objects
    */
-  static generalListCategories(origin, html) {
+  generalListCategories(origin, html) {
     debug('generalListCategories', origin);
     let processing = false;
     let captureText = false;
@@ -78,16 +83,16 @@ class Scrap {
     parser.end();
 
     return categories;
-  }
+  },
 
   /**
    * Scrap Layout.COLUMNS_LIST HTML to get it's links and create a Category for each
    * @method columnsListCategories
-   * @static
+   * @private
    * @param {String} html The HTML that will be scraped
    * @return {Array} Array of 'Category' objects
    */
-  static columnsListCategories(origin, html) {
+  columnsListCategories(origin, html) {
     debug('columnsListCategories', origin);
     let processing = false;
     let processingTr = false;
@@ -159,16 +164,16 @@ class Scrap {
     parser.end();
 
     return categories;
-  }
+  },
 
   /**
    * Scrap Layout.IMAGES_LIST HTML to get it's links and create a Category for each
    * @method imagesListCategories
-   * @static
+   * @private
    * @param {String} html The HTML that will be scraped
    * @return {Array} Array of 'Category' objects
    */
-  static imagesListCategories(origin, html) {
+  imagesListCategories(origin, html) {
     debug('imagesListCategories', origin);
     let processing = false;
     let captureImage = false;
@@ -231,6 +236,269 @@ class Scrap {
     parser.end();
 
     return categories;
+  },
+
+  /**
+   * Legislations list
+   * @private
+   * @type {Object}
+   */
+  legislations: {},
+
+  /**
+   * Last legislations index
+   * @private
+   * @type {Number}
+   */
+  legislationsLastIndex: 0,
+
+  /**
+   * Scrap a page and retrieve it's content
+   * @method page
+   * @private
+   * @param {Object} legislation Legislation object
+   */
+  page(legislation) {
+    // Used to capture bolds that are not part of articles
+    const ignoreTagRegEx = /b|strong|strike/;
+    // Used do revert ignore on bold used on some unique paragraphs
+    const uniqueParagraphRegEx = /\s?Parágrafo\súnico[\s-]*/;
+
+    let useContent = false;
+    let scrapedContent = '';
+
+    return new Promise((resolve, reject) => {
+      const requestoptions = {
+        url: legislation.url,
+        encoding: 'latin1',
+      };
+      request(requestoptions)
+        .then((html) => {
+          const parser = new htmlparser.Parser({
+            onopentag(tag) {
+              if (ignoreTagRegEx.test(tag)) {
+                // debug(`ignored tag: ${tag}`);
+                useContent = false;
+              }
+            },
+            ontext(dirtyText) {
+              if (useContent || uniqueParagraphRegEx.test(dirtyText)) {
+                // debug(`captured ${dirtyText}`);
+                scrapedContent += dirtyText;
+              } else {
+                // debug(`ignored ${dirtyText}`);
+              }
+            },
+            onclosetag(tag) {
+              if (ignoreTagRegEx.test(tag)) {
+                // debug(`finished ignored tag: ${tag}`);
+                useContent = true;
+              }
+            },
+          }, {
+            decodeEntities: true,
+          });
+          parser.write(html);
+          parser.end();
+
+          debug('scrapedContent', scrapedContent);
+          resolve(scrapedContent);
+        })
+        .catch((err) => {
+          error(legislation.name, 'Could not scrap page', err);
+          reject(error);
+        });
+    });
+  },
+
+  /**
+   * Some texts don't follow the patterns and need to be treated individually
+   * @method cleanArticles
+   * @private
+   * @param  {String} legislationName   The name of the legislation
+   * @param  {Array} dirtyArticles   Array of articles to be clean
+   * @return {Array}        Array of clean articles
+   */
+  cleanArticles(legislationName, dirtyArticles) {
+    const articles = dirtyArticles;
+
+    articles.forEach((article, index) => {
+      articles[index].article = Clean.knownSemanticErrors(legislationName, article);
+      articles[index].article = Clean.trim(article.article);
+    });
+
+    return articles;
+  },
+
+  /**
+   * Breakes the article into it's number and it's text
+   * @method getArticles
+   * @static
+   * @param  {String} cleanText    The text already cleanned to be parsed into articles
+   * @return {Array}               Array with each article object
+   * @example
+   * [
+   *    {
+   *      number: '1º',
+   *      article: 'Os menores de 18 anos são penalmente inimputáveis, ficando sujeitos às …'
+   *    },
+   *    {
+   *      number: '10',
+   *      article: 'É assegurada a \nparticipação dos trabalhadores e empregadores nos …'
+   *    }
+   * ]
+   */
+  getArticles(cleanText) {
+    const articleRegEx = /^(Art.)\s[0-9.?]+([o|º|o.|°])?\s?(-|\.)?(\s|[A-Z]+\.\s)?/gm;
+    let text = cleanText;
+    const articles = [];
+    // Get only the article numeric part
+    const articlesMatch = text.match(articleRegEx);
+    // debug('articlesMatch', articlesMatch);
+
+    let order = 0;
+    articlesMatch.forEach((num, index) => {
+      // The first split results in an empty string, so we need to treat it
+      // debug('num: ', num);
+      const nextNum = articlesMatch[index + 1];
+      // debug('nextNum: ', nextNum);
+      const number = Clean.articleNumber(num);
+      // debug('number: ', number);
+      const splitNextNum = text.split(nextNum);
+      // const lastOne = articlesMatch.length - 1;
+      // const nextNumClean = nextNum ? Cleaner.cleanArticleNumber(nextNum) : '';
+      // debug('number:', number, 'nextNumClean:', nextNumClean, 'index:', index,
+      //       'lastOne:', lastOne, 'splitNextNum.length', splitNextNum.length);
+
+      text = splitNextNum ? splitNextNum[splitNextNum.length - 1] : '';
+      if (index === 0) {
+        const article = splitNextNum[0].split(num)[splitNextNum.length - 1];
+        articles[order] = {
+          number,
+          article,
+        };
+      } else {
+        const article = splitNextNum[0] ? splitNextNum[0] : text;
+        debug(number, ': ', article);
+        articles[order] = {
+          number,
+          article,
+        };
+      }
+      order += 1;
+    });
+    // const parsedText = objectToArray(articles, 'article');
+    debug(articles);
+    return articles;
+  },
+  /**
+   * @method crawlLegislation
+   * @private
+   * @param {Number} i Iterator
+   * @param {function} next forLimit next function
+   */
+  crawlLegislation(i, next) {
+    setTimeout(() => {
+      const legislation = priv.legislations[i];
+      const status = new ScrapStatus(legislation.name);
+
+      status.startProcessComplete();
+      status.startProcess('Scrap');
+
+      priv.page(legislation)
+        // Get the legislations from the URLs set in the config
+        .then((scrapedText) => {
+          status.finishProcess();
+          return scrapedText;
+        })
+        // Clean the text removing everithing that is not part of an article
+        .then((scrapedText) => {
+          // debug(scrapedText);
+          status.startProcess('Clean');
+          const cleanText = Clean.scrapedText(scrapedText);
+          // debug(cleanText);
+          status.finishProcess();
+          return cleanText;
+        })
+        // Parse the content to extract Articles
+        .then((cleanText) => {
+          status.startProcess('Parse');
+          const articles = priv.getArticles(cleanText);
+          // debug(articles);
+          status.finishProcess();
+          return articles;
+        })
+        // Clean articles
+        .then((articles) => {
+          status.startProcess('Clean');
+          // debug(articles);
+
+          const cleanArticles = priv.cleanArticles(legislation.name, articles);
+          debug(cleanArticles);
+          status.finishProcess();
+          return cleanArticles;
+        })
+        // Save the organized legislation
+        .then((cleanArticles) => {
+          status.startProcess('Save');
+          const legis = new Legislation(
+            legislation.name,
+            legislation.category,
+            legislation.link,
+            legislation.url,
+            cleanArticles
+          );
+
+          // Save the lislation in the DB
+          legis.save();
+          status.finishProcess();
+
+          status.finishProcessComplete();
+        // status.finishAll();
+        })
+        .then(() => {
+          ScrapStatus.finishAll(priv.legislationsLastIndex, i);
+          next();
+        })
+        .catch((err) => {
+          error(legislation.name, 'Could not reach legislation', err);
+        });
+    }, 1000);
+  },
+};
+/**
+ * Scrap HTMLs to get specific content
+ * @module Crawler
+ * @class Scrap
+ */
+class Scrap {
+  /**
+   * Scrap a list of legislations and save each on on the legislations DB
+   * @param  {Array} legislations Array of legislations objects
+   * @param  {Number} parallel    Number of parallel request executions
+   * @return {Promise}            Promise with success response after all legislations has been
+   *                              scraped
+   */
+  static legislations(legislations, parallel) {
+    priv.legislations = legislations;
+    priv.legislationsLastIndex = legislations.length - 1;
+    forLimit(0, priv.legislationsLastIndex, parallel, priv.crawlLegislation);
+  }
+  static listCategories(name, html) {
+    const layout = Scrap.layout(html);
+    let legislations = {};
+
+    // Verify the type of layout to use the correct parser
+    if (Layout.enumValueOf(layout) === Layout.GENERAL_LIST) {
+      legislations = priv.generalListCategories(name, html);
+    } else if (Layout.enumValueOf(layout) === Layout.IMAGES_LIST) {
+      legislations = priv.imagesListCategories(name, html);
+    } else if (Layout.enumValueOf(layout) === Layout.COLUMNS_LIST) {
+      legislations = priv.columnsListCategories(name, html);
+    } else {
+      error('Crawl', 'no layout found', name);
+    }
+    return legislations;
   }
 
   /**
@@ -294,84 +562,6 @@ class Scrap {
     parser.end();
 
     return response;
-  }
-
-  /**
-   * Breakes the article into it's number and it's text
-   * @param  {String} cleanText    The text already cleanned to be parsed into articles
-   * @return {Array}               Array with each article object
-   * @example
-   * [
-   *    {
-   *      number: '1º',
-   *      article: 'Os menores de 18 anos são penalmente inimputáveis, ficando sujeitos às …'
-   *    },
-   *    {
-   *      number: '10',
-   *      article: 'É assegurada a \nparticipação dos trabalhadores e empregadores nos …'
-   *    }
-   * ]
-   */
-  static getArticles(cleanText) {
-    const articleRegEx = /^(Art.)\s[0-9.?]+([o|º|o.|°])?\s?(-|\.)?(\s|[A-Z]+\.\s)?/gm;
-    let text = cleanText;
-    const articles = [];
-    // Get only the article numeric part
-    const articlesMatch = text.match(articleRegEx);
-    // debug('articlesMatch', articlesMatch);
-
-    let order = 0;
-    articlesMatch.forEach((num, index) => {
-      // The first split results in an empty string, so we need to treat it
-      // debug('num: ', num);
-      const nextNum = articlesMatch[index + 1];
-      // debug('nextNum: ', nextNum);
-      const number = Clean.articleNumber(num);
-      // debug('number: ', number);
-      const splitNextNum = text.split(nextNum);
-      // const lastOne = articlesMatch.length - 1;
-      // const nextNumClean = nextNum ? Cleaner.cleanArticleNumber(nextNum) : '';
-      // debug('number:', number, 'nextNumClean:', nextNumClean, 'index:', index,
-      //       'lastOne:', lastOne, 'splitNextNum.length', splitNextNum.length);
-
-      text = splitNextNum ? splitNextNum[splitNextNum.length - 1] : '';
-      if (index === 0) {
-        const article = splitNextNum[0].split(num)[splitNextNum.length - 1];
-        articles[order] = {
-          number,
-          article,
-        };
-      } else {
-        const article = splitNextNum[0] ? splitNextNum[0] : text;
-        debug(number, ': ', article);
-        articles[order] = {
-          number,
-          article,
-        };
-      }
-      order += 1;
-    });
-    // const parsedText = objectToArray(articles, 'article');
-    debug(articles);
-    return articles;
-  }
-
-  /**
-   * Some texts don't follow the patterns and need to be treated individually
-   * @static
-   * @param  {String} legislationName   The name of the legislation
-   * @param  {Array} dirtyArticles   Array of articles to be clean
-   * @return {Array}        Array of clean articles
-   */
-  static cleanArticles(legislationName, dirtyArticles) {
-    const articles = dirtyArticles;
-
-    articles.forEach((article, index) => {
-      articles[index].article = Clean.knownSemanticErrors(legislationName, article);
-      articles[index].article = Clean.trim(article.article);
-    });
-
-    return articles;
   }
 }
 

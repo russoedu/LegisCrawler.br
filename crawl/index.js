@@ -3,7 +3,7 @@ const cron = require('node-cron');
 const forLimit = require('for-limit');
 const config = require('../config/config');
 const error = require('../helpers/error');
-const Status = require('../helpers/Status');
+const ScrapStatus = require('../helpers/ScrapStatus');
 const Legislation = require('../models/Legislation');
 const Scraper = require('./Scraper');
 const Clean = require('./Clean');
@@ -14,11 +14,11 @@ const quantity = legislations.length;
 
 
 function crawl(i, next) {
-  Status.startAll(quantity);
+  ScrapStatus.startAll(quantity);
   setTimeout(() => {
     const legislation = legislations[i];
 
-    const status = new Status(legislation.name);
+    const status = new ScrapStatus(legislation.name);
     status.startProcessComplete();
 
     status.startProcess('Scrap');
@@ -75,7 +75,7 @@ function crawl(i, next) {
       // status.finishAll();
       })
       .then(() => {
-        Status.finishAll(quantity, i);
+        ScrapStatus.finishAll(quantity, i);
         next();
       })
       .catch((err) => {

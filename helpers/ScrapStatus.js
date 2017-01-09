@@ -32,7 +32,7 @@ function getProcessIcon(process = null) {
   }
   return icon;
 }
-class Status {
+class ScrapStatus {
   constructor(legislationName) {
     this.legislationName = legislationName;
   }
@@ -89,4 +89,4 @@ class Status {
   }
 }
 
-module.exports = Status;
+module.exports = ScrapStatus;

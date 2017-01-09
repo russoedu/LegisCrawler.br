@@ -90,6 +90,7 @@ class Clean {
       .replace(brokenArticleRegEx, 'A$1');
 
     // Clean everything before the first article
+    console.log(text.match(beginingOfLegislation));
     text = text.match(beginingOfLegislation)[0];
 
     return text;
