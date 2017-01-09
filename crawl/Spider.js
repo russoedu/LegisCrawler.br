@@ -65,8 +65,8 @@ class Spider {
     });
   }
 }
-Spider.crawlLinks();
 
+Spider.crawlLinks();
 // cron.schedule('0 0 4 1-31 * *', () => {
 //   Spider.crawlLinks();
 // });
