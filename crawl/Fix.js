@@ -1,15 +1,15 @@
 // const debug = require('debug')('fix');
 const Type = require('../models/Type');
 const Clean = require('./Clean');
+const Scrap = require('./Scrap');
 
 class Fix {
   static name(title) {
     let response = Clean.name(title);
-    if (title ===
-      'http://www4.planalto.gov.br/legislacao/imagens/codigos/copy3_of_CdigodeProcessoCivil2015.png'
+    if (title === 'copy3_of_CdigodeProcessoCivil2015'
     ) {
-      response = 'Código de Processo Civil';
-    } else if (title === 'Código de Processo Civil') {
+      response = 'Código de processo civil';
+    } else if (title === 'Código de processo civil') {
       response = null;
     } else if (title === 'Veja aqui todas as leis complementares') {
       response = null;

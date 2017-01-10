@@ -132,7 +132,6 @@ const priv = {
 
           if (name && url) {
             type = Fix.type(url, name, Type.check(url));
-            debug(name, type.name, url);
             category = new Category({
               name,
               url,
@@ -300,7 +299,6 @@ const priv = {
           parser.write(html);
           parser.end();
 
-          debug('scrapedContent', scrapedContent);
           resolve(scrapedContent);
         })
         .catch((err) => {
@@ -359,7 +357,6 @@ const priv = {
         };
       } else {
         const article = splitNextNum[0] ? splitNextNum[0] : text;
-        debug(number, ': ', article);
         articles[order] = {
           number,
           article,
@@ -368,7 +365,6 @@ const priv = {
       order += 1;
     });
     // const parsedText = objectToArray(articles, 'article');
-    debug(articles);
     return articles;
   },
 
@@ -417,29 +413,29 @@ const priv = {
           // debug(articles);
 
           const cleanArticles = Clean.articles(legislation.name, articles);
-          debug(cleanArticles);
           status.finishProcess();
           return cleanArticles;
         })
         // Save the organized legislation
-        .then((cleanArticles) => {
-          status.startProcess('Save');
-          const legis = new Legislation(
+        .then(cleanArticles =>
+           new Legislation(
             legislation.name,
             legislation.category,
             legislation.link,
             legislation.url,
             cleanArticles
-          );
-
+          )
+        )
+        .then((legis) => {
           // Save the lislation in the DB
-          legis.save();
-          status.finishProcess();
+          status.startProcess('Save');
+          return legis.save();
 
-          status.finishProcessComplete();
         // status.finishAll();
         })
         .then(() => {
+          status.finishProcess();
+          status.finishProcessComplete();
           ScrapStatus.finishAll(priv.legislationsLastIndex, i);
           next();
         })
@@ -456,6 +452,13 @@ const priv = {
  */
 class Scrap {
   /**
+   * @constructor
+   * @param {String} html The HTML used in the class
+   */
+  constructor(html) {
+    this.html = html;
+  }
+  /**
    * Scrap a list of legislations and save each on on the legislations DB
    * @method legislations
    * @param  {Array} legislations Array of legislations objects
@@ -464,52 +467,94 @@ class Scrap {
    *                              scraped
    */
   static legislations(legislations, parallel) {
-    priv.legislations = legislations;
-    priv.legislationsLastIndex = legislations.length - 1;
-    forLimit(0, priv.legislationsLastIndex, parallel, priv.legislation);
+    return new Promise((resolve) => {
+      priv.legislations = legislations;
+      priv.legislationsLastIndex = legislations.length - 1;
+      forLimit(0, priv.legislationsLastIndex, parallel, priv.legislation, resolve);
+    });
   }
 
   /**
-  * Scrap the links of a category page from it's html
+  * Scrap the categpries links from the html
   * @method categories
-  * @param  {String} name Array of legislations objects
-  * @param  {Number} parallel    Number of parallel request executions
-  * @return {Promise}            Promise with array of categories objects on success
-  *                              scraped
+  * @return {Object} Object with Categories
    */
-  static categories(html) {
-    const layout = Scrap.layout(html);
+  categories() {
+    const layout = this.layout();
     let categories = {};
 
     // Verify the type of layout to use the correct scraper
-    if (Layout.enumValueOf(layout) === Layout.GENERAL_LIST) {
-      categories = priv.getGeneraCategoriesLinks(html);
-    } else if (Layout.enumValueOf(layout) === Layout.IMAGES_LIST) {
-      categories = priv.getImageCategoriesLinks(html);
-    } else if (Layout.enumValueOf(layout) === Layout.COLUMNS_LIST) {
-      categories = priv.getColumnCategoriesLinks(html);
+    if (layout === Layout.GENERAL_LIST) {
+      categories = priv.getGeneraCategoriesLinks(this.html);
+    } else if (layout === Layout.IMAGES_LIST) {
+      categories = priv.getImageCategoriesLinks(this.html);
+    } else if (layout === Layout.COLUMNS_LIST) {
+      categories = priv.getColumnCategoriesLinks(this.html);
     } else {
-      error('Crawl', 'no layout found', html);
+      error('Crawl', 'no layout found', this.html);
     }
     return categories;
   }
 
+  static getCompiledUrl(crawlUrl) {
+    let processing = false;
+    let url;
+    let response = crawlUrl;
+
+    const requestOptions = {
+      url: crawlUrl,
+      encoding: 'latin1',
+    };
+
+    const parser = new htmlparser.Parser({
+      onopentag(tag, attribs) {
+          // Check if the page processing is activated
+        if (tag === 'a') {
+          processing = true;
+          url = attribs.href;
+        }
+      },
+      ontext(text) {
+        if (processing && text.match(/texto[\n\s.]*compilado/gmi)) {
+          response = url;
+        }
+      },
+      onclosetag(tag) {
+        if (processing === true && tag === 'a') {
+          processing = false;
+        }
+      },
+    }, {
+      decodeEntities: true,
+    });
+
+    return new Promise((resolve) => {
+      request(requestOptions)
+        .then((crawlHtml) => {
+          parser.write(crawlHtml);
+          parser.end();
+
+          if (!response.match(/http/)) {
+            response = crawlUrl.replace(/(https?:\/\/.*\/)(.*)/, `$1${response}`);
+            debug(crawlUrl, response);
+          }
+          resolve(response);
+        });
+    });
+  }
   /**
-   * Check the layout of an HTML
+   * Check the layout of the HTML
    * @method layout
-   * @static
-   * @param {String} html The HTML that will be parsed to discover the layout
-   * @return {String} The Layout of the HTML ('GENERAL_LIST', 'COLUMNS_LIST'
-   *                  or 'IMAGES_LIST')
+   * @return {Object} The Layout of the HTML (GENERAL_LIST, COLUMNS_LIST
+   *                  or IMAGES_LIST)
    */
-  static layout(html) {
-    // return new Promise((resolve, reject) => {
+  layout() {
     let processing = false;
     let ignoreCount = 0;
     let countTds = false;
     let tdCounter = 0;
     let removeTd = true;
-    let response = 'IMAGES_LIST';
+    let response = Layout.IMAGES_LIST;
 
     const parser = new htmlparser.Parser({
       onopentag(tag, attribs) {
@@ -540,9 +585,9 @@ class Scrap {
             }
           } else if (tag === 'tr') {
             if (tdCounter === 2 || (removeTd && tdCounter === 3)) {
-              response = 'COLUMNS_LIST';
+              response = Layout.COLUMNS_LIST;
             } else if (tdCounter === 3) {
-              response = 'GENERAL_LIST';
+              response = Layout.GENERAL_LIST;
             }
           }
         }
@@ -551,7 +596,7 @@ class Scrap {
       decodeEntities: true,
     });
 
-    parser.write(html);
+    parser.write(this.html);
     parser.end();
 
     return response;

@@ -17,7 +17,6 @@ function correctImageName(name) {
     .replace('indio', 'índio')
     .replace('EstatutodaPessoacomDeficincia', 'Estatuto da pessoa com deficiência')
     .replace('codigo', 'Código')
-    .replace('copy3_of_CdigodeProcessoCivil2015', 'Código civil')
     .replace('tributario', 'tributário')
     .replace('consolidacao', 'Consolidação')
     .replace('transito', 'trânsito')

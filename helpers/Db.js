@@ -32,6 +32,7 @@ class Db {
         name: data.name,
         slug: data.slug,
         url: data.url,
+        path: data.path,
       };
       const options = {
         upsert: true,

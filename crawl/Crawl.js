@@ -23,9 +23,10 @@ class Crawl {
    * @static
    * @return {Promise} Array of legislations with name and link
    */
-  static page(crawlUrl, name = '') {
+  static page(crawlUrl, name = '/') {
     debug(name, crawlUrl);
     return new Promise((resolve, reject) => {
+      let scrap;
       function respond(data, processedListCounter) {
         // debug('respond', processedListCounter, crawlUrl);
         if (processedListCounter === 0) {
@@ -34,11 +35,10 @@ class Crawl {
       }
 
       request(crawlUrl)
-        .then(html => Scrap.categories(html),
-          (err) => {
-            error('Crawl', `request ${crawlUrl}`, err);
-            reject(err);
-          })
+        .then((crawlHtml) => {
+          scrap = new Scrap(crawlHtml);
+          return scrap.categories();
+        })
         .then((categories) => {
           // Start processing the lists
           let processedListCounter = Object.keys(categories).length;
@@ -50,12 +50,19 @@ class Crawl {
             Object.keys(categories).forEach((lKey) => {
               const category = categories[lKey];
               const catSlug = slug(category.name.replace(/\./g, '-', '-'), { lower: true });
-              const path = `${name}/${catSlug}`;
+              const path = `${name}${catSlug}/`;
               category.path = path;
 
               // If the categories type is list, call Crawl.page recursively and respond
               if (category.type === 'LIST') {
-                Crawl.page(category.url, path)
+                Category.listSave(category)
+                .then((list) => {
+                  SpiderStatus.legislationFinish(category.url);
+                  category._id = list._id;
+                  return;
+                })
+                .then(() => {
+                  Crawl.page(category.url, path)
                   .then((list) => {
                     // debug(index, categories.type, list.length);
                     category.list = list;
@@ -67,16 +74,21 @@ class Crawl {
                   .catch((err) => {
                     error('Crawl', `${name} recursion error`, err);
                   });
+                });
               // If the legislation type is not a list, respond with the categories
               } else {
                 debug(category.slug);
-
-                Category.listSave(category)
-                  .then((list) => {
-                    SpiderStatus.legislationFinish(category.url);
-                    category._id = list._id;
-                    processedListCounter -= 1;
-                    respond(categories, processedListCounter);
+                Scrap.getCompiledUrl(category.url)
+                  .then((url) => {
+                    category.url = url;
+                    debug(category);
+                    Category.listSave(category)
+                    .then((list) => {
+                      SpiderStatus.legislationFinish(category.url);
+                      category._id = list._id;
+                      processedListCounter -= 1;
+                      respond(categories, processedListCounter);
+                    });
                   });
               }
             });
