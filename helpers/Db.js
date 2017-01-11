@@ -72,10 +72,31 @@ class Db {
     });
   }
 
-  static count(collection) {
+  static list(collection, filter) {
+    return new Promise((resolve, reject) => {
+      global.db.collection(collection)
+        .find(filter)
+        .toArray()
+        .then((result) => {
+          // debug(result);
+          if (result.length === 1) {
+            resolve(result[0]);
+          } else {
+            resolve(result.sort(Order.portuguese));
+          }
+        })
+        .catch((err) => {
+          error(err);
+          reject(err);
+        });
+    });
+  }
+
+  static count(collection, data = {}) {
     debug('DB count');
     return new Promise((resolve, reject) => {
       global.db.collection(collection)
+        .find(data)
         .count()
         .then((result) => {
           debug(result);

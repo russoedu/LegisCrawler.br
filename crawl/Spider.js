@@ -8,8 +8,8 @@ const debug = require('debug')('spider');
 const Crawl = require('./Crawl');
 const Scrap = require('./Scrap');
 
-const Category = require('../models/Category');
-const Type = require('../models/Type');
+const Legislation = require('../models/Legislation');
+const PageType = require('../models/PageType');
 // const Legislation = require('../models/Legislation');
 
 const error = require('../helpers/error');
@@ -18,46 +18,47 @@ const SpiderStatus = require('../helpers/SpiderStatus');
 
 // Limit the number of simultaneous connections to avoid http 503 error
 
-const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1';
-// const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1/codigos-1';
+// const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1';
+const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1/codigos-1';
 
 
 class Spider {
   static crawlLinks(parallel) {
     Db.connect()
-    .then(() => {
-      SpiderStatus.start(url);
-      return Crawl.page(url);
-    })
-    .then((categories) => {
-      if (global.error) {
-        SpiderStatus.finishAllWithError();
-      } else {
+      .then(() => {
         const category = {
           name: 'home',
-          type: Type.LIST,
+          type: PageType.LIST,
           layout: 'GENERAL_LIST',
-          list: categories,
           path: '/',
           url,
         };
-        // debug(category);
-        new Category(category).save();
-      }
-    })
-    .then(() => Category.listCount())
-    .then((quantity) => {
-      debug(quantity);
-      SpiderStatus.finishAll(quantity);
-    })
-    .then(() => Category.list())
-    .then(legislations => Scrap.legislations(legislations, parallel))
-    .then(() => {
-      Db.close();
-    })
-    .catch((err) => {
-      error('spider', 'general error', err);
-    });
+        Legislation.listSave(category);
+        return 0;
+      })
+      .then(() => {
+        SpiderStatus.start(url);
+        return Crawl.page(url);
+      })
+      .then(() => {
+        if (global.error) {
+          SpiderStatus.finishAllWithError();
+          return 0;
+        }
+        return Legislation.listCount();
+      })
+      .then((quantity) => {
+        debug(quantity);
+        SpiderStatus.finishAll(quantity);
+      })
+      .then(() => Legislation.list())
+      .then(legislations => Scrap.legislations(legislations, parallel))
+      .then(() => {
+        Db.close();
+      })
+      .catch((err) => {
+        error('spider', 'general error', err);
+      });
   }
 }
 
@@ -75,8 +76,9 @@ process.argv.forEach((arg, index) => {
 
 http.globalAgent.maxSockets = parallel;
 if (useSchedule) {
-  SpiderStatus.cronSet();
-  cron.schedule('0 0 4 1-31 * *', () => {
+  const hour = 11;
+  SpiderStatus.cronSet(hour);
+  cron.schedule(`0 0 ${hour} 1-31 * *`, () => {
     Spider.crawlLinks(parallel);
   });
 } else {

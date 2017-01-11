@@ -6,10 +6,9 @@ const slug = require('slug');
 const Clean = require('./Clean');
 const Fix = require('./Fix');
 
-const Category = require('../models/Category');
-const Layout = require('../models/Layout');
-const Type = require('../models/Type');
 const Legislation = require('../models/Legislation');
+const Layout = require('../models/Layout');
+const PageType = require('../models/PageType');
 
 const Name = require('../helpers/Name');
 const error = require('../helpers/error');
@@ -19,11 +18,11 @@ const ScrapStatus = require('../helpers/ScrapStatus');
 
 const priv = {
   /**
-   * Scrap Layout.GENERAL_LIST HTML to get it's links and create a Category for each
+   * Scrap Layout.GENERAL_LIST HTML to get it's links and create a Legislation for each
    * @method getGeneraCategoriesLinks
    * @private
    * @param {String} html The HTML that will be scraped
-   * @return {Array} Array of 'Category' objects
+   * @return {Array} Array of 'Legislation' objects
    */
   getGeneraCategoriesLinks(html) {
     let processing = false;
@@ -54,16 +53,13 @@ const priv = {
           url = Fix.url(url, name);
 
           if (name && url) {
-            type = Fix.type(url, name, Type.check(url));
-            category = new Category({
+            type = Fix.type(url, name, PageType.check(url));
+            category = new Legislation({
               name,
               url,
               type,
               slug: slug(name.replace(/\./g, '-', '-'), { lower: true }),
             });
-            if (type === Type.LIST) {
-              category.list = {};
-            }
 
             categories[category.slug] = category;
           }
@@ -85,11 +81,11 @@ const priv = {
   },
 
   /**
-   * Scrap Layout.COLUMNS_LIST HTML to get it's links and create a Category for each
+   * Scrap Layout.COLUMNS_LIST HTML to get it's links and create a Legislation for each
    * @method getColumnCategoriesLinks
    * @private
    * @param {String} html The HTML that will be scraped
-   * @return {Array} Array of 'Category' objects
+   * @return {Array} Array of 'Legislation' objects
    */
   getColumnCategoriesLinks(html) {
     debug('getColumnCategoriesLinks');
@@ -131,16 +127,13 @@ const priv = {
           url = Fix.url(url, name);
 
           if (name && url) {
-            type = Fix.type(url, name, Type.check(url));
-            category = new Category({
+            type = Fix.type(url, name, PageType.check(url));
+            category = new Legislation({
               name,
               url,
               type,
               slug: slug(name.replace(/\./g, '-', '-'), { lower: true }),
             });
-            if (type === Type.LIST) {
-              category.list = {};
-            }
 
             categories[category.slug] = category;
             // categories.push(category);
@@ -165,11 +158,11 @@ const priv = {
   },
 
   /**
-   * Scrap Layout.IMAGES_LIST HTML to get it's links and create a Category for each
+   * Scrap Layout.IMAGES_LIST HTML to get it's links and create a Legislation for each
    * @method getImageCategoriesLinks
    * @private
    * @param {String} html The HTML that will be scraped
-   * @return {Array} Array of 'Category' objects
+   * @return {Array} Array of 'Legislation' objects
    */
   getImageCategoriesLinks(html) {
     debug('getImageCategoriesLinks');
@@ -200,17 +193,13 @@ const priv = {
             url = Fix.url(url, name);
 
             if (name && url) {
-              type = Fix.type(url, name, Type.check(url));
-              const category = new Category({
+              type = Fix.type(url, name, PageType.check(url));
+              const category = new Legislation({
                 name,
                 url,
                 type,
                 slug: slug(name.replace(/\./g, '-', '-'), { lower: true }),
               });
-
-              if (type === Type.LIST) {
-                category.list = {};
-              }
 
               categories[category.slug] = category;
               // categories.push(category);
@@ -417,21 +406,10 @@ const priv = {
           return cleanArticles;
         })
         // Save the organized legislation
-        .then(cleanArticles =>
-           new Legislation(
-            legislation.name,
-            legislation.category,
-            legislation.link,
-            legislation.url,
-            cleanArticles
-          )
-        )
-        .then((legis) => {
-          // Save the lislation in the DB
+        .then((cleanArticles) => {
           status.startProcess('Save');
-          return legis.save();
-
-        // status.finishAll();
+          legislation.articles = cleanArticles;
+          new Legislation(legislation).save();
         })
         .then(() => {
           status.finishProcess();
@@ -469,7 +447,7 @@ class Scrap {
   static legislations(legislations, parallel) {
     return new Promise((resolve) => {
       priv.legislations = legislations;
-      priv.legislationsLastIndex = legislations.length - 1;
+      priv.legislationsLastIndex = legislations.length;
       forLimit(0, priv.legislationsLastIndex, parallel, priv.legislation, resolve);
     });
   }

@@ -1,11 +1,11 @@
 const enumify = require('enumify');
 
-class Type extends enumify.Enum {
+class PageType extends enumify.Enum {
   /**
    * Check the type of a legislation page
    * @method type
    * @static
-   * @param {String} checkUrl The url that will be parsed and verified the Type
+   * @param {String} checkUrl The url that will be parsed and verified the PageType
    * @return {Object} The type of the url
    * @example
    * {
@@ -35,10 +35,10 @@ class Type extends enumify.Enum {
     const urlCheckSplit = urlSplit[urlSplit.length - 1].split('.');
     // debug(urlCheckSplit);
     const urlCheck = urlCheckSplit[urlCheckSplit.length - 1].toLowerCase();
-    let type = Type.LIST;
+    let type = PageType.LIST;
 
     // debug(deep, checkUrl, urlCheck);
-    // If the URL is an HTML, resolve with Type LEGISLATION
+    // If the URL is an HTML, resolve with PageType LEGISLATION
     if (urlCheck.match(/html?/)) {
       type = this.LEGISLATION;
     } else if (urlCheck === 'pdf') {
@@ -52,6 +52,6 @@ class Type extends enumify.Enum {
   }
 }
 
-Type.initEnum(['LEGISLATION', 'PDF', 'DOC', 'LIST']);
+PageType.initEnum(['LEGISLATION', 'PDF', 'DOC', 'LIST']);
 
-module.exports = Type;
+module.exports = PageType;

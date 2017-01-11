@@ -3,7 +3,8 @@ const slug = require('slug');
 
 const Scrap = require('./Scrap');
 
-const Category = require('../models/Category');
+const Legislation = require('../models/Legislation');
+const LegislationType = require('../models/LegislationType');
 
 const request = require('../helpers/request');
 const error = require('../helpers/error');
@@ -23,12 +24,12 @@ class Crawl {
    * @static
    * @return {Promise} Array of legislations with name and link
    */
-  static page(crawlUrl, name = '/') {
-    debug(name, crawlUrl);
+  static page(crawlUrl, parent = '') {
+    debug(parent, crawlUrl);
     return new Promise((resolve, reject) => {
       let scrap;
       function respond(data, processedListCounter) {
-        // debug('respond', processedListCounter, crawlUrl);
+        debug('respond', processedListCounter, crawlUrl);
         if (processedListCounter === 0) {
           resolve(data);
         }
@@ -50,52 +51,45 @@ class Crawl {
             Object.keys(categories).forEach((lKey) => {
               const category = categories[lKey];
               const catSlug = slug(category.name.replace(/\./g, '-', '-'), { lower: true });
-              const path = `${name}${catSlug}/`;
-              category.path = path;
+              category.parent = (parent === '') ? '/' : parent;
 
+              // TODO - veto não tem artigo - marcar isso em algum lugar
               // If the categories type is list, call Crawl.page recursively and respond
               if (category.type === 'LIST') {
-                Category.listSave(category)
-                .then((list) => {
-                  SpiderStatus.legislationFinish(category.url);
-                  category._id = list._id;
-                  return;
-                })
-                .then(() => {
-                  Crawl.page(category.url, path)
+                Legislation.listSave(category)
                   .then((list) => {
-                    // debug(index, categories.type, list.length);
-                    category.list = list;
-                    processedListCounter -= 1;
-                    respond(categories, processedListCounter);
-                  }, (err) => {
-                    error('Crawl', `${name} recursion error`, err);
+                    SpiderStatus.legislationFinish(category.url);
+                    category._id = list._id;
+                    return category;
+                  })
+                  .then(() => {
+                    Crawl.page(category.url, `${parent}/${catSlug}`)
+                      .then(() => {
+                        processedListCounter -= 1;
+                        respond(categories, processedListCounter);
+                      })
+                      .catch((err) => {
+                        error('Crawl', `${parent}/${catSlug} error`, err);
+                      });
                   })
                   .catch((err) => {
-                    error('Crawl', `${name} recursion error`, err);
+                    error('Crawl', `${parent} LIST`, err);
                   });
-                });
               // If the legislation type is not a list, respond with the categories
               } else {
                 debug(category.slug);
-                Scrap.getCompiledUrl(category.url)
-                  .then((url) => {
-                    category.url = url;
-                    debug(category);
-                    Category.listSave(category)
-                    .then((list) => {
-                      SpiderStatus.legislationFinish(category.url);
-                      category._id = list._id;
-                      processedListCounter -= 1;
-                      respond(categories, processedListCounter);
-                    });
+                category.crawl = parent.match(/\/mensagens-de-veto-total/) ? 'TEXT' : 'ART';
+
+                Legislation.listSave(category)
+                  .then((list) => {
+                    SpiderStatus.legislationFinish(category.url);
+                    category._id = list._id;
+                    processedListCounter -= 1;
+                    respond(categories, processedListCounter);
                   });
               }
             });
           }
-        }, (err) => {
-          error('Crawl', 'legislations processing', err);
-          reject(err);
         })
         .catch((err) => {
           error('getPages', `Could not reach ${crawlUrl}`, err);
@@ -106,133 +100,3 @@ class Crawl {
 }
 
 module.exports = Crawl;
-
-/**
- * Check the type of a legislation page
- * @method checkType
- * @static
- * @param {String} checkUrl The url that will be parsed and verified the Type
- * @return {Promise} A Type (DATE or LEGISLATION)
- */
-// static getLinks(checkUrl) {
-//   if (!checkUrl) {
-//     error('NO URL!!!');
-//     return new Promise((resolve, reject) => {
-//       resolve('');
-//     });
-//   }
-//   return new Promise((resolve, reject) => {
-//     // Check if url is an HTML
-//     const urlSplit = checkUrl.split('/');
-//     // debug(urlSplit);
-//     const htmlCheckSplit = urlSplit[urlSplit.length - 1].split('.');
-//     // debug(htmlCheckSplit);
-//     const htmlCheck = htmlCheckSplit[htmlCheckSplit.length - 1].toLowerCase();
-//
-//     // If the URL is an HTML, resolve with Type LEGISLATION
-//     if (htmlCheck === 'htm' || htmlCheck === 'html') {
-//       resolve(Type.LEGISLATION);
-//     }
-//
-//     // Check the other types
-//     let processing = false;
-//     let ignoreCount = 0;
-//     let captureText = false;
-//     let url = '';
-//     const requestoptions = {
-//       url: checkUrl,
-//       encoding: 'latin1',
-//     };
-//     request(requestoptions)
-//       .then((html) => {
-//         const parser = new htmlparser.Scrap({
-//           onopentag(tag, attribs) {
-//             // Check if the page processing is activated
-//             if (processing === true) {
-//               // add divs inside the capture div to the ignore counter
-//               if (tag === 'div') {
-//                 ignoreCount += 1;
-//               } else if (tag === 'a') {
-//                 url = attribs.href;
-//                 captureText = true;
-//               }
-//             // Check if the 'content-core' id is found to activate the processing
-//             } else if (tag === 'div' && attribs.id === 'content-core') {
-//               // debug(chalk.green(`found tag ${tag} with id ${attribs.id}`));
-//               processing = true;
-//             }
-//           },
-//           ontext(name) {
-//             if (processing === true && captureText === true) {
-//               // debug(chalk.blue(`captured ${name}, ${url}`));
-//             }
-//           },
-//           onclosetag(tag) {
-//             if (tag === 'div' && processing === true) {
-//               if (ignoreCount === 0) {
-//                 // debug(chalk.green('finished processing'));
-//                 processing = false;
-//               } else if (ignoreCount > 0) {
-//                 // debug(chalk.yellow(`removed ignore div # ${ignoreCount}`));
-//                 ignoreCount -= 1;
-//               }
-//             }
-//           },
-//         }, {
-//           decodeEntities: true,
-//         });
-//         parser.write(html);
-//         parser.end();
-//
-//         resolve(Type.LIST);
-//       })
-//       .catch((err) => {
-//         error('checkType', `Could not check type of ${url}`, err);
-//         reject(error);
-//       });
-//   });
-// }
-
-// function getListTitle(listUrl) {
-//   let processingBC = false;
-//   let breadCrumb = '';
-//
-//   return new Promise((resolve, reject) => {
-//     const requestoptions = {
-//       url: listUrl,
-//       // encoding: 'latin1',
-//     };
-//     request(requestoptions)
-//     .then((html) => {
-//       const parser = new htmlparser.Scrap({
-//         onopentag(tag, attribs) {
-//           if (tag === 'div' && attribs.id === 'portal-breadcrumbs') {
-//             processingBC = true;
-//           }
-//         },
-//         ontext(text) {
-//           if (processingBC) {
-//             breadCrumb += text;
-//           }
-//         },
-//         onclosetag(tag) {
-//           if (tag === 'div' && processingBC) {
-//             processingBC = false;
-//           }
-//         },
-//       }, {
-//         decodeEntities: true,
-//       });
-//       parser.write(html);
-//       parser.end();
-//       breadCrumb = Clean.breadCrumb(breadCrumb);
-//       // debug(breadCrumb);
-//       // debug(chalk.green('scrapedContent', legislations));
-//       resolve(breadCrumb);
-//     })
-//     .catch((err) => {
-//       error('InitialPage', 'Could not scrap page', err);
-//       reject(error);
-//     });
-//   });
-// }

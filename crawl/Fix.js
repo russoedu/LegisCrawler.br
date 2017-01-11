@@ -1,5 +1,5 @@
 // const debug = require('debug')('fix');
-const Type = require('../models/Type');
+const PageType = require('../models/PageType');
 const Clean = require('./Clean');
 const Scrap = require('./Scrap');
 
@@ -35,7 +35,7 @@ class Fix {
     let response = type;
 
     if (url === 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1/medidas-provisorias/1996-a-1999' && name === 'http://www4.planalto.gov.br/legislacao/imagens/anos/1996a1999.png') {
-      response = Type.LEGISLATION;
+      response = PageType.LEGISLATION;
     }
     return response;
   }
