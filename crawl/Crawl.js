@@ -4,7 +4,6 @@ const slug = require('slug');
 const Scrap = require('./Scrap');
 
 const Legislation = require('../models/Legislation');
-const LegislationType = require('../models/LegislationType');
 
 const request = require('../helpers/request');
 const error = require('../helpers/error');
@@ -79,13 +78,16 @@ class Crawl {
               } else {
                 debug(category.slug);
                 category.crawl = parent.match(/\/mensagens-de-veto-total/) ? 'TEXT' : 'ART';
-
-                Legislation.listSave(category)
-                  .then((list) => {
-                    SpiderStatus.legislationFinish(category.url);
-                    category._id = list._id;
-                    processedListCounter -= 1;
-                    respond(categories, processedListCounter);
+                Scrap.getCompiledUrl(category.url)
+                  .then((url) => {
+                    category.url = url;
+                    Legislation.listSave(category)
+                      .then((list) => {
+                        SpiderStatus.legislationFinish(category.url);
+                        category._id = list._id;
+                        processedListCounter -= 1;
+                        respond(categories, processedListCounter);
+                      });
                   });
               }
             });

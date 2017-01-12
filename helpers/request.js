@@ -25,7 +25,7 @@ module.exports = function req(url) {
     const lib = options.url.startsWith('https') ? https : http;
     options.hostname = options.url.replace(/https?:\/\//, '').split('/')[0];
     options.path = options.url.replace(/https?:\/\//, '').replace(options.hostname, '');
-    options.timeout = 120 * 1000;
+    options.timeout = 300 * 1000;
 
     const request = lib.get(options, (response) => {
       const statusCode = response.statusCode;

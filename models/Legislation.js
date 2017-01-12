@@ -58,6 +58,22 @@ class Legislation {
     );
   }
 
+  static listFind(id) {
+    return Db.find(
+      listCollection,
+      {
+        _id: '',
+        name: '',
+        link: '',
+        category: '',
+        url: '',
+        date: '',
+        articles: '',
+      },
+      id
+    );
+  }
+
   static listSave(list) {
     debug(list);
     return new Promise((resolve, reject) =>

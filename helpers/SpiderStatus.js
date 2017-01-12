@@ -1,21 +1,7 @@
 const log = require('../helpers/log');
 const chalk = require('chalk');
 
-function processedWithCommas() {
-  let spaces = '          ';
-  let sliceVal = -10;
-
-  if (global.processed > 1000) {
-    spaces = '         ';
-    sliceVal = -9;
-  } else if (global.processed > 10000000) {
-    spaces = '        ';
-    sliceVal = -8;
-  }
-  // [PROCESSING]      358 legislations scraped
-  const processed = String(spaces + global.processed).slice(sliceVal);
-  return processed.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-}
+const Text = require('../helpers/Text');
 
 class SpiderStatus {
   constructor(url, name) {
@@ -28,16 +14,15 @@ class SpiderStatus {
   }
 
   static start(url, parralell) {
+    global.processed = 0
     log(chalk.blue(`🕸  [START]                Spider initiated with ${parralell} connections on ${url}`));
     process.stdout.write(chalk.green('👷  [WORKING]    '));
   }
 
   static legislationFinish(url) {
     let plural = '';
-    if (typeof global.processed === 'undefined') {
-      global.processed = 1;
-    } else {
-      global.processed += 1;
+    global.processed += 1;
+    if (global.processed === 1) {
       plural = 's';
     }
     process.stdout.clearLine();
@@ -46,16 +31,16 @@ class SpiderStatus {
     process.stdout.write(chalk.green('👷  [WORKING]    '));
 
     process.stdout.cursorTo(15);
-    process.stdout.write(chalk.green(`${processedWithCommas()} link${plural} crawled`));
+    process.stdout.write(chalk.green(`${Text.spacedNumberWithComma(global.processed)} link${plural} crawled`));
 
     process.stdout.cursorTo(45);
     process.stdout.write(chalk.yellow(` ${url}`));
   }
 
   static finishAll(legislationsQuantity) {
-    const quantity = legislationsQuantity.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    // const quantity = legislationsQuantity.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     log('');
-    log(chalk.blue(`🕸  [FINISH]               Scraped ${quantity} legislations`));
+    log(chalk.blue(`🕸  [FINISH]               Captured ${Text.numberWithComma(legislationsQuantity)} pages`));
   }
 
   static finishAllWithError() {

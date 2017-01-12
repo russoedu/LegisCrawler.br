@@ -1,6 +1,8 @@
 const log = require('../helpers/log');
 const chalk = require('chalk');
 
+const Text = require('../helpers/Text');
+
 function spaces(name) {
   const rest = 80 - name.length;
   let response = '';
@@ -38,51 +40,26 @@ class ScrapStatus {
     this.legislationUrl = legislationUrl;
   }
 
-  static startAll(quantity) {
-    const plural = quantity === 1 ? '' : 's';
-    log(chalk.blue(`🔍   [START] ${quantity} legislation${plural} to capture and organize`));
+  static start(quantity, parralell) {
+    global.processed = 0;
+    global.toProcess = quantity;
+    log(chalk.blue(`🔍  [START]                Scrap ${Text.numberWithComma(quantity)} legislations with ${parralell} parallel connections`));
+    process.stdout.write(chalk.green('📏  [PARALLELL]            '));
   }
 
-  startProcess(process = null) {
-    this.process = process;
-    const processIcon = getProcessIcon(this.process);
-    log(chalk.yellow(`${processIcon}   [START] ${this.process} ${this.legislationName}`));
-  }
-  startProcessComplete() {
-    const processIcon = getProcessIcon(this.process);
-    let spcs = spaces(this.legislationName);
-    log(chalk.black.bgYellow(`${processIcon}   [START] ${this.legislationName}${spcs}`));
-    spcs = spaces(this.legislationUrl);
-    log(chalk.black.bgYellow(`${processIcon}   [START] ${this.legislationUrl}${spcs}`));
-  }
+  static legislationStart(url) {
+    global.processed += 1;
 
-  finishProcess() {
-    log(chalk.green(`✅  [FINISH] ${this.process} ${this.legislationName}`));
-  }
+    process.stdout.clearLine();
 
-  finishProcessComplete() {
-    const spcs = spaces(this.legislationName);
-    log(chalk.black.bgGreen.bold(`👍  [FINISH] ${this.legislationName}${spcs}`));
-  }
-  // static startProcess
+    process.stdout.cursorTo(0);
+    process.stdout.write(chalk.green('👷  [WORKING]    '));
 
-  static finishAll() {
-    log('');
-    log('✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ' +
-      '✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨');
-    log('✨                                                              ' +
-      '                           ✨');
-    log('✨                                                              ' +
-      '                           ✨');
-    log(chalk.bold.cyan('✨                     [FINISH] All legislations' +
-      ' captured and organized                    ✨'));
-    log('✨                                                              ' +
-      '                           ✨');
-    log('✨                                                              ' +
-      '                           ✨');
-    log('✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ' +
-      '✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨');
-    log('');
+    process.stdout.cursorTo(15);
+    process.stdout.write(chalk.green(`${Text.spacedNumberWithComma(global.processed)}/${Text.numberWithComma(global.toProcess)} links to scrap`));
+
+    process.stdout.cursorTo(49);
+    process.stdout.write(chalk.yellow(` ${url}`));
   }
 
   static finishAllWithError() {

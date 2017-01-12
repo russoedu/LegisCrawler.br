@@ -10,13 +10,13 @@ const Legislation = require('../models/Legislation');
 const Layout = require('../models/Layout');
 const PageType = require('../models/PageType');
 
-const Name = require('../helpers/Name');
+const Text = require('../helpers/Text');
 const error = require('../helpers/error');
 // const log = require('../helpers/log');
 const request = require('../helpers/request');
 const ScrapStatus = require('../helpers/ScrapStatus');
 
-const priv = {
+const pvt = {
   /**
    * Scrap Layout.GENERAL_LIST HTML to get it's links and create a Legislation for each
    * @method getGeneraCategoriesLinks
@@ -189,7 +189,7 @@ const priv = {
           } else if (tag === 'img' &&
                 captureImage &&
                 attribs.src !== 'http://www4.planalto.gov.br/legislacao/imagens/anos/Setas2.png') {
-            name = Fix.name(Name.fromImageUrl(attribs.src));
+            name = Fix.name(Text.fromImageUrl(attribs.src));
             url = Fix.url(url, name);
 
             if (name && url) {
@@ -240,59 +240,54 @@ const priv = {
   legislationsLastIndex: 0,
 
   /**
-   * Scrap a page and retrieve it's content
-   * @method page
+   * Scrap everything from a page but <strike> content
+   * @method fullCapture
    * @private
    * @param {Object} legislation Legislation object
    */
-  page(legislation) {
-    // Used to capture bolds that are not part of articles
-    const ignoreTagRegEx = /b|strong|strike/;
-    // Used do revert ignore on bold used on some unique paragraphs
-    const uniqueParagraphRegEx = /\s?Parágrafo\súnico[\s-]*/;
-
-    let useContent = false;
+  fullCapture(legislation) {
+    let processing = false;
+    let useContent = true;
     let scrapedContent = '';
 
+    const requestoptions = {
+      url: legislation.url,
+      encoding: 'latin1',
+    };
+    const parser = new htmlparser.Parser({
+      onopentag(tag) {
+        if (processing && tag === 'strike') {
+          useContent = false;
+        }
+      },
+      ontext(text) {
+        if (processing && useContent) {
+          // debug(`captured ${dirtyText}`);
+          scrapedContent += text;
+        } else {
+          // debug(`ignored ${dirtyText}`);
+        }
+      },
+      onclosetag(tag) {
+        if (tag === 'head') {
+          processing = true;
+        } else if (tag === 'strike') {
+          // debug(`finished ignored tag: ${tag}`);
+          useContent = true;
+        }
+      },
+    }, { decodeEntities: true });
+
     return new Promise((resolve, reject) => {
-      const requestoptions = {
-        url: legislation.url,
-        encoding: 'latin1',
-      };
       request(requestoptions)
         .then((html) => {
-          const parser = new htmlparser.Parser({
-            onopentag(tag) {
-              if (ignoreTagRegEx.test(tag)) {
-                // debug(`ignored tag: ${tag}`);
-                useContent = false;
-              }
-            },
-            ontext(dirtyText) {
-              if (useContent || uniqueParagraphRegEx.test(dirtyText)) {
-                // debug(`captured ${dirtyText}`);
-                scrapedContent += dirtyText;
-              } else {
-                // debug(`ignored ${dirtyText}`);
-              }
-            },
-            onclosetag(tag) {
-              if (ignoreTagRegEx.test(tag)) {
-                // debug(`finished ignored tag: ${tag}`);
-                useContent = true;
-              }
-            },
-          }, {
-            decodeEntities: true,
-          });
           parser.write(html);
           parser.end();
-
           resolve(scrapedContent);
         })
         .catch((err) => {
           error(legislation.name, 'Could not scrap page', err);
-          reject(error);
+          reject(err);
         });
     });
   },
@@ -316,13 +311,12 @@ const priv = {
    * ]
    */
   getArticles(cleanText) {
-    const articleRegEx = /^(Art.)\s[0-9.?]+([o|º|o.|°])?\s?(-|\.)?(\s|[A-Z]+\.\s)?/gm;
+    const articleRegEx = /^(Art.)[\s\n]+[0-9.?]+([o|º|o.|°])?\s?(-|\.)?(\s|[A-Z]+\.\s)?/gm;
     let text = cleanText;
     const articles = [];
     // Get only the article numeric part
     const articlesMatch = text.match(articleRegEx);
     // debug('articlesMatch', articlesMatch);
-
     let order = 0;
     articlesMatch.forEach((num, index) => {
       // The first split results in an empty string, so we need to treat it
@@ -365,56 +359,50 @@ const priv = {
    */
   legislation(i, next) {
     setTimeout(() => {
-      const legislation = priv.legislations[i];
-      const status = new ScrapStatus(legislation.name, legislation.url);
+      const legislation = pvt.legislations[i];
 
-      status.startProcessComplete();
-      status.startProcess('Scrap');
+      ScrapStatus.legislationStart(legislation.url);
 
       // TODO Check the type of legislation - some of them don't have articles
       // http://www.planalto.gov.br/ccivil_03/_Ato2004-2006/2004/Msg/VET/VET-2-04.htm
-      priv.page(legislation)
-        // Get the legislations from the URLs set in the config
-        .then((scrapedText) => {
-          status.finishProcess();
-          return scrapedText;
-        })
+      // ^(Art)([\s\S]*)(?:\.\n)
+      // (.+,)\s[0-9]+\sde\s.+\sde\s[0-9]+
+      // First, we capture everithing but <strike>  content
+      pvt.fullCapture(legislation)
         // Clean the text removing everithing that is not part of an article
-        .then((scrapedText) => {
-          // debug(scrapedText);
-          status.startProcess('Clean');
-          const cleanText = Clean.scrapedText(scrapedText);
-          // debug(cleanText);
-          status.finishProcess();
-          return cleanText;
+        .then((fullCapture) => {
+          debug(fullCapture);
+          return Clean.articleContent(fullCapture);
         })
         // Parse the content to extract Articles
-        .then((cleanText) => {
-          status.startProcess('Parse');
-          const articles = priv.getArticles(cleanText);
-          // debug(articles);
-          status.finishProcess();
-          return articles;
+        .then((articleContent) => {
+          if (articleContent) {
+            return pvt.getArticles(articleContent);
+            // debug(articleContent);
+          }
+          return null;
         })
         // Clean articles
         .then((articles) => {
-          status.startProcess('Clean');
+          if (articles) {
           // debug(articles);
 
-          const cleanArticles = Clean.articles(legislation.name, articles);
-          status.finishProcess();
-          return cleanArticles;
+            const cleanArticles = Clean.articles(legislation.name, articles);
+            return cleanArticles;
+          }
+          return null;
         })
         // Save the organized legislation
         .then((cleanArticles) => {
-          status.startProcess('Save');
-          legislation.articles = cleanArticles;
-          new Legislation(legislation).save();
+          // TODO If articles is null,
+          if (cleanArticles) {
+            legislation.articles = cleanArticles;
+          } else {
+            legislation.articles = [];
+          }
+          return new Legislation(legislation).save();
         })
         .then(() => {
-          status.finishProcess();
-          status.finishProcessComplete();
-          ScrapStatus.finishAll(priv.legislationsLastIndex, i);
           next();
         })
         .catch((err) => {
@@ -446,9 +434,10 @@ class Scrap {
    */
   static legislations(legislations, parallel) {
     return new Promise((resolve) => {
-      priv.legislations = legislations;
-      priv.legislationsLastIndex = legislations.length;
-      forLimit(0, priv.legislationsLastIndex, parallel, priv.legislation, resolve);
+      pvt.legislations = legislations;
+      pvt.legislationsLastIndex = legislations.length;
+      ScrapStatus.start(pvt.legislationsLastIndex, parallel);
+      forLimit(0, pvt.legislationsLastIndex, parallel, pvt.legislation, resolve);
     });
   }
 
@@ -463,11 +452,11 @@ class Scrap {
 
     // Verify the type of layout to use the correct scraper
     if (layout === Layout.GENERAL_LIST) {
-      categories = priv.getGeneraCategoriesLinks(this.html);
+      categories = pvt.getGeneraCategoriesLinks(this.html);
     } else if (layout === Layout.IMAGES_LIST) {
-      categories = priv.getImageCategoriesLinks(this.html);
+      categories = pvt.getImageCategoriesLinks(this.html);
     } else if (layout === Layout.COLUMNS_LIST) {
-      categories = priv.getColumnCategoriesLinks(this.html);
+      categories = pvt.getColumnCategoriesLinks(this.html);
     } else {
       error('Crawl', 'no layout found', this.html);
     }

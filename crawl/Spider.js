@@ -53,10 +53,15 @@ class Spider {
       })
       .then(() => Legislation.list())
       .then(legislations => Scrap.legislations(legislations, parallel))
+
+      // .then(() => Legislation.listFind('58758c45a08886be2291dde5'))
+      // .then(legislations => Scrap.legislations([legislations], parallel))
+
       .then(() => {
         Db.close();
       })
       .catch((err) => {
+        Db.close();
         error('spider', 'general error', err);
       });
   }

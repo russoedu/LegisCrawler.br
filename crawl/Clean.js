@@ -51,12 +51,22 @@ class Clean {
         .replace(/\s\s+/gm, '')
         .replace(/\n+/, ' ');
   }
-  static breadCrumb(breadCrumb) {
-    const bc = breadCrumb.replace('\n', '')
-      .replace(/(\s|\n|\t)+(\s|\n|\t)/gm, '')
-      .split('>');
-
-    return (bc[bc.length - 1]);
+  /**
+   * Pre cleaning function removes all double spaces and text things that shoudn't be there
+   * @method articleContent
+   * @static
+   * @param  {Strign} text The complete text without <strike> content
+   * @return {Strign}           The articles area of the text, if any
+   */
+  static articleContent(text) {
+    // const articleRegEx = /(Art[\s\S]*)?(?:(\n.*,)\s[0-9]+\sde\s.+\sde\s[0-9]{2,4})?/gm;
+    const articleRegEx = /(Art[\s\S]*)((.*,)\s[0-9]+\sde\s.+\sde\s[0-9]{2,4})/gm;
+    if (text.match(articleRegEx)) {
+      let response = text.match(articleRegEx)[0];
+      response = response.replace(articleRegEx, '$1');
+      return response;
+    }
+    return null;
   }
   /**
    * Pre cleaning function removes all double spaces and text things that shoudn't be there
