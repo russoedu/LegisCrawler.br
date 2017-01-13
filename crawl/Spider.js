@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 process.env.UV_THREADPOOL_SIZE = 128;
+process.setMaxListeners(300);
 
 const http = require('http');
 const cron = require('node-cron');
@@ -89,7 +90,7 @@ let useSchedule = true;
  * @type {Number}
  * @default 3
  */
-let parallel = 3;
+let parallel = 1;
 
 // Read the CLI arguments
 process.argv.forEach((arg, index) => {
@@ -105,7 +106,7 @@ http.globalAgent.maxSockets = parallel;
 
 // Set the cron job if useSchedule was set
 if (useSchedule) {
-  const hour = 11;
+  const hour = 4;
   SpiderStatus.cronSet(hour);
   cron.schedule(`0 0 ${hour} 1-31 * *`, () => {
     Spider.crawlLinks(parallel);
