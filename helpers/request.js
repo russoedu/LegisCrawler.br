@@ -52,7 +52,10 @@ module.exports = function req(url) {
     // handle connection errors of the request
     request.on('error', (err) => {
       error('request', 'request error', err);
-      reject(err);
+      setTimeout(() => {
+        req(url);
+      }, 1000);
+      // reject(err);
     });
   });
 };

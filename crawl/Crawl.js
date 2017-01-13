@@ -55,7 +55,7 @@ class Crawl {
               // TODO - veto não tem artigo - marcar isso em algum lugar
               // If the categories type is list, call Crawl.page recursively and respond
               if (category.type === 'LIST') {
-                Legislation.listSave(category)
+                new Legislation(category).save()
                   .then((list) => {
                     SpiderStatus.legislationFinish(category.url);
                     category._id = list._id;
@@ -81,7 +81,7 @@ class Crawl {
                 Scrap.getCompiledUrl(category.url)
                   .then((url) => {
                     category.url = url;
-                    Legislation.listSave(category)
+                    new Legislation(category).save()
                       .then((list) => {
                         SpiderStatus.legislationFinish(category.url);
                         category._id = list._id;

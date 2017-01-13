@@ -5,31 +5,73 @@ const slug = require('slug');
 const error = require('../helpers/error');
 
 const collection = 'legislations';
-const listCollection = 'legislationsList';
 
+/**
+ * Legislation model
+ * @module Models
+ * @class Legislation
+ */
 class Legislation {
-  constructor(name = null, url = null, type = null, crawl = null) {
-    if (typeof name === 'object') {
-      Object.keys(name).forEach((key) => {
-        if (key === 'type' || key === 'crawl') {
-          this[key] = name[key].name;
-        } else {
-          this[key] = name[key];
-        }
-      });
-      this.slug = name.slug || slug(this.name.replace(/\./g, '-', '-'), { lower: true });
-      debug(this.slug);
-    } else {
-      this.name = name;
-      this.slug = slug(this.name.replace(/\./g, '-', '-'), { lower: true });
-      debug(this.slug);
-      this.url = url;
-      this.type = type.name || type;
-      this.crawl = crawl.name || crawl;
-    }
-    // debug(this);
+  /**
+   * Create a new Legislations
+   * @constructor
+   * @param {Object} legislation Object with legislations properties
+   */
+  constructor(legislation) {
+    Object.keys(legislation).forEach((key) => {
+      if (typeof legislation[key].name === 'undefined') {
+        debug('direct', legislation[key]);
+        this[key] = legislation[key];
+      } else {
+        debug('name', legislation[key].name);
+        this[key] = legislation[key].name;
+      }
+    });
+    this.slug = legislation.slug ||
+                slug(this.name.replace(/\./g, '-', '-'), { lower: true });
+    debug(this);
   }
 
+  /**
+   * Save the legislation on the DB and set the returned _id in it
+   * @method save
+   * @return {Promise} The Legislation object with the _id
+   */
+  save() {
+    return new Promise((resolve, reject) =>
+       Db.createOrUpdate(collection, this)
+        .then((res) => {
+          if (res.value && res.value._id) {
+            this._id = res.value._id;
+          }
+          debug(this);
+          resolve(this);
+        })
+        .catch((err) => {
+          error('List', 'createOrUpdate', err);
+          reject(err);
+        })
+    );
+  }
+
+  /**
+   * Get all legislations of type 'LEGISLATION' and crawl 'ART', that are, in
+   * fact, legislations
+   * @method count
+   * @static
+   * @return {Number} The quantity of legislations
+   */
+  static count() {
+    return Db.count(collection, { type: 'LEGISLATION', crawl: 'ART' });
+  }
+
+  /**
+   * Find a legislation by its id
+   * @method find
+   * @static
+   * @param {Number} id The id Number
+   * @return {Promise} Promise that will get the legislation after completion
+   */
   static find(id) {
     return Db.find(
       collection,
@@ -46,54 +88,27 @@ class Legislation {
     );
   }
 
-  save() {
-    debug(this);
-    return Db.createOrUpdate(collection, this);
-  }
-
-  static list() {
+  /**
+   * List all legislations within a search object
+   * @method list
+   * @static
+   * @param {Object} Object with the search
+   * @return {Promise} After completion, array of legislations that match the
+   *                   search
+   * @example
+   * const search = {
+   *   parent: '/leis-ordinarias/2005'
+   * }
+   * Legislation.list(search)
+   *   .then((legislations) => {
+   *     debug(legislations);
+   *   });
+   */
+  static list(search) {
     return Db.list(
-      listCollection,
-      { type: 'LEGISLATION', crawl: 'ART' }
+      collection,
+      search
     );
-  }
-
-  static listFind(id) {
-    return Db.find(
-      listCollection,
-      {
-        _id: '',
-        name: '',
-        link: '',
-        category: '',
-        url: '',
-        date: '',
-        articles: '',
-      },
-      id
-    );
-  }
-
-  static listSave(list) {
-    debug(list);
-    return new Promise((resolve, reject) =>
-       Db.createOrUpdate(listCollection, list)
-        .then((res) => {
-          if (res.value && res.value._id) {
-            this._id = res.value._id;
-          }
-          debug(this);
-          resolve(this);
-        })
-        .catch((err) => {
-          error('List', 'createOrUpdate', err);
-          reject(err);
-        })
-    );
-  }
-
-  static listCount() {
-    return Db.count(listCollection, { type: 'LEGISLATION', crawl: 'ART' });
   }
 }
 

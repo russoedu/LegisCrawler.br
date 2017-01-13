@@ -1,10 +1,14 @@
 const express = require('express');
-const pmx = require('pmx').init({
+const pmx = require('pmx');
+const Db = require('./helpers/Db');
+
+pmx.init({
   http: true, // HTTP routes logging (default: true)
   errors: true, // Exceptions loggin (default: true)
   custom_probes: true, // Auto expose JS Loop Latency and HTTP req/s as custom metrics
   network: true, // Network monitoring at the application level
 });
+
 const http = require('http');
 const bodyParser = require('body-parser');
 const favicon = require('serve-favicon');
@@ -51,6 +55,10 @@ app
 
 http.createServer(app).listen(config.server.port);
 
-log(chalk.bgBlue(`  Express listening http  on ${config.server.port}       `));
-
-router(app);
+// Create the DB connection
+Db.connect()
+  .then(() => {
+    log(chalk.bgBlue('🔛  [SERVER]               Express listening http ' +
+                      `on ${config.server.port}       `));
+    router(app);
+  });

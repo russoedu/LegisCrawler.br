@@ -2,6 +2,7 @@ const debug = require('debug')('scrap');
 const forLimit = require('for-limit');
 const htmlparser = require('htmlparser2');
 const slug = require('slug');
+const cheerio = require('cheerio');
 
 const Clean = require('./Clean');
 const Fix = require('./Fix');
@@ -247,8 +248,9 @@ const pvt = {
    */
   fullCapture(legislation) {
     let processing = false;
-    let useContent = true;
-    let scrapedContent = '';
+    let tagCapture = [];
+    let textCapture;
+    let scrapedContent = [];
 
     const requestoptions = {
       url: legislation.url,
@@ -256,23 +258,21 @@ const pvt = {
     };
     const parser = new htmlparser.Parser({
       onopentag(tag) {
-        if (processing && tag === 'strike') {
-          useContent = false;
+        if (tag === 'body') {
+          processing = true;
+        } else if (processing) {
+          tagCapture = tag;
         }
       },
       ontext(text) {
-        if (processing && useContent) {
-          // debug(`captured ${dirtyText}`);
-          scrapedContent += text;
-        } else {
-          // debug(`ignored ${dirtyText}`);
+        if (processing) {
+          textCapture = text;
         }
       },
       onclosetag(tag) {
-        if (tag === 'head') {
-          processing = true;
-        } else if (tag === 'strike') {
-          // debug(`finished ignored tag: ${tag}`);
+        if (processing) {
+          processing = false;
+        } else {
           useContent = true;
         }
       },
@@ -368,45 +368,76 @@ const pvt = {
       // ^(Art)([\s\S]*)(?:\.\n)
       // (.+,)\s[0-9]+\sde\s.+\sde\s[0-9]+
       // First, we capture everithing but <strike>  content
-      pvt.fullCapture(legislation)
-        // Clean the text removing everithing that is not part of an article
-        .then((fullCapture) => {
-          debug(fullCapture);
-          return Clean.articleContent(fullCapture);
+      request({ url: legislation.url, encoding: 'latin1' })
+        .then((data) => {
+          const $ = cheerio.load(data, { decodeEntities: false });
+          $('head').remove();
+          $('*').each(function removeAttributes() {
+            if (!(this.type === 'tag' && this.name === 'a')) {
+              this.attribs = {};
+            }
+          });
+          $.root()
+            .contents()
+            .filter(function filter() {
+              return this.type === 'head';
+            })
+            .remove();
+          return $.html()
+            .replace(/(<html>[\s\S]*<body>)([\s\S]*)/, '$2')
+            .replace(/([\s\S]*)(<\/body>[\s\S]*<\/html>)/, '$1');
         })
-        // Parse the content to extract Articles
-        .then((articleContent) => {
-          if (articleContent) {
-            return pvt.getArticles(articleContent);
-            // debug(articleContent);
-          }
-          return null;
+        .then((content) => {
+          legislation.content = content;
+          return new Legislation(legislation).save()
         })
-        // Clean articles
-        .then((articles) => {
-          if (articles) {
-          // debug(articles);
+        // .then(() => {
+        //   next();
+        // })
+        // .catch((err) => {
+        //   console.log(err);
+        // });
+      // pvt.fullCapture(legislation)
+      //   // Clean the text removing everithing that is not part of an article
+      //   .then((fullCapture) => {
+      //     debug(fullCapture);
+      //     return Clean.articleContent(fullCapture);
+      //   })
+      //   // Parse the content to extract Articles
+      //   .then((articleContent) => {
+      //     if (articleContent) {
+      //       return pvt.getArticles(articleContent);
+      //       // debug(articleContent);
+      //     }
+      //     return null;
+      //   })
+      //   // Clean articles
+      //   .then((articles) => {
+      //     if (articles) {
+      //     // debug(articles);
 
-            const cleanArticles = Clean.articles(legislation.name, articles);
-            return cleanArticles;
-          }
-          return null;
-        })
-        // Save the organized legislation
-        .then((cleanArticles) => {
-          // TODO If articles is null,
-          if (cleanArticles) {
-            legislation.articles = cleanArticles;
-          } else {
-            legislation.articles = [];
-          }
-          return new Legislation(legislation).save();
-        })
+      //       const cleanArticles = Clean.articles(legislation.name, articles);
+      //       return cleanArticles;
+      //     }
+      //     return null;
+      //   })
+      //   // Save the organized legislation
+      //   .then((cleanArticles) => {
+      //     // TODO If articles is null,
+      //     if (cleanArticles) {
+      //       legislation.articles = cleanArticles;
+      //     } else {
+      //       legislation.articles = [];
+      //     }
+      //     return new Legislation(legislation).save();
+      //   })
         .then(() => {
           next();
         })
         .catch((err) => {
-          error(legislation.name, 'Could not reach legislation', err);
+          console.log(err);
+          legislation(i, next);
+          // error(legislation.name, 'Could not reach legislation', err);
         });
     }, 1000);
   },
