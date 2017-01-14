@@ -226,66 +226,66 @@ const pvt = {
     return categories;
   },
 
-  /**
-   * Legislations list
-   * @private
-   * @type {Object}
-   */
-  legislations: {},
+  // /**
+  //  * Legislations list
+  //  * @private
+  //  * @type {Object}
+  //  */
+  // legislations: {},
 
-  /**
-   * Last legislations index
-   * @private
-   * @type {Number}
-   */
-  legislationsLastIndex: 0,
+  // /**
+  //  * Last legislations index
+  //  * @private
+  //  * @type {Number}
+  //  */
+  // legislationsLastIndex: 0,
 
-  /**
-   * @method legislation
-   * @private
-   * @param {Number} i Iterator
-   * @param {function} next forLimit next function
-   */
-  legislation(i, next) {
-    setTimeout(() => {
-      const legislation = pvt.legislations[i];
+  // /**
+  //  * @method legislation
+  //  * @private
+  //  * @param {Number} i Iterator
+  //  * @param {function} next forLimit next function
+  //  */
+  // legislation(i, next) {
+  //   setTimeout(() => {
+  //     const legislation = pvt.legislations[i];
 
-      // ScrapStatus.legislationStart(legislation.url);
+  //     // ScrapStatus.legislationStart(legislation.url);
 
-      // First, we capture everithing but <strike>  content
-      request({ url: legislation.url, encoding: 'latin1' })
-        .then((data) => {
-          const $ = cheerio.load(data, { decodeEntities: false });
-          $('head').remove();
-          $('*').each(function removeAttributes() {
-            if (!(this.type === 'tag' && this.name === 'a')) {
-              this.attribs = {};
-            }
-          });
-          $.root()
-            .contents()
-            .filter(function filter() {
-              return this.type === 'head';
-            })
-            .remove();
-          return $.html()
-            .replace(/(<html>[\s\S]*<body>)([\s\S]*)/, '$2')
-            .replace(/([\s\S]*)(<\/body>[\s\S]*<\/html>)/, '$1');
-        })
-        .then((content) => {
-          legislation.content = content;
-          return new Legislation(legislation).save();
-        })
-        .then(() => {
-          next();
-        })
-        .catch((err) => {
-          console.log(err);
-          legislation(i, next);
-          // error(legislation.name, 'Could not reach legislation', err);
-        });
-    }, 1000);
-  },
+  //     // First, we capture everithing but <strike>  content
+  //     request({ url: legislation.url, encoding: 'latin1' })
+  //       .then((data) => {
+  //         const $ = cheerio.load(data, { decodeEntities: false });
+  //         $('head').remove();
+  //         $('*').each(function removeAttributes() {
+  //           if (!(this.type === 'tag' && this.name === 'a')) {
+  //             this.attribs = {};
+  //           }
+  //         });
+  //         $.root()
+  //           .contents()
+  //           .filter(function filter() {
+  //             return this.type === 'head';
+  //           })
+  //           .remove();
+  //         return $.html()
+  //           .replace(/(<html>[\s\S]*<body>)([\s\S]*)/, '$2')
+  //           .replace(/([\s\S]*)(<\/body>[\s\S]*<\/html>)/, '$1');
+  //       })
+  //       .then((content) => {
+  //         legislation.content = content;
+  //         return new Legislation(legislation).save();
+  //       })
+  //       .then(() => {
+  //         next();
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //         legislation(i, next);
+  //         // error(legislation.name, 'Could not reach legislation', err);
+  //       });
+  //   }, 1000);
+  // },
 };
 /**
  * Scrap HTMLs to get specific content
@@ -300,22 +300,22 @@ class Scrap {
   constructor(html) {
     this.html = html;
   }
-  /**
-   * Scrap a list of legislations and save each on on the legislations DB
-   * @method legislations
-   * @param  {Array} legislations Array of legislations objects
-   * @param  {Number} parallel    Number of parallel request executions
-   * @return {Promise}            Promise with success response after all legislations has been
-   *                              scraped
-   */
-  static legislations(legislations, parallel) {
-    return new Promise((resolve) => {
-      pvt.legislations = legislations;
-      pvt.legislationsLastIndex = legislations.length;
-      ScrapStatus.start(pvt.legislationsLastIndex, parallel);
-      forLimit(0, pvt.legislationsLastIndex, parallel, pvt.legislation, resolve);
-    });
-  }
+  // /**
+  //  * Scrap a list of legislations and save each on on the legislations DB
+  //  * @method legislations
+  //  * @param  {Array} legislations Array of legislations objects
+  //  * @param  {Number} parallel    Number of parallel request executions
+  //  * @return {Promise}            Promise with success response after all legislations has been
+  //  *                              scraped
+  //  */
+  // static legislations(legislations, parallel) {
+  //   return new Promise((resolve) => {
+  //     pvt.legislations = legislations;
+  //     pvt.legislationsLastIndex = legislations.length;
+  //     ScrapStatus.start(pvt.legislationsLastIndex, parallel);
+  //     forLimit(0, pvt.legislationsLastIndex, parallel, pvt.legislation, resolve);
+  //   });
+  // }
 
   /**
    * @method legislation
@@ -380,7 +380,7 @@ class Scrap {
     return categories;
   }
 
-  static getCompiledUrl(crawlUrl) {
+  static compiledUrl(crawlUrl) {
     let processing = false;
     let url;
     let response = crawlUrl;

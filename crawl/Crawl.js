@@ -38,7 +38,7 @@ class Crawl {
             categories,
             global.parallel,
             (cat, callback) => {
-              let category = cat;
+              const category = cat;
               const catSlug = slug(category.name.replace(/\./g, '-', '-'), { lower: true });
               category.parent = (parent === '') ? '/' : parent;
 
@@ -68,22 +68,21 @@ class Crawl {
               // If the legislation type is not a list, respond with the categories
               } else {
                 debug(category.slug);
-                Scrap.getCompiledUrl(category.url)
+                Scrap.compiledUrl(category.url)
                   .then((url) => {
                     category.url = url;
                     return Scrap.legislation(category);
                   })
-                  .then(() => {
-                    new Legislation(category).save()
-                      .then(() => {
-                        category = null;
-                        callback();
-                        // processedListCounter -= 1;
-                        // respond(categories, processedListCounter);
-                      })
-                      .catch((err) => {
-                        callback('Crawl', `${parent} LIST`, err);
-                      });
+                  .then(legislation => new Legislation(legislation).save())
+                  .then((clearMe) => {
+                    SpiderStatus.legislationFinish(category.url);
+                    clearMe = null;
+                    callback();
+                    // processedListCounter -= 1;
+                    // respond(categories, processedListCounter);
+                  })
+                  .catch((err) => {
+                    callback('Crawl', `${parent} LIST`, err);
                   });
               }
             },
