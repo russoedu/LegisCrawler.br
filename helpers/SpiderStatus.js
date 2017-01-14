@@ -25,6 +25,9 @@ class SpiderStatus {
   }
 
   static legislationFinish(url) {
+    const workers = ['👷', '👷🏼', '👷🏽', '👷🏾', '👷🏿'];
+    const rand = workers[Math.floor(Math.random() * workers.length)];
+
     let plural = '';
     global.processed += 1;
     if (global.processed !== 1) {
@@ -33,7 +36,7 @@ class SpiderStatus {
     process.stdout.clearLine();
 
     process.stdout.cursorTo(0);
-    process.stdout.write(chalk.green('👷  [WORKING]    '));
+    process.stdout.write(chalk.green(`${rand}  [WORKING]    `));
 
     process.stdout.cursorTo(15);
     process.stdout.write(chalk.green(`${Text.spacedNumberWithComma(global.processed)} ` +

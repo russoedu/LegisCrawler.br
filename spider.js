@@ -38,7 +38,7 @@ process.argv.forEach((arg, index) => {
 // Set the number of parallel requests that should be opened
 http.globalAgent.maxSockets = global.parallel;
 process.env.UV_THREADPOOL_SIZE = 128;
-process.setMaxListeners(300);
+process.setMaxListeners(0);
 
 // Set the cron job if useSchedule was set
 if (useSchedule) {
