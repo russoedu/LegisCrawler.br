@@ -6,7 +6,7 @@ const log = require('../helpers/log');
 
 let attempt = 0;
 
-const req = function req(url, retry = false) {
+function req(url, retry = false) {
   if (retry) {
     log('RETRY', url);
   }
@@ -65,11 +65,11 @@ const req = function req(url, retry = false) {
       } else {
         SpiderStatus.requestError(options.url, attempt);
         setTimeout(() => {
-          req(options.url);
+          req(url);
         }, 10 * 1000);
       }
     });
   });
-};
+}
 
 module.exports = req;

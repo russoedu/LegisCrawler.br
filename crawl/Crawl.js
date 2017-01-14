@@ -38,7 +38,7 @@ class Crawl {
             categories,
             global.parallel,
             (cat, callback) => {
-              const category = cat;
+              let category = cat;
               const catSlug = slug(category.name.replace(/\./g, '-', '-'), { lower: true });
               category.parent = (parent === '') ? '/' : parent;
 
@@ -75,9 +75,8 @@ class Crawl {
                   })
                   .then(() => {
                     new Legislation(category).save()
-                      .then((legislation) => {
-                        SpiderStatus.legislationFinish(category.url);
-                        category._id = legislation._id;
+                      .then(() => {
+                        category = null;
                         callback();
                         // processedListCounter -= 1;
                         // respond(categories, processedListCounter);
