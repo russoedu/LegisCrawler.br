@@ -13,16 +13,21 @@ class SpiderStatus {
     log(chalk.blue(`⏰  [CRON]                 Cron set to process everyday at ${hour}:00 AM`));
   }
 
-  static start(url, parralell) {
-    global.processed = 0
-    log(chalk.blue(`🕸  [START]                Spider initiated with ${parralell} connections on ${url}`));
+  static requestError(url, attempt) {
+    process.stdout.write(chalk.red(`\n⛔️  [ERROR]  attempt ${attempt} for ${url}\n`));
+  }
+
+  static start(url) {
+    global.processed = 0;
+    log(chalk.blue(`🕸  [START]                Spider initiated with ${global.parallel} ` +
+                   `parallel connections on ${url}`));
     process.stdout.write(chalk.green('👷  [WORKING]    '));
   }
 
   static legislationFinish(url) {
     let plural = '';
     global.processed += 1;
-    if (global.processed === 1) {
+    if (global.processed !== 1) {
       plural = 's';
     }
     process.stdout.clearLine();
@@ -31,7 +36,8 @@ class SpiderStatus {
     process.stdout.write(chalk.green('👷  [WORKING]    '));
 
     process.stdout.cursorTo(15);
-    process.stdout.write(chalk.green(`${Text.spacedNumberWithComma(global.processed)} link${plural} crawled`));
+    process.stdout.write(chalk.green(`${Text.spacedNumberWithComma(global.processed)} ` +
+                                     `link${plural} crawled`));
 
     process.stdout.cursorTo(45);
     process.stdout.write(chalk.yellow(` ${url}`));
@@ -40,7 +46,8 @@ class SpiderStatus {
   static finishAll(legislationsQuantity) {
     // const quantity = legislationsQuantity.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     log('');
-    log(chalk.blue(`🕸  [FINISH]               Captured ${Text.numberWithComma(legislationsQuantity)} pages`));
+    log(chalk.blue('🕸  [FINISH]               Captured ' +
+                   `${Text.numberWithComma(legislationsQuantity)} pages`));
   }
 
   static finishAllWithError() {

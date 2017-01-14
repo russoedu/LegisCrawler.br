@@ -1,5 +1,6 @@
 const debug = require('debug')('crawl');
 const slug = require('slug');
+const async = require('async');
 
 const Scrap = require('./Scrap');
 
@@ -26,29 +27,18 @@ class Crawl {
   static page(crawlUrl, parent = '') {
     debug(parent, crawlUrl);
     return new Promise((resolve, reject) => {
-      let scrap;
-      function respond(data, processedListCounter) {
-        debug('respond', processedListCounter, crawlUrl);
-        if (processedListCounter === 0) {
-          resolve(data);
-        }
-      }
-
       request(crawlUrl)
         .then((crawlHtml) => {
-          scrap = new Scrap(crawlHtml);
+          const scrap = new Scrap(crawlHtml);
           return scrap.categories();
         })
         .then((categories) => {
-          // Start processing the lists
-          let processedListCounter = Object.keys(categories).length;
-          // If the categories are empty, respond with the empty array
-          if (processedListCounter === 0) {
-            respond(categories, processedListCounter);
-          } else {
-            // If there is data, process each one
-            Object.keys(categories).forEach((lKey) => {
-              const category = categories[lKey];
+          // Process the categories with a limit of 'global.parallell' requests in parallel
+          async.forEachLimit(
+            categories,
+            global.parallel,
+            (cat, callback) => {
+              const category = cat;
               const catSlug = slug(category.name.replace(/\./g, '-', '-'), { lower: true });
               category.parent = (parent === '') ? '/' : parent;
 
@@ -64,15 +54,16 @@ class Crawl {
                   .then(() => {
                     Crawl.page(category.url, `${parent}/${catSlug}`)
                       .then(() => {
-                        processedListCounter -= 1;
-                        respond(categories, processedListCounter);
+                        callback();
+                        // processedListCounter -= 1;
+                        // respond(categories, processedListCounter);
                       })
                       .catch((err) => {
-                        error('Crawl', `${parent}/${catSlug} error`, err);
+                        callback('Crawl', `${parent}/${catSlug} error`, err);
                       });
                   })
                   .catch((err) => {
-                    error('Crawl', `${parent} LIST`, err);
+                    callback('Crawl', `${parent} LIST`, err);
                   });
               // If the legislation type is not a list, respond with the categories
               } else {
@@ -85,13 +76,24 @@ class Crawl {
                       .then((list) => {
                         SpiderStatus.legislationFinish(category.url);
                         category._id = list._id;
-                        processedListCounter -= 1;
-                        respond(categories, processedListCounter);
+                        callback();
+                        // processedListCounter -= 1;
+                        // respond(categories, processedListCounter);
+                      })
+                      .catch((err) => {
+                        callback('Crawl', `${parent} LIST`, err);
                       });
                   });
               }
+            },
+            (err) => {
+              if (err) {
+                error(err);
+              } else {
+                debug('finish categories');
+                resolve();
+              }
             });
-          }
         })
         .catch((err) => {
           error('getPages', `Could not reach ${crawlUrl}`, err);

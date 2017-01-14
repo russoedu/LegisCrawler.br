@@ -241,117 +241,6 @@ const pvt = {
   legislationsLastIndex: 0,
 
   /**
-   * Scrap everything from a page but <strike> content
-   * @method fullCapture
-   * @private
-   * @param {Object} legislation Legislation object
-   */
-  fullCapture(legislation) {
-    let processing = false;
-    let tagCapture = [];
-    let textCapture;
-    let scrapedContent = [];
-
-    const requestoptions = {
-      url: legislation.url,
-      encoding: 'latin1',
-    };
-    const parser = new htmlparser.Parser({
-      onopentag(tag) {
-        if (tag === 'body') {
-          processing = true;
-        } else if (processing) {
-          tagCapture = tag;
-        }
-      },
-      ontext(text) {
-        if (processing) {
-          textCapture = text;
-        }
-      },
-      onclosetag(tag) {
-        if (processing) {
-          processing = false;
-        } else {
-          useContent = true;
-        }
-      },
-    }, { decodeEntities: true });
-
-    return new Promise((resolve, reject) => {
-      request(requestoptions)
-        .then((html) => {
-          parser.write(html);
-          parser.end();
-          resolve(scrapedContent);
-        })
-        .catch((err) => {
-          error(legislation.name, 'Could not scrap page', err);
-          reject(err);
-        });
-    });
-  },
-
-  /**
-   * Breakes the article into it's number and it's text
-   * @method getArticles
-   * @static
-   * @param  {String} cleanText    The text already cleanned to be parsed into articles
-   * @return {Array}               Array with each article object
-   * @example
-   * [
-   *    {
-   *      number: '1º',
-   *      article: 'Os menores de 18 anos são penalmente inimputáveis, ficando sujeitos às …'
-   *    },
-   *    {
-   *      number: '10',
-   *      article: 'É assegurada a \nparticipação dos trabalhadores e empregadores nos …'
-   *    }
-   * ]
-   */
-  getArticles(cleanText) {
-    const articleRegEx = /^(Art.)[\s\n]+[0-9.?]+([o|º|o.|°])?\s?(-|\.)?(\s|[A-Z]+\.\s)?/gm;
-    let text = cleanText;
-    const articles = [];
-    // Get only the article numeric part
-    const articlesMatch = text.match(articleRegEx);
-    // debug('articlesMatch', articlesMatch);
-    let order = 0;
-    articlesMatch.forEach((num, index) => {
-      // The first split results in an empty string, so we need to treat it
-      // debug('num: ', num);
-      const nextNum = articlesMatch[index + 1];
-      // debug('nextNum: ', nextNum);
-      const number = Clean.articleNumber(num);
-      // debug('number: ', number);
-      const splitNextNum = text.split(nextNum);
-      // const lastOne = articlesMatch.length - 1;
-      // const nextNumClean = nextNum ? Cleaner.cleanArticleNumber(nextNum) : '';
-      // debug('number:', number, 'nextNumClean:', nextNumClean, 'index:', index,
-      //       'lastOne:', lastOne, 'splitNextNum.length', splitNextNum.length);
-
-      text = splitNextNum ? splitNextNum[splitNextNum.length - 1] : '';
-      if (index === 0) {
-        const article = splitNextNum[0].split(num)[splitNextNum.length - 1];
-        articles[order] = {
-          number,
-          article,
-        };
-      } else {
-        const article = splitNextNum[0] ? splitNextNum[0] : text;
-        articles[order] = {
-          number,
-          article,
-        };
-      }
-      order += 1;
-    });
-    // const parsedText = objectToArray(articles, 'article');
-    return articles;
-  },
-
-  /**
    * @method legislation
    * @private
    * @param {Number} i Iterator
@@ -363,10 +252,6 @@ const pvt = {
 
       ScrapStatus.legislationStart(legislation.url);
 
-      // TODO Check the type of legislation - some of them don't have articles
-      // http://www.planalto.gov.br/ccivil_03/_Ato2004-2006/2004/Msg/VET/VET-2-04.htm
-      // ^(Art)([\s\S]*)(?:\.\n)
-      // (.+,)\s[0-9]+\sde\s.+\sde\s[0-9]+
       // First, we capture everithing but <strike>  content
       request({ url: legislation.url, encoding: 'latin1' })
         .then((data) => {
@@ -389,48 +274,8 @@ const pvt = {
         })
         .then((content) => {
           legislation.content = content;
-          return new Legislation(legislation).save()
+          return new Legislation(legislation).save();
         })
-        // .then(() => {
-        //   next();
-        // })
-        // .catch((err) => {
-        //   console.log(err);
-        // });
-      // pvt.fullCapture(legislation)
-      //   // Clean the text removing everithing that is not part of an article
-      //   .then((fullCapture) => {
-      //     debug(fullCapture);
-      //     return Clean.articleContent(fullCapture);
-      //   })
-      //   // Parse the content to extract Articles
-      //   .then((articleContent) => {
-      //     if (articleContent) {
-      //       return pvt.getArticles(articleContent);
-      //       // debug(articleContent);
-      //     }
-      //     return null;
-      //   })
-      //   // Clean articles
-      //   .then((articles) => {
-      //     if (articles) {
-      //     // debug(articles);
-
-      //       const cleanArticles = Clean.articles(legislation.name, articles);
-      //       return cleanArticles;
-      //     }
-      //     return null;
-      //   })
-      //   // Save the organized legislation
-      //   .then((cleanArticles) => {
-      //     // TODO If articles is null,
-      //     if (cleanArticles) {
-      //       legislation.articles = cleanArticles;
-      //     } else {
-      //       legislation.articles = [];
-      //     }
-      //     return new Legislation(legislation).save();
-      //   })
         .then(() => {
           next();
         })

@@ -1,9 +1,3 @@
-#!/usr/bin/env node
-process.env.UV_THREADPOOL_SIZE = 128;
-process.setMaxListeners(300);
-
-const http = require('http');
-const cron = require('node-cron');
 const debug = require('debug')('spider');
 
 const Crawl = require('./Crawl');
@@ -19,8 +13,6 @@ const SpiderStatus = require('../helpers/SpiderStatus');
 
 // Limit the number of simultaneous connections to avoid http 503 error
 
-const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1';
-// const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1/codigos-1';
 
 /**
  * Web Spider to capture everithing from an URL
@@ -32,9 +24,8 @@ class Spider {
    * Capture all links and it's details and content from a single URL
    * @method crawlLinks
    * @static
-   * @param {Number} parallel The number of parallel requests and executions
    */
-  static crawlLinks(parallel) {
+  static crawlLinks(url) {
     // Create the DB connection
     Db.connect()
       // Create the home category in the DB
@@ -56,16 +47,14 @@ class Spider {
       // Count the legislations created
       .then(() => {
         const quantity = Legislation.count();
+        debug(quantity);
         SpiderStatus.finishAll(quantity);
         return quantity;
       })
       // Get all legislations from the DB
       .then(() => Legislation.list({ type: 'LEGISLATION', crawl: 'ART' }))
       // Scrap the legislations
-      .then(legislations => Scrap.legislations(legislations, parallel))
-
-      // .then(() => Legislation.find('58758c45a08886be2291dde5'))
-      // .then(legislations => Scrap.legislations([legislations], parallel))
+      .then(legislations => Scrap.legislations(legislations, global.parallel))
 
       // Close the DB connection
       .then(() => {
@@ -77,40 +66,5 @@ class Spider {
       });
   }
 }
-/**
- * Define if the Spider should create a cron job or run now
- * @property useSchedule
- * @type {Boolean}
- * @default true
- */
-let useSchedule = true;
-/**
- * Define how many parallel requests and executions should run
- * @property parallel
- * @type {Number}
- * @default 3
- */
-let parallel = 1;
 
-// Read the CLI arguments
-process.argv.forEach((arg, index) => {
-  if (arg === '--no-schedule') {
-    useSchedule = false;
-  } else if (arg === '--parallel') {
-    parallel = Number(process.argv[index + 1]);
-  }
-});
-
-// Set the number of parallel requests that should be opened
-http.globalAgent.maxSockets = parallel;
-
-// Set the cron job if useSchedule was set
-if (useSchedule) {
-  const hour = 4;
-  SpiderStatus.cronSet(hour);
-  cron.schedule(`0 0 ${hour} 1-31 * *`, () => {
-    Spider.crawlLinks(parallel);
-  });
-} else {
-  Spider.crawlLinks(parallel);
-}
+module.exports = Spider;

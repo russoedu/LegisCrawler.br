@@ -1,7 +1,6 @@
 // const debug = require('debug')('fix');
 const PageType = require('../models/PageType');
 const Clean = require('./Clean');
-const Scrap = require('./Scrap');
 
 class Fix {
   static name(title) {

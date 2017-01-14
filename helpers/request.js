@@ -1,6 +1,9 @@
 const https = require('https');
 const http = require('http');
 const error = require('./error');
+const SpiderStatus = require('../helpers/SpiderStatus');
+
+let attempt = 0;
 
 module.exports = function req(url) {
   // return new pending promise
@@ -51,11 +54,16 @@ module.exports = function req(url) {
 
     // handle connection errors of the request
     request.on('error', (err) => {
-      error('request', 'request error', err);
-      setTimeout(() => {
-        req(url);
-      }, 1000);
-      // reject(err);
+      attempt += 1;
+      if (attempt === 10) {
+        error('request', 'request error', err);
+        reject(err);
+      } else {
+        SpiderStatus.requestError(options.url, attempt);
+        setTimeout(() => {
+          req(options.url);
+        }, 10 * 1000);
+      }
     });
   });
 };
