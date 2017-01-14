@@ -4,9 +4,7 @@ const error = require('./error');
 const SpiderStatus = require('../helpers/SpiderStatus');
 const log = require('../helpers/log');
 
-let attempt = 0;
-
-function req(url, retry = false) {
+function req(url, retry = false, attempt = 0) {
   if (retry) {
     log('RETRY', url);
   }
@@ -58,15 +56,13 @@ function req(url, retry = false) {
 
     // handle connection errors of the request
     request.on('error', (err) => {
-      attempt += 1;
-      if (attempt === 10) {
+      const att = attempt + 1;
+      if (att === 100) {
         error('request', 'request error', err);
         reject(err);
       } else {
-        SpiderStatus.requestError(options.url, attempt);
-        setTimeout(() => {
-          req(url);
-        }, 10 * 1000);
+        SpiderStatus.requestError(options.url, att);
+        setTimeout(() => req(url, true, att), 10 * 1000);
       }
     });
   });
