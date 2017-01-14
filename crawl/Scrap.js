@@ -250,7 +250,7 @@ const pvt = {
     setTimeout(() => {
       const legislation = pvt.legislations[i];
 
-      ScrapStatus.legislationStart(legislation.url);
+      // ScrapStatus.legislationStart(legislation.url);
 
       // First, we capture everithing but <strike>  content
       request({ url: legislation.url, encoding: 'latin1' })
@@ -314,6 +314,47 @@ class Scrap {
       pvt.legislationsLastIndex = legislations.length;
       ScrapStatus.start(pvt.legislationsLastIndex, parallel);
       forLimit(0, pvt.legislationsLastIndex, parallel, pvt.legislation, resolve);
+    });
+  }
+
+  /**
+   * @method legislation
+   * @private
+   * @param {Number} i Iterator
+   * @param {function} next forLimit next function
+   */
+  static legislation(legis) {
+    const legislation = legis;
+    return new Promise((resolve, reject) => {
+      // ScrapStatus.legislationStart(legislation.url);
+
+      request({ url: legislation.url, encoding: 'latin1' })
+        .then((data) => {
+          const $ = cheerio.load(data, { decodeEntities: false });
+          $('head').remove();
+          $('*').each(function removeAttributes() {
+            if (!(this.type === 'tag' && this.name === 'a')) {
+              this.attribs = {};
+            }
+          });
+          $.root()
+            .contents()
+            .filter(function filter() {
+              return this.type === 'head';
+            })
+            .remove();
+          return $.html()
+            .replace(/(<html>[\s\S]*<body>)([\s\S]*)/, '$2')
+            .replace(/([\s\S]*)(<\/body>[\s\S]*<\/html>)/, '$1');
+        })
+        .then((content) => {
+          legislation.content = content;
+          resolve(legislation);
+        })
+        .catch((err) => {
+          error(legislation.name, 'Could not reach legislation', err);
+          reject(err);
+        });
     });
   }
 

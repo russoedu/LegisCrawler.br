@@ -45,16 +45,16 @@ class Spider {
         return Crawl.page(url);
       })
       // Count the legislations created
-      .then(() => {
-        const quantity = Legislation.count();
-        debug(quantity);
-        SpiderStatus.finishAll(quantity);
-        return quantity;
-      })
-      // Get all legislations from the DB
-      .then(() => Legislation.list({ type: 'LEGISLATION', crawl: 'ART' }))
-      // Scrap the legislations
-      .then(legislations => Scrap.legislations(legislations, global.parallel))
+      // .then(() => {
+      //   const quantity = Legislation.count();
+      //   debug(quantity);
+      //   SpiderStatus.finishAll(quantity);
+      //   return quantity;
+      // })
+      // // Get all legislations from the DB
+      // .then(() => Legislation.list({ type: 'LEGISLATION', crawl: 'ART' }))
+      // // Scrap the legislations
+      // .then(legislations => Scrap.legislations(legislations, global.parallel))
 
       // Close the DB connection
       .then(() => {

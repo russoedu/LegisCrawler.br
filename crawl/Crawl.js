@@ -68,14 +68,16 @@ class Crawl {
               // If the legislation type is not a list, respond with the categories
               } else {
                 debug(category.slug);
-                category.crawl = parent.match(/\/mensagens-de-veto-total/) ? 'TEXT' : 'ART';
                 Scrap.getCompiledUrl(category.url)
                   .then((url) => {
                     category.url = url;
+                    return Scrap.legislation(category);
+                  })
+                  .then(() => {
                     new Legislation(category).save()
-                      .then((list) => {
+                      .then((legislation) => {
                         SpiderStatus.legislationFinish(category.url);
-                        category._id = list._id;
+                        category._id = legislation._id;
                         callback();
                         // processedListCounter -= 1;
                         // respond(categories, processedListCounter);

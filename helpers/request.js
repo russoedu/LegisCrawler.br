@@ -2,10 +2,14 @@ const https = require('https');
 const http = require('http');
 const error = require('./error');
 const SpiderStatus = require('../helpers/SpiderStatus');
+const log = require('../helpers/log');
 
 let attempt = 0;
 
-module.exports = function req(url) {
+const req = function req(url, retry = false) {
+  if (retry) {
+    log('RETRY', url);
+  }
   // return new pending promise
   return new Promise((resolve, reject) => {
     const options = {
@@ -67,3 +71,5 @@ module.exports = function req(url) {
     });
   });
 };
+
+module.exports = req;

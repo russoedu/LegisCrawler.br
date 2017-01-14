@@ -47,7 +47,6 @@ class SpiderStatus {
   }
 
   static finishAll(legislationsQuantity) {
-    // const quantity = legislationsQuantity.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     log('');
     log(chalk.blue('🕸  [FINISH]               Captured ' +
                    `${Text.numberWithComma(legislationsQuantity)} pages`));
