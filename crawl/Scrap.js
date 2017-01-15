@@ -247,7 +247,7 @@ class Scrap {
 
   /**
    * @method legislation
-   * @private
+   * @static
    * @param {Object} leg Legislation object
    * @return {Promise} Promise with the same legislation object with the clean html on content attribute
    */
