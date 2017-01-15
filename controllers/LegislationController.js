@@ -34,7 +34,7 @@ const pvt = {
       hasSlug,
     };
 
-    if (pvt.hasSlug) {
+    if (hasSlug) {
       response.search.slug = slug;
     }
 
