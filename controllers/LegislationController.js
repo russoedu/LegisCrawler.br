@@ -50,17 +50,19 @@ class LegislationController {
     const readData = pvt.readData(req);
     const search = readData.search;
     const hasSlug = readData.hasSlug;
+    const searchQuery = req.query.search;
 
-    if (req.query.search) {
+    if (searchQuery) {
       search.parent = new RegExp(`${search.parent}.*`, 'img');
       search.type = 'LEGISLATION';
-      search.content = new RegExp(`.*${req.query.search}.*`, 'img');
+      search.content = new RegExp(`.*${searchQuery}.*`, 'img');
     }
     log(search);
 
     let resultData = {};
 
-    if (!hasSlug) {
+    // Don't send the content string if it's not a legislation (!hasSlug) or search (!searchQuery)
+    if (!hasSlug || !searchQuery) {
       resultData = {
         _id: '',
         name: '',
@@ -73,7 +75,7 @@ class LegislationController {
 
     Legislation.list(search, resultData)
       .then((response) => {
-        if (req.query.search) {
+        if (searchQuery) {
           // TODO - create match array
         }
         res.status(200).send(response);
