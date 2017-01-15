@@ -142,7 +142,7 @@ class LegislationController {
     }
 
     debug(search, searchQuery);
-    Legislation.list(search, resultData)
+    Legislation.list(search, resultData, 300)
       .then((listResponse) => {
         debug(listResponse.length);
         if (searchQuery) {
