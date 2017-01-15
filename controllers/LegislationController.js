@@ -1,11 +1,13 @@
 const Legislation = require('../models/Legislation.js');
 const debug = require('debug')('api');
 const error = require('../helpers/error');
+const log = require('../helpers/log');
 
 const pvt = {
   hasSlug: false,
 
   search(req) {
+    debug(req);
     const base = '_parsedUrl';
     const path = req[base].pathname;
     const data = path.split('/');
@@ -31,8 +33,17 @@ const pvt = {
       parent = '/';
     }
 
-    return { parent, slug };
-  }
+    const response = {
+      parent,
+    };
+
+    if (pvt.hasSlug) {
+      response.slug = slug;
+    }
+
+    log(parent, slug, pvt.hasSlug);
+    return response;
+  },
 };
 
 class LegislationController {
@@ -40,6 +51,7 @@ class LegislationController {
     debug('LegislationController.find()');
 
     const search = pvt.search(req);
+    log(search);
 
     Legislation.list(search)
       .then((response) => {

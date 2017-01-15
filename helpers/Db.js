@@ -82,7 +82,7 @@ class Db {
           if (result.length === 1) {
             resolve(result[0]);
           } else {
-            resolve(result);
+            resolve(result.sort(Order.portuguese));
           }
         })
         .catch((err) => {
