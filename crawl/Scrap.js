@@ -273,7 +273,8 @@ class Scrap {
             .remove();
           return $.html()
             .replace(/(<html>[\s\S]*<body>)([\s\S]*)/, '$2')
-            .replace(/([\s\S]*)(<\/body>[\s\S]*<\/html>)/, '$1');
+            .replace(/([\s\S]*)(<\/body>[\s\S]*<\/html>)/, '$1')
+            .replace(/[\n\t\r]/img, '');
         })
         .then((content) => {
           legislation.content = content;

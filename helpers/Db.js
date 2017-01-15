@@ -57,12 +57,8 @@ class Db {
         .find(search, resultData)
         .toArray()
         .then((result) => {
-          // debug(result);
-          if (result.length === 1) {
-            resolve(result[0]);
-          } else {
-            resolve(result.sort(Order.portuguese));
-          }
+          debug(result);
+          resolve(result.sort(Order.portuguese));
         })
         .catch((err) => {
           error(err);
