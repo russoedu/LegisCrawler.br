@@ -4,7 +4,16 @@ class Order {
   static portuguese(a, b) {
     debug(a.name);
     debug(b.name);
-    return a.name.localeCompare(b.name);
+    let response = 0;
+
+    if (a.name === 'Constituição') {
+      response = -1;
+    } else if (b.name === 'Constituição') {
+      response = 1;
+    } else {
+      response = a.name.localeCompare(b.name);
+    }
+    return response;
   }
 }
 

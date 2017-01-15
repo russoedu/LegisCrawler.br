@@ -261,9 +261,9 @@ class Scrap {
           const $ = cheerio.load(data, { decodeEntities: false });
           $('head').remove();
           $('*').each(function removeAttributes() {
-            if (!(this.type === 'tag' && this.name === 'a')) {
-              this.attribs = {};
-            }
+            // if (!(this.type === 'tag' && this.name === 'a')) {
+            this.attribs = {};
+            // }
           });
           $.root()
             .contents()
