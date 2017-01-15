@@ -81,11 +81,8 @@ class Legislation {
    *     debug(legislations);
    *   });
    */
-  static list(search) {
-    return Db.list(
-      collection,
-      search
-    );
+  static list(search, resultData) {
+    return Db.list(collection, search, resultData);
   }
 }
 

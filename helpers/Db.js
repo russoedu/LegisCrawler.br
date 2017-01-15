@@ -51,10 +51,10 @@ class Db {
     });
   }
 
-  static list(collection, filter) {
+  static list(collection, search, resultData = {}) {
     return new Promise((resolve, reject) => {
       global.db.collection(collection)
-        .find(filter)
+        .find(search, resultData)
         .toArray()
         .then((result) => {
           // debug(result);

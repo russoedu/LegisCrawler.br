@@ -4,18 +4,12 @@ const error = require('../helpers/error');
 const log = require('../helpers/log');
 
 const pvt = {
-  hasSlug: false,
-
-  search(req) {
+  readData(req) {
+    let hasSlug = false;
     debug(req);
     const base = '_parsedUrl';
     const path = req[base].pathname;
     const data = path.split('/');
-    data.splice(0, 1);
-
-    if (data[data.length - 1] === '') {
-      data.splice(data.length - 1, 1);
-    }
 
     let parent = '';
     let slug = /./;
@@ -23,8 +17,8 @@ const pvt = {
     data.forEach((value, key) => {
       if (value === 'l') {
         slug = data[key + 1];
-        pvt.hasSlug = true;
-      } else if (!pvt.hasSlug) {
+        hasSlug = true;
+      } else if (!hasSlug && value !== '') {
         parent += `/${value}`;
       }
     });
@@ -34,14 +28,17 @@ const pvt = {
     }
 
     const response = {
-      parent,
+      search: {
+        parent,
+      },
+      hasSlug,
     };
 
     if (pvt.hasSlug) {
-      response.slug = slug;
+      response.search.slug = slug;
     }
 
-    log(parent, slug, pvt.hasSlug);
+    debug(response);
     return response;
   },
 };
@@ -50,22 +47,34 @@ class LegislationController {
   static list(req, res) {
     debug('LegislationController.find()');
 
-    const search = pvt.search(req);
+    const readData = pvt.readData(req);
+    const search = readData.search;
+    const hasSlug = readData.hasSlug;
+
     if (req.query.search) {
       search.type = 'LEGISLATION';
       search.content = new RegExp(`.${req.query.search}.`, 'img');
     }
     log(search);
 
-    Legislation.list(search)
+    let resultData = {};
+
+    if (!hasSlug) {
+      resultData = {
+        _id: '',
+        name: '',
+        url: '',
+        type: '',
+        slug: '',
+        parent: '',
+      };
+    }
+    Legislation.list(search, resultData)
       .then((response) => {
-        debug(response);
-        if (!pvt.hasSlug) {
+        if (!hasSlug) {
           response.forEach((data) => {
             const leg = data;
-            // if (data.type === 'LEGISLATION') {
             delete leg.content;
-            // }
           });
         }
         res.status(200).send(response);
