@@ -6,7 +6,6 @@ const Scrap = require('./Scrap');
 
 const Legislation = require('../models/Legislation');
 
-// const request = require('../helpers/request');
 const request = require('requestretry');
 const error = require('../helpers/error');
 const SpiderStatus = require('../helpers/SpiderStatus');

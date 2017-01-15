@@ -1,10 +1,9 @@
 // const debug = require('debug')('fix');
 const PageType = require('../models/PageType');
-const Clean = require('./Clean');
 
 class Fix {
   static name(title) {
-    let response = Clean.name(title);
+    let response = title.trim().replace(/\s\s+/gm, '').replace(/\n+/, ' ');
     if (title === 'copy3_of_CdigodeProcessoCivil2015'
     ) {
       response = 'Código de processo civil';

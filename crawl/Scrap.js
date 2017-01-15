@@ -12,7 +12,6 @@ const PageType = require('../models/PageType');
 
 const Text = require('../helpers/Text');
 const error = require('../helpers/error');
-// const request = require('../helpers/request');
 
 const pvt = {
   requestOptions: {
