@@ -1,5 +1,8 @@
-const Legislation = require('../models/Legislation.js');
 const debug = require('debug')('api');
+const async = require('async');
+
+const Legislation = require('../models/Legislation.js');
+
 const error = require('../helpers/error');
 const log = require('../helpers/log');
 
@@ -63,40 +66,46 @@ const pvt = {
   },
 
   setSearchMarks(data, search) {
-    const response = data;
-    response.marks = [];
+    return new Promise((resolve, reject) => {
+      const response = data;
+      response.marks = [];
 
-    response.content = response.content
-                          .replace(/[\n\t\r]+/img, ' ')
-                          .replace(/(&nbsp;)+/img, ' ');
+      response.content = response.content
+                            .replace(/[\n\t\r]+/img, ' ')
+                            .replace(/(&nbsp;)+/img, ' ');
 
-    const searchRegEx = new RegExp(`(${search})`, 'img');
-    const indices = pvt.allIndexOf(response.content, searchRegEx);
-    debug(indices);
+      const searchRegEx = new RegExp(`(${search})`, 'img');
+      const indices = pvt.allIndexOf(response.content, searchRegEx);
+      log(indices);
 
-    const delta = 30;
-    const wordLength = search.length;
+      const delta = 30;
+      const wordLength = search.length;
 
-    indices.forEach((index) => {
-      let begin = 0;
-      let end = response.content.length;
+      indices.forEach((index) => {
+        let begin = 0;
+        let end = response.content.length;
 
-      if (index >= begin + delta) {
-        begin = index - delta;
-      }
-      if (index <= end - wordLength - delta) {
-        end = index + wordLength + delta;
-      }
-      let res = response.content.substring(begin, end);
-      res = res
-            .replace(/>|(<?\/?[A-z]+>)|(<\/?[A-z]+>?)|</img, '')
-            .replace(searchRegEx, `<mark id="mark-${index}">$1</mark>`);
+        if (index >= begin + delta) {
+          begin = index - delta;
+        }
+        if (index <= end - wordLength - delta) {
+          end = index + wordLength + delta;
+        }
+        let res = response.content.substring(begin, end);
+        res = res
+              .replace(/>|(<?\/?[A-z]+>)|(<\/?[A-z]+>?)|</img, '')
+              .replace(searchRegEx, `<mark id="mark-${index}">$1</mark>`);
 
-      res = `…${res}…`;
-      response.marks.push(res);
+        res = `…${res}…`;
+        if (res.length > 0) {
+          resolve(res);
+        } else {
+          reject();
+        }
+      });
+
+      debug(response.marks);
     });
-
-    debug(response.marks);
   },
 };
 
@@ -131,20 +140,36 @@ class LegislationController {
         parent: '',
       };
     }
-    log(search);
-    log(searchQuery);
 
+    log(search, searchQuery);
     Legislation.list(search, resultData)
       .then((listResponse) => {
-        const response = listResponse;
+        log(listResponse.length);
         if (searchQuery) {
-          response.forEach((data) => {
-            debug(data.name, data._id);
-            pvt.setSearchMarks(data, searchQuery);
-            delete data.content;
-          });
+          async.forEachLimit(
+            listResponse,
+            5,
+            (response, callback) => {
+              const data = response;
+              log(data.name);
+              log(data.name, data._id);
+              pvt.setSearchMarks(data, searchQuery)
+                .then((marks) => {
+                  data.marks = marks;
+                  delete data.content;
+                  callback();
+                });
+            },
+            (err) => {
+              if (err) {
+                error(err);
+                res.status(500).send();
+              } else {
+                log('finish search');
+                res.status(200).send(listResponse);
+              }
+            });
         }
-        res.status(200).send(response);
       })
       .catch((err) => {
         error(req.params.name, 'Could not retrieve data', err);
