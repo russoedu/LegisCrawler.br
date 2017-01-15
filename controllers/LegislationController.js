@@ -47,9 +47,9 @@ class LegislationController {
         if (!pvt.hasSlug) {
           response.forEach((data) => {
             const leg = data;
-            if (data.type === 'LEGISLATION') {
-              delete leg.content;
-            }
+            // if (data.type === 'LEGISLATION') {
+            delete leg.content;
+            // }
           });
         }
         res.status(200).send(response);
