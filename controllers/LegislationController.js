@@ -69,13 +69,11 @@ class LegislationController {
         parent: '',
       };
     }
+
     Legislation.list(search, resultData)
       .then((response) => {
-        if (!hasSlug) {
-          response.forEach((data) => {
-            const leg = data;
-            delete leg.content;
-          });
+        if (req.query.search) {
+          // TODO - create match array
         }
         res.status(200).send(response);
       })
