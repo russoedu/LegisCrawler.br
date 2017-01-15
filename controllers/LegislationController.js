@@ -107,7 +107,10 @@ class LegislationController {
     const readData = pvt.readData(req);
     const search = readData.search;
     const hasSlug = readData.hasSlug;
-    const searchQuery = decodeURIComponent(req.query.search);
+
+    const searchQuery = typeof req.query.search === 'undefined' ?
+                        false :
+                        decodeURIComponent(req.query.search);
 
     if (searchQuery) {
       search.parent = new RegExp(`${search.parent}.*`, 'img');
@@ -128,6 +131,8 @@ class LegislationController {
         parent: '',
       };
     }
+    log(search);
+    log(searchQuery);
 
     Legislation.list(search, resultData)
       .then((listResponse) => {
