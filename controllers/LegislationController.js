@@ -52,9 +52,9 @@ class LegislationController {
     const hasSlug = readData.hasSlug;
 
     if (req.query.search) {
-      search.parent = new RegExp(`${search.parent}.`, 'img');
+      search.parent = new RegExp(`${search.parent}.*`, 'img');
       search.type = 'LEGISLATION';
-      search.content = new RegExp(`.${req.query.search}.`, 'img');
+      search.content = new RegExp(`.*${req.query.search}.*`, 'img');
     }
     log(search);
 
