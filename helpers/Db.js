@@ -51,27 +51,6 @@ class Db {
     });
   }
 
-  static find(collection, filter, id = false) {
-    return new Promise((resolve, reject) => {
-      const idObj = id ? new mongo.ObjectID(id) : {};
-      global.db.collection(collection)
-        .find(idObj, filter)
-        .toArray()
-        .then((result) => {
-          // debug(result);
-          if (result.length === 1) {
-            resolve(result[0]);
-          } else {
-            resolve(result.sort(Order.portuguese));
-          }
-        })
-        .catch((err) => {
-          error(err);
-          reject(err);
-        });
-    });
-  }
-
   static list(collection, filter) {
     return new Promise((resolve, reject) => {
       global.db.collection(collection)

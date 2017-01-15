@@ -66,29 +66,6 @@ class Legislation {
   }
 
   /**
-   * Find a legislation by its id
-   * @method find
-   * @static
-   * @param {Number} id The id Number
-   * @return {Promise} Promise that will get the legislation after completion
-   */
-  static find(id) {
-    return Db.find(
-      collection,
-      {
-        _id: '',
-        name: '',
-        link: '',
-        category: '',
-        url: '',
-        date: '',
-        articles: '',
-      },
-      id
-    );
-  }
-
-  /**
    * List all legislations within a search object
    * @method list
    * @static
