@@ -4,7 +4,7 @@ const async = require('async');
 const Legislation = require('../models/Legislation.js');
 
 const error = require('../helpers/error');
-// const log = require('../helpers/log');
+const log = require('../helpers/log');
 
 const pvt = {
   readData(req) {
@@ -141,10 +141,14 @@ class LegislationController {
       };
     }
 
-    debug(search, searchQuery);
-    Legislation.list(search, resultData, 300)
+    log(search, resultData, searchQuery);
+    let limit = 0;
+    if (searchQuery) {
+      limit = 300;
+    }
+    Legislation.list(search, resultData, limit)
       .then((listResponse) => {
-        debug(listResponse.length);
+        log(listResponse.length);
         if (searchQuery) {
           async.forEachLimit(
             listResponse,
@@ -169,6 +173,8 @@ class LegislationController {
                 res.status(200).send(listResponse);
               }
             });
+        } else {
+          res.status(200).send(listResponse);
         }
       })
       .catch((err) => {

@@ -58,7 +58,6 @@ class Db {
         .limit(limit)
         .toArray()
         .then((result) => {
-          debug(result);
           resolve(result.sort(Order.portuguese));
         })
         .catch((err) => {
