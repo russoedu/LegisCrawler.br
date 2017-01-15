@@ -134,7 +134,7 @@ class Crawl {
             });
         })
         .catch((err) => {
-          error('getPages', `Could not reach ${crawlUrl}`, err);
+          error('getPages', `Could not reach ${url}`, err);
           reject(error);
         });
     });

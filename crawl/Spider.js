@@ -10,8 +10,6 @@ const error = require('../helpers/error');
 const Db = require('../helpers/Db');
 const SpiderStatus = require('../helpers/SpiderStatus');
 
-
-
 /**
  * Web Spider to capture everithing from an URL
  * @module Crawler
