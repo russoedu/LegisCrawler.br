@@ -1,10 +1,9 @@
 const debug = require('debug')('scrap');
-const forLimit = require('for-limit');
 const htmlparser = require('htmlparser2');
 const slug = require('slug');
 const cheerio = require('cheerio');
+const request = require('requestretry');
 
-const Clean = require('./Clean');
 const Fix = require('./Fix');
 
 const Legislation = require('../models/Legislation');
@@ -13,11 +12,18 @@ const PageType = require('../models/PageType');
 
 const Text = require('../helpers/Text');
 const error = require('../helpers/error');
-// const log = require('../helpers/log');
-const request = require('../helpers/request');
-const ScrapStatus = require('../helpers/ScrapStatus');
+// const request = require('../helpers/request');
 
 const pvt = {
+  requestOptions: {
+    axAttempts: 1000,
+    retryDelay: 60 * 1000,
+    fullResponse: false,
+    rejectUnauthorized: false,
+    retryStrategy: true,
+    encoding: 'latin1',
+  },
+
   /**
    * Scrap Layout.GENERAL_LIST HTML to get it's links and create a Legislation for each
    * @method getGeneraCategoriesLinks
@@ -225,67 +231,6 @@ const pvt = {
 
     return categories;
   },
-
-  // /**
-  //  * Legislations list
-  //  * @private
-  //  * @type {Object}
-  //  */
-  // legislations: {},
-
-  // /**
-  //  * Last legislations index
-  //  * @private
-  //  * @type {Number}
-  //  */
-  // legislationsLastIndex: 0,
-
-  // /**
-  //  * @method legislation
-  //  * @private
-  //  * @param {Number} i Iterator
-  //  * @param {function} next forLimit next function
-  //  */
-  // legislation(i, next) {
-  //   setTimeout(() => {
-  //     const legislation = pvt.legislations[i];
-
-  //     // ScrapStatus.legislationStart(legislation.url);
-
-  //     // First, we capture everithing but <strike>  content
-  //     request({ url: legislation.url, encoding: 'latin1' })
-  //       .then((data) => {
-  //         const $ = cheerio.load(data, { decodeEntities: false });
-  //         $('head').remove();
-  //         $('*').each(function removeAttributes() {
-  //           if (!(this.type === 'tag' && this.name === 'a')) {
-  //             this.attribs = {};
-  //           }
-  //         });
-  //         $.root()
-  //           .contents()
-  //           .filter(function filter() {
-  //             return this.type === 'head';
-  //           })
-  //           .remove();
-  //         return $.html()
-  //           .replace(/(<html>[\s\S]*<body>)([\s\S]*)/, '$2')
-  //           .replace(/([\s\S]*)(<\/body>[\s\S]*<\/html>)/, '$1');
-  //       })
-  //       .then((content) => {
-  //         legislation.content = content;
-  //         return new Legislation(legislation).save();
-  //       })
-  //       .then(() => {
-  //         next();
-  //       })
-  //       .catch((err) => {
-  //         console.log(err);
-  //         legislation(i, next);
-  //         // error(legislation.name, 'Could not reach legislation', err);
-  //       });
-  //   }, 1000);
-  // },
 };
 /**
  * Scrap HTMLs to get specific content
@@ -300,35 +245,19 @@ class Scrap {
   constructor(html) {
     this.html = html;
   }
-  // /**
-  //  * Scrap a list of legislations and save each on on the legislations DB
-  //  * @method legislations
-  //  * @param  {Array} legislations Array of legislations objects
-  //  * @param  {Number} parallel    Number of parallel request executions
-  //  * @return {Promise}            Promise with success response after all legislations has been
-  //  *                              scraped
-  //  */
-  // static legislations(legislations, parallel) {
-  //   return new Promise((resolve) => {
-  //     pvt.legislations = legislations;
-  //     pvt.legislationsLastIndex = legislations.length;
-  //     ScrapStatus.start(pvt.legislationsLastIndex, parallel);
-  //     forLimit(0, pvt.legislationsLastIndex, parallel, pvt.legislation, resolve);
-  //   });
-  // }
 
   /**
    * @method legislation
    * @private
-   * @param {Number} i Iterator
-   * @param {function} next forLimit next function
+   * @param {Object} leg Legislation object
+   * @return {Promise} Promise with the same legislation object with the clean html on content attribute
    */
-  static legislation(legis) {
-    const legislation = legis;
+  static legislation(leg) {
+    const legislation = leg;
     return new Promise((resolve, reject) => {
       // ScrapStatus.legislationStart(legislation.url);
-
-      request({ url: legislation.url, encoding: 'latin1' })
+      pvt.requestOptions.url = legislation.url;
+      request(pvt.requestOptions)
         .then((data) => {
           const $ = cheerio.load(data, { decodeEntities: false });
           $('head').remove();
@@ -352,32 +281,10 @@ class Scrap {
           resolve(legislation);
         })
         .catch((err) => {
-          error(legislation.name, 'Could not reach legislation', err);
+          error(legislation.name, legislation.url, 'Could not reach legislation', err);
           reject(err);
         });
     });
-  }
-
-  /**
-  * Scrap the categpries links from the html
-  * @method categories
-  * @return {Object} Object with Categories
-   */
-  categories() {
-    const layout = this.layout();
-    let categories = {};
-
-    // Verify the type of layout to use the correct scraper
-    if (layout === Layout.GENERAL_LIST) {
-      categories = pvt.getGeneraCategoriesLinks(this.html);
-    } else if (layout === Layout.IMAGES_LIST) {
-      categories = pvt.getImageCategoriesLinks(this.html);
-    } else if (layout === Layout.COLUMNS_LIST) {
-      categories = pvt.getColumnCategoriesLinks(this.html);
-    } else {
-      error('Crawl', 'no layout found', this.html);
-    }
-    return categories;
   }
 
   static compiledUrl(crawlUrl) {
@@ -385,10 +292,7 @@ class Scrap {
     let url;
     let response = crawlUrl;
 
-    const requestOptions = {
-      url: crawlUrl,
-      encoding: 'latin1',
-    };
+    pvt.requestOptions.url = crawlUrl;
 
     const parser = new htmlparser.Parser({
       onopentag(tag, attribs) {
@@ -413,7 +317,7 @@ class Scrap {
     });
 
     return new Promise((resolve) => {
-      request(requestOptions)
+      request(pvt.requestOptions)
         .then((crawlHtml) => {
           parser.write(crawlHtml);
           parser.end();
@@ -426,6 +330,50 @@ class Scrap {
         });
     });
   }
+
+  /**
+  * Scrap the categories links from the html and return a list o
+  * @method categories
+  * @return {Object} Object with Categories objects
+  * @example
+  * {
+  *   constituicao: {
+  *     name: 'Constituição',
+  *     url: 'http://www.planalto.gov.br/ccivil_03/Constituicao/Constituicao.htm',
+  *     type: 'LEGISLATION',
+  *     slug: 'constituicao'
+  *   },
+  *   'medidas-provisorias': {
+  *     name: 'Medidas Provisórias',
+  *     url: 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1/medidas-provisorias',
+  *     type: 'LIST',
+  *     slug: 'medidas-provisorias'
+  *   },
+  *   'mensagens-de-veto-total': {
+  *     name: 'Mensagens de Veto Total',
+  *     url: 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1/mensagem-de-veto-total',
+  *     type: 'LIST',
+  *     slug: 'mensagens-de-veto-total'
+  *   }
+  * }
+  */
+  categories() {
+    const layout = this.layout();
+    let categories = {};
+
+    // Verify the type of layout to use the correct scraper
+    if (layout === Layout.GENERAL_LIST) {
+      categories = pvt.getGeneraCategoriesLinks(this.html);
+    } else if (layout === Layout.IMAGES_LIST) {
+      categories = pvt.getImageCategoriesLinks(this.html);
+    } else if (layout === Layout.COLUMNS_LIST) {
+      categories = pvt.getColumnCategoriesLinks(this.html);
+    } else {
+      error('Crawl', 'no layout found', this.html);
+    }
+    return categories;
+  }
+
   /**
    * Check the layout of the HTML
    * @method layout

@@ -2,10 +2,12 @@
 
 const http = require('http');
 const cron = require('node-cron');
+const Elapsy = require('elapsy');
 
 const Spider = require('./crawl/Spider');
 const SpiderStatus = require('./helpers/SpiderStatus');
 
+const elapsy = new Elapsy();
 
 const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1';
 // const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1/codigos-1';
@@ -24,7 +26,7 @@ let useSchedule = true;
  * @type {Number}
  * @default 3
  */
-global.parallel = 5;
+global.parallel = 1;
 
 // Read the CLI arguments
 process.argv.forEach((arg, index) => {

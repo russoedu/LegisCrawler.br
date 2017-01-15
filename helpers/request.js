@@ -4,10 +4,7 @@ const error = require('./error');
 const SpiderStatus = require('../helpers/SpiderStatus');
 const log = require('../helpers/log');
 
-function req(url, retry = false, attempt = 0) {
-  if (retry) {
-    log('RETRY', url);
-  }
+function req(url, retry = false, attempt = 1) {
   // return new pending promise
   return new Promise((resolve, reject) => {
     const options = {
@@ -27,6 +24,29 @@ function req(url, retry = false, attempt = 0) {
     } else {
       options.url = url;
     }
+    if (retry) {
+      SpiderStatus.requestRetry(options.url, attempt);
+    }
+
+    function handleError(err) {
+      if (attempt === 100) {
+        error('request', 'request error', err);
+        reject(err);
+      } else {
+        SpiderStatus.requestError(options.url, err, attempt);
+        setTimeout(() => {
+          req(url, true, attempt + 1)
+            .then((body) => {
+              console.log('resolve body.length', body.length);
+              resolve(body);
+            })
+            .catch(() => {
+              console.log('error', options.url);
+            });
+        }, 10 * 1000);
+      }
+    }
+
     const lib = options.url.startsWith('https') ? https : http;
     options.hostname = options.url.replace(/https?:\/\//, '').split('/')[0];
     options.path = options.url.replace(/https?:\/\//, '').replace(options.hostname, '');
@@ -39,31 +59,31 @@ function req(url, retry = false, attempt = 0) {
       if (options.encoding) {
         response.setEncoding(options.encoding);
       }
-      request.setTimeout(options.timeout, (err) => {
-        error('request', 'Connection timed out.', err);
+      request.setTimeout(options.timeout, () => {
+        handleError('timeout');
       });
 
       // handle http errors
       if (statusCode < 200 || statusCode > 299) {
-        reject(new Error(`Failed to load page, status code: ${response.statusCode}`));
+        handleError('statusCode !== 2XX', response.statusCode);
       }
 
       // on every content chunk, push it to the data array
       response.on('data', chunk => body.push(chunk));
       // we are done, resolve promise with those joined chunks
-      response.on('end', () => resolve(body.join('')));
+      response.on('end', () => {
+        const theBody = body.join('');
+        if (retry) {
+          SpiderStatus.requestRetrySuccess(options.url, attempt);
+          console.log(theBody.length);
+        }
+        resolve(theBody);
+      });
     });
 
     // handle connection errors of the request
     request.on('error', (err) => {
-      const att = attempt + 1;
-      if (att === 100) {
-        error('request', 'request error', err);
-        reject(err);
-      } else {
-        SpiderStatus.requestError(options.url, att);
-        setTimeout(() => req(url, true, att), 10 * 1000);
-      }
+      handleError(err);
     });
   });
 }

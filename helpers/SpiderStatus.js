@@ -2,6 +2,9 @@ const log = require('../helpers/log');
 const chalk = require('chalk');
 
 const Text = require('../helpers/Text');
+const Elapsy = require('elapsy');
+
+const elapsy = new Elapsy();
 
 class SpiderStatus {
   constructor(url, name) {
@@ -13,8 +16,19 @@ class SpiderStatus {
     log(chalk.blue(`⏰  [CRON]                 Cron set to process everyday at ${hour}:00 AM`));
   }
 
-  static requestError(url, attempt) {
-    process.stdout.write(chalk.red(`\n⛔️  [ERROR]  attempt ${attempt} for ${url}\n`));
+  static requestError(url, err, attempt) {
+    process.stdout.write(chalk.red(`\n⛔️  [ERROR]  attempt ${attempt} ${err} for ${url}`));
+    elapsy.log();
+  }
+
+  static requestRetry(url, attempt) {
+    process.stdout.write(chalk.blue(`\n♻️  [RETRY]  attempt ${attempt} for ${url}`));
+    elapsy.log();
+  }
+
+  static requestRetrySuccess(url, attempt) {
+    process.stdout.write(chalk.green(`\n👍  [SUCCESS]  attempt ${attempt} for ${url}`));
+    elapsy.log();
   }
 
   static start(url) {
@@ -44,6 +58,8 @@ class SpiderStatus {
 
     process.stdout.cursorTo(45);
     process.stdout.write(chalk.yellow(` ${url}`));
+
+    elapsy.log();
   }
 
   static finishAll(legislationsQuantity) {

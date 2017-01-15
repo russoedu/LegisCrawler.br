@@ -1,7 +1,6 @@
 const debug = require('debug')('spider');
 
 const Crawl = require('./Crawl');
-const Scrap = require('./Scrap');
 
 const Legislation = require('../models/Legislation');
 const PageType = require('../models/PageType');
@@ -11,7 +10,6 @@ const error = require('../helpers/error');
 const Db = require('../helpers/Db');
 const SpiderStatus = require('../helpers/SpiderStatus');
 
-// Limit the number of simultaneous connections to avoid http 503 error
 
 
 /**
@@ -26,6 +24,7 @@ class Spider {
    * @static
    */
   static crawlLinks(url) {
+    debug(url);
     // Create the DB connection
     Db.connect()
       // Create the home category in the DB
