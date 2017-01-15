@@ -76,7 +76,7 @@ const pvt = {
 
       const searchRegEx = new RegExp(`(${search})`, 'img');
       const indices = pvt.allIndexOf(response.content, searchRegEx);
-      log(indices);
+      debug(indices);
 
       const delta = 30;
       const wordLength = search.length;
