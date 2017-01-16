@@ -40,7 +40,7 @@
     "compression": "^1.6.2",
     "cors": "^2.8.1",
     "debug": "^2.2.0",
-    "elapsy": "^1.0.3",
+    "elapsy": "^1.0.5",
     "enumify": "^1.0.4",
     "express": "^4.14.0",
     "htmlparser2": "^3.9.2",
