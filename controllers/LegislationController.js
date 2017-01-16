@@ -68,7 +68,7 @@ const pvt = {
   setSearchMarks(data, search) {
     return new Promise((resolve, reject) => {
       const response = data;
-      response.marks = [];
+      const marks = [];
 
       response.content = response.content
                             .replace(/[\n\t\r]+/img, ' ')
@@ -97,12 +97,13 @@ const pvt = {
               .replace(searchRegEx, `<mark id="mark-${index}">$1</mark>`);
 
         res = `…${res}…`;
-        if (res.length > 0) {
-          resolve(res);
-        } else {
-          reject();
-        }
+        marks.push(res);
       });
+      if (marks.length > 0) {
+        resolve(marks);
+      } else {
+        reject();
+      }
 
       debug(response.marks);
     });
