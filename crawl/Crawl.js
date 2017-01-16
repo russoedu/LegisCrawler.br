@@ -22,11 +22,11 @@ class Crawl {
    * @static
    * @param {String} crawlUrl Url to be crawled
    * @param {String} parent The parent(s) slug
-   * @param {String} parentName The parent(s) name
+   * @param {String} breadCrumb The parent(s) name
    * @return {Promise} Empty promisse after all the recursive calls are finished
    */
-  static page(url, parent = '', parentName = '') {
-    debug(parent, parentName, url);
+  static page(url, parent = '', breadCrumb = '') {
+    debug(parent, breadCrumb, url);
     const requestOptions = {
       url,
       axAttempts: 100,
@@ -50,7 +50,7 @@ class Crawl {
               const category = cat;
               const catSlug = slug(category.name.replace(/\./g, '-', '-'), { lower: true });
               category.parent = (parent === '') ? '/' : parent;
-              category.parentName = parentName;
+              category.breadCrumb = breadCrumb;
 
               // If the categories type is list, call Crawl.page recursively and respond
               if (category.type === 'LIST') {
@@ -61,8 +61,8 @@ class Crawl {
                     return category;
                   })
                   .then(() => {
-                    const p = parentName === '' ? category.name : `${parentName}>${category.name}`;
-                    Crawl.page(category.url, `${parent}/${catSlug}`, p)
+                    const bc = breadCrumb === '' ? `${category.name}>` : `${breadCrumb}>${category.name}>`;
+                    Crawl.page(category.url, `${parent}/${catSlug}`, bc)
                       .then(() => {
                         callback();
                         // processedListCounter -= 1;
