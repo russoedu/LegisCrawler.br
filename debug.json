@@ -1,0 +1,10 @@
+{
+  "apps": [
+    {
+      "name": "API",
+      "script": "index.js",
+      "node_args": ["--inspect"],
+      "watch"       : true
+    }
+  ]
+}

@@ -9,7 +9,7 @@ const log = require('../helpers/log');
 const pvt = {
   readData(req) {
     debug(req);
-    let hasSlug = false;
+    let isLegislation = false;
     const base = '_parsedUrl';
     const path = req[base].pathname;
     const data = path.split('/');
@@ -20,8 +20,8 @@ const pvt = {
     data.forEach((value, key) => {
       if (value === 'l') {
         slug = data[key + 1];
-        hasSlug = true;
-      } else if (!hasSlug && value !== '') {
+        isLegislation = true;
+      } else if (!isLegislation && value !== '') {
         parent += `/${value}`;
       }
     });
@@ -34,10 +34,10 @@ const pvt = {
       search: {
         parent,
       },
-      hasSlug,
+      isLegislation,
     };
 
-    if (hasSlug) {
+    if (isLegislation) {
       response.search.slug = slug;
     }
 
@@ -116,7 +116,7 @@ class LegislationController {
 
     const readData = pvt.readData(req);
     const search = readData.search;
-    const hasSlug = readData.hasSlug;
+    const isLegislation = readData.isLegislation;
 
     const searchQuery = typeof req.query.search === 'undefined' ?
                         false :
@@ -130,8 +130,9 @@ class LegislationController {
 
     let resultData = {};
 
-    // Don't send the content string if it's not a legislation (!hasSlug) or search (!searchQuery)
-    if (!hasSlug && !searchQuery) {
+    // Don't send the content string if it's not a legislation (!isLegislation) or search (!searchQuery)
+
+    if (!isLegislation && !searchQuery) {
       resultData = {
         _id: '',
         name: '',
@@ -150,7 +151,9 @@ class LegislationController {
     Legislation.list(search, resultData, limit)
       .then((listResponse) => {
         log(listResponse.length);
-        if (searchQuery) {
+        if (isLegislation) {
+          res.status(200).send(listResponse[0].content);
+        } else if (searchQuery) {
           async.forEachLimit(
             listResponse,
             100,

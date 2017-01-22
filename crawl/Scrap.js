@@ -259,22 +259,28 @@ class Scrap {
       request(pvt.requestOptions)
         .then((data) => {
           const $ = cheerio.load(data, { decodeEntities: false });
-          $('head').remove();
+
+          // Remove head content and add the stylesheet
+          const legislationStyle = '<link rel="stylesheet" type="text/css" href="/legislation.css">';
+          $('head').empty();
+          $('head').append(legislationStyle);
+
+          // Remove all attributes
           $('*').each(function removeAttributes() {
             // if (!(this.type === 'tag' && this.name === 'a')) {
             this.attribs = {};
             // }
           });
-          $.root()
-            .contents()
-            .filter(function filter() {
-              return this.type === 'head';
-            })
-            .remove();
+          // $.root()
+          //   .contents()
+          //   .filter(function filter() {
+          //     return this.type === 'head';
+          //   })
+          //   .remove();
           return $.html()
-            .replace(/(<html>[\s\S]*<body>)([\s\S]*)/, '$2')
-            .replace(/([\s\S]*)(<\/body>[\s\S]*<\/html>)/, '$1')
-            .replace(/[\n\t\r]/img, '');
+            .replace(/[\n\t\r]/mgi, '');
+            // .replace(/(<html>[\s\S]*<body>)([\s\S]*)/, '$2')
+            // .replace(/([\s\S]*)(<\/body>[\s\S]*<\/html>)/, '$1')
         })
         .then((content) => {
           legislation.content = content;

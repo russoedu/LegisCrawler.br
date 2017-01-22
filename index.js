@@ -44,9 +44,9 @@ const app = express();
 
 app
   .use(compress())
-  .use(favicon('./public/favicon.ico'))
+  .use(favicon('./static/favicon.ico'))
   .use(morgan(config.logger.express))
-  .use(express.static('public'))
+  .use(express.static(`${__dirname}/static`))
   .use(bodyParser.json())
   .use(bodyParser.urlencoded({
     extended: true,
