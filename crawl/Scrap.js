@@ -259,28 +259,23 @@ class Scrap {
       request(pvt.requestOptions)
         .then((data) => {
           const $ = cheerio.load(data, { decodeEntities: false });
+          const $head = $('head');
+          // Remove all head content
+          $head.empty();
 
-          // Remove head content and add the stylesheet
-          const legislationStyle = '<link rel="stylesheet" type="text/css" href="/legislation.css">';
-          $('head').empty();
-          $('head').append(legislationStyle);
 
           // Remove all attributes
           $('*').each(function removeAttributes() {
-            // if (!(this.type === 'tag' && this.name === 'a')) {
             this.attribs = {};
-            // }
+            if (!(this.type === 'tag' && this.name === 'font')) {
+              console.log(this);
+            }
           });
-          // $.root()
-          //   .contents()
-          //   .filter(function filter() {
-          //     return this.type === 'head';
-          //   })
-          //   .remove();
-          return $.html()
-            .replace(/[\n\t\r]/mgi, '');
-            // .replace(/(<html>[\s\S]*<body>)([\s\S]*)/, '$2')
-            // .replace(/([\s\S]*)(<\/body>[\s\S]*<\/html>)/, '$1')
+
+          // Add legislation.css to the head
+          $head.append('<link rel="stylesheet" type="text/css" href="/legislation.css" />');
+
+          return $.html().replace(/[\n\t\r]/mgi, '');
         })
         .then((content) => {
           legislation.content = content;

@@ -61,7 +61,7 @@ class Crawl {
                     return category;
                   })
                   .then(() => {
-                    const bc = breadCrumb === '' ? `${category.name}>` : `${breadCrumb}>${category.name}>`;
+                    const bc = breadCrumb === '' ? `${category.name}` : `${breadCrumb}>${category.name}`;
                     Crawl.page(category.url, `${parent}/${catSlug}`, bc)
                       .then(() => {
                         callback();

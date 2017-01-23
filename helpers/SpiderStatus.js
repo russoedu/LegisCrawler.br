@@ -12,8 +12,8 @@ class SpiderStatus {
     this.name = name;
   }
 
-  static cronSet(hour) {
-    log(chalk.blue(`⏰  [CRON]                 Cron set to process everyday at ${hour}:00 AM`));
+  static cronSet(hour, minute) {
+    log(chalk.blue(`⏰  [CRON]                 Cron set to process everyday at ${hour}:${minute} AM`));
   }
 
   static requestError(url, err, attempt) {

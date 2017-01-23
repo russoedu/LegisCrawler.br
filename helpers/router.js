@@ -12,10 +12,6 @@ module.exports = function route(app) {
     mergeParams: true,
   };
   const router = routerClass(routerOptions);
-  // Get the list of legislations
-  // router.get('/', LegislationController.list);
-
-  // Get a legislation
   router.get('/', LegislationController.list);
   router.get('/*', LegislationController.list);
 

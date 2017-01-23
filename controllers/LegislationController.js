@@ -121,6 +121,9 @@ class LegislationController {
     const searchQuery = typeof req.query.search === 'undefined' ?
                         false :
                         decodeURIComponent(req.query.search);
+    const infoQuery = typeof req.query.info === 'undefined' ?
+                        false :
+                        decodeURIComponent(req.query.info);
 
     if (searchQuery) {
       search.parent = new RegExp(`${search.parent}.*`, 'img');
@@ -134,12 +137,21 @@ class LegislationController {
 
     if (!isLegislation && !searchQuery) {
       resultData = {
-        _id: '',
         name: '',
         url: '',
         type: '',
         slug: '',
+        date: '',
         parent: '',
+        breadCrumb: '',
+      };
+    } else if (isLegislation && infoQuery) {
+      resultData = {
+        name: '',
+        url: '',
+        slug: '',
+        date: '',
+        breadCrumb: '',
       };
     }
 
@@ -151,8 +163,15 @@ class LegislationController {
     Legislation.list(search, resultData, limit)
       .then((listResponse) => {
         log(listResponse.length);
-        if (isLegislation) {
-          res.status(200).send(listResponse[0].content);
+        // Legislation information
+        if (isLegislation && infoQuery) {
+          const data = listResponse[0];
+          res.status(200).send(data);
+        // Legislation HTML (for the moblet iframe)
+        } else if (isLegislation) {
+          const html = listResponse[0].content;
+          res.status(200).send(html);
+        // Search
         } else if (searchQuery) {
           async.forEachLimit(
             listResponse,
@@ -177,6 +196,7 @@ class LegislationController {
                 res.status(200).send(listResponse);
               }
             });
+        // List of legislations and lists
         } else {
           res.status(200).send(listResponse);
         }

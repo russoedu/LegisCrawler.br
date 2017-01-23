@@ -5,6 +5,12 @@
       "script": "index.js",
       "node_args": ["--inspect"],
       "watch"       : true
+    },
+    {
+      "name": "Spider",
+      "script": "spider.js",
+      "node_args": ["--parallel 10", "--no-schedule"],
+      "watch"       : true
     }
   ]
 }
