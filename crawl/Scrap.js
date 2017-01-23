@@ -267,9 +267,9 @@ class Scrap {
           // Remove all attributes
           $('*').each(function removeAttributes() {
             this.attribs = {};
-            if (!(this.type === 'tag' && this.name === 'font')) {
-              console.log(this);
-            }
+            // if (!(this.type === 'tag' && this.name === 'font')) {
+            //   console.log(this);
+            // }
           });
 
           // Add legislation.css to the head
