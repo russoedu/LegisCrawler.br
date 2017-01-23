@@ -44,8 +44,8 @@ process.setMaxListeners(0);
 
 // Set the cron job if useSchedule was set
 if (useSchedule) {
-  const hour = 6;
-  const minute = 21;
+  const hour = 3;
+  const minute = 30;
   SpiderStatus.cronSet(hour, minute);
   cron.schedule(`0 ${minute} ${hour} 1-31 * *`, () => {
     Spider.crawlLinks(url);
