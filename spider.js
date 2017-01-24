@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint no-unused-vars: 0 */
 
 const http = require('http');
 const cron = require('node-cron');
@@ -34,6 +35,8 @@ process.argv.forEach((arg, index) => {
     useSchedule = false;
   } else if (arg === '--parallel') {
     global.parallel = Number(process.argv[index + 1]);
+  } else if (arg === '--stdoutLog') {
+    global.useStdout = true;
   }
 });
 
