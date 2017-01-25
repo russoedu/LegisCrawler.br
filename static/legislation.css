@@ -1,14 +1,19 @@
 body {
   margin: 0;
-  padding: 0;
+  padding: 10px;
   font-family: sans-serif;
   font-size: 14px;
 }
-
 small {
   font-size: 90%;
 }
 
 big {
   font-size: 110%;
+}
+.source, .date {
+  margin-bottom: 10px;
+}
+.source > .data, .date > .data {
+  word-break: break-all;
 }

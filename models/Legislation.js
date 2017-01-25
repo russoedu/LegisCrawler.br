@@ -29,11 +29,6 @@ class Legislation {
     });
     this.slug = legislation.slug ||
                 slug(this.name.replace(/\./g, '-', '-'), { lower: true });
-    this.date = new Date().toLocaleString(
-      'pt-BR',
-      {
-        timeZone: 'America/Sao_Paulo',
-      });
     debug(this);
   }
 

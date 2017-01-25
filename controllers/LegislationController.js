@@ -2,6 +2,7 @@ const debug = require('debug')('api');
 const async = require('async');
 
 const Legislation = require('../models/Legislation.js');
+const Scrap = require('../crawl/Scrap.js');
 
 const error = require('../helpers/error');
 const log = require('../helpers/log');
@@ -121,9 +122,6 @@ class LegislationController {
     const searchQuery = typeof req.query.search === 'undefined' ?
                         false :
                         decodeURIComponent(req.query.search);
-    const infoQuery = typeof req.query.info === 'undefined' ?
-                        false :
-                        decodeURIComponent(req.query.info);
 
     if (searchQuery) {
       search.parent = new RegExp(`${search.parent}.*`, 'img');
@@ -145,14 +143,6 @@ class LegislationController {
         parent: '',
         breadCrumb: '',
       };
-    } else if (isLegislation && infoQuery) {
-      resultData = {
-        name: '',
-        url: '',
-        slug: '',
-        date: '',
-        breadCrumb: '',
-      };
     }
 
     log(search, resultData, searchQuery);
@@ -164,9 +154,10 @@ class LegislationController {
       .then((listResponse) => {
         log(listResponse.length);
         // Legislation information
-        if (isLegislation && infoQuery) {
-          const data = listResponse[0];
-          res.status(200).send(data);
+        if (isLegislation && searchQuery) {
+          const html = listResponse[0].content;
+          const markedHtml = Scrap.htmlMark(html, searchQuery);
+          res.status(200).send(markedHtml);
         // Legislation HTML (for the moblet iframe)
         } else if (isLegislation) {
           const html = listResponse[0].content;

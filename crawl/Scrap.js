@@ -11,7 +11,9 @@ const Layout = require('../models/Layout');
 const PageType = require('../models/PageType');
 
 const Text = require('../helpers/Text');
+const DateFormat = require('../helpers/DateFormat');
 const error = require('../helpers/error');
+const log = require('../helpers/log');
 
 const pvt = {
   requestOptions: {
@@ -253,6 +255,25 @@ class Scrap {
    */
   static legislation(leg) {
     const legislation = leg;
+    legislation.date = new Date().toLocaleString(
+      'pt-BR',
+      {
+        timeZone: 'America/Sao_Paulo',
+      });
+
+    const date = DateFormat.brazil(legislation.date);
+
+    const style = '<link rel="stylesheet" type="text/css" href="/legislation.css" />';
+    const prepend = `<div class="source">
+    <span class="title">fonte: </span>
+    <a class="data" href="${legislation.url}" target="_blank">${legislation.url}</a>
+    </div>
+    <div class="date">
+    <span class="title">data de captura: </span>
+    <span class="data">${date}</span>
+    </div>
+    <hr>`;
+
     return new Promise((resolve, reject) => {
       // ScrapStatus.legislationStart(legislation.url);
       pvt.requestOptions.url = legislation.url;
@@ -260,6 +281,7 @@ class Scrap {
         .then((data) => {
           const $ = cheerio.load(data, { decodeEntities: false });
           const $head = $('head');
+          const $body = $('body');
           // Remove all head content
           $head.empty();
 
@@ -273,9 +295,13 @@ class Scrap {
           });
 
           // Add legislation.css to the head
-          $head.append('<link rel="stylesheet" type="text/css" href="/legislation.css" />');
+          $head.append(style);
+          $body.prepend(prepend);
 
-          return $.html().replace(/[\n\t\r]/mgi, '');
+          const response = $.html()
+            .replace(/[\n\t\r]/mgi, '')
+            .replace(/\s\s+/, ' ');
+          return response;
         })
         .then((content) => {
           legislation.content = content;
@@ -433,6 +459,22 @@ class Scrap {
     parser.end();
 
     return response;
+  }
+
+  static htmlMark(html, search) {
+    const searchRegEx = new RegExp(`(${decodeURI(search)})`, 'gmi');
+    const $ = cheerio.load(html, { decodeEntities: false });
+    const body = $('body').html();
+
+    let markId = 0;
+    const replacer = function replacer(match) {
+      const response = `<mark id="mark-${markId}">${match}</mark>`;
+      markId += 1;
+      return response;
+    };
+
+    const resp = body.replace(searchRegEx, replacer);
+    return resp;
   }
 }
 
