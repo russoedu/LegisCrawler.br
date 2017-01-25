@@ -464,7 +464,8 @@ class Scrap {
   static htmlMark(html, search) {
     const searchRegEx = new RegExp(`(${decodeURI(search)})`, 'gmi');
     const $ = cheerio.load(html, { decodeEntities: false });
-    const body = $('body').html();
+    const $body = $('body');
+    const body = $body.html();
 
     let markId = 0;
     const replacer = function replacer(match) {
@@ -473,8 +474,8 @@ class Scrap {
       return response;
     };
 
-    const resp = body.replace(searchRegEx, replacer);
-    return resp;
+    $body.replaceWith(body.replace(searchRegEx, replacer));
+    return $.html();
   }
 }
 
