@@ -155,9 +155,25 @@ class LegislationController {
         log(listResponse.length);
         // Legislation information
         if (isLegislation && searchQuery) {
-          const html = listResponse[0].content;
-          const markedHtml = Scrap.htmlMark(html, searchQuery);
-          res.status(200).send(markedHtml);
+          if (listResponse.length > 0) {
+            const html = listResponse[0].content;
+            const markedHtml = Scrap.htmlMark(html, searchQuery);
+            res.status(200).send(markedHtml);
+          } else {
+            const html = `<html><head>
+            <link rel="stylesheet" type="text/css" href="/legislation.css" />
+            </head>
+            <body>
+            <div
+              class="no-data"
+              >
+              <h4>Sem resultados</h4>
+              <p>Por favor, tente novamente com outros termos</p>
+              </div>
+              </body>
+              </html>`;
+            res.status(200).send(html);
+          }
         // Legislation HTML (for the moblet iframe)
         } else if (isLegislation) {
           const html = listResponse[0].content;
