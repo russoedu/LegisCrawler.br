@@ -265,7 +265,7 @@ class Scrap {
 
     const style = '<link rel="stylesheet" type="text/css" href="/legislation.css" />';
     const prepend = `<div class="source">
-    <span class="title">fonte: </span>
+    <span class="title"></span>
     <a class="data" href="${legislation.url}" target="_blank">${legislation.url}</a>
     </div>
     <div class="date">
