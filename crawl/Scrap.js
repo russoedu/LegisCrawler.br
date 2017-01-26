@@ -299,8 +299,7 @@ class Scrap {
           $body.prepend(prepend);
 
           const response = $.html()
-            .replace(/[\n\t\r]/mgi, '')
-            .replace(/\s\s+/, ' ');
+            .replace(/[\n\t\r\s]+/mgi, ' ');
           return response;
         })
         .then((content) => {
