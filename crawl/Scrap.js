@@ -269,7 +269,7 @@ class Scrap {
     <a class="data" href="${legislation.url}" target="_blank">${legislation.url}</a>
     </div>
     <div class="date">
-    <span class="title">data de captura: </span>
+    <span class="title"></span>
     <span class="data">${date}</span>
     </div>
     <hr>`;

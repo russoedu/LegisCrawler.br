@@ -19,6 +19,12 @@ big {
   word-break: break-all;
 }
 
+.source > .title::before {
+  content: "fonte: "
+}
+.date > .title::before {
+  content: "data de atualização: "
+}
 .no-data {
   position: absolute;
   top: 0;
