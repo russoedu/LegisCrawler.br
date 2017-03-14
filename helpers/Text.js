@@ -1,5 +1,21 @@
 const debug = require('debug')('name');
 // const diacriticsMap = require('./diacriticsMap');
+
+/**
+ * Convert all first letter to uppercase but "da, de and do"
+ * @method toTitleCase
+ * @private
+ * @param  {String} str The text to be converted
+ * @return {String}     the converted text
+ */
+function toTitleCase(str) {
+  const glue = ['a', 'e', 'o', 'até', 'da', 'de', 'do', 'das', 'dos', 'com', 'em', 'no', 'na'];
+  return str.replace(/(\w)(\w*)/g, (_, i, r) => {
+    const j = i.toUpperCase() + (r != null ? r : '');
+    return (glue.indexOf(j.toLowerCase()) < 0) ? j : j.toLowerCase();
+  });
+}
+
 /**
  * Transform no accent, dash separated text in the correct legislation name
  * @method correctImageName
@@ -13,18 +29,18 @@ function correctImageName(name) {
     .split('-')
     .join(' ')
     .replace('estatuto', 'Estatuto')
-    .replace('crianca', 'criança')
-    .replace('indio', 'índio')
-    .replace('EstatutodaPessoacomDeficincia', 'Estatuto da pessoa com deficiência')
+    .replace('crianca', 'Criança')
+    .replace('indio', 'Índio')
+    .replace('EstatutodaPessoacomDeficincia', 'Estatuto da Pessoa com Deficiência')
     .replace('codigo', 'Código')
-    .replace('tributario', 'tributário')
+    .replace('tributario', 'Tributário')
     .replace('consolidacao', 'Consolidação')
-    .replace('transito', 'trânsito')
-    .replace('aguas', 'águas')
-    .replace('aeronautica', 'aeronáutica')
-    .replace('telecomunicacoes', 'telecomunicações')
-    .replace('brasil', 'Brasil')
-    .replace('Brasileiro', 'brasileiro');
+    .replace('transito', 'Trânsito')
+    .replace('aguas', 'Águas')
+    .replace('aeronautica', 'Aeronáutica')
+    .replace('telecomunicacoes', 'Telecomunicações')
+    .replace('brasil', 'Brasil');
+
   return correctName;
 }
 
@@ -43,6 +59,7 @@ class Text {
    * @static
    */
   static fromImageUrl(imageUrl) {
+    // TODO tudo que não for "de, do, da" deve ter a primeira em caixa alta
     const yearRegEx = /^([0-9]+)([A-z]*)([0-9]*).png/;
     const yearBeforeRegEx = /^(Anteriores)(a)([0-9]+).png/;
 
@@ -56,7 +73,8 @@ class Text {
     } else if (dirtyName.match(yearBeforeRegEx)) {
       name = dirtyName.replace(yearBeforeRegEx, '$1 $2 $3').trim();
     } else {
-      name = correctImageName(dirtyName);
+      name = toTitleCase(dirtyName);
+      name = correctImageName(name);
       debug(name);
     }
 
@@ -82,15 +100,6 @@ class Text {
   static numberWithComma(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
-
-  // static slug(word) {
-  //   return word
-  //     .toLowerCase()
-  //     .replace(/-+/g, '')
-  //     .replace(/\s+/g, '-')
-  //     // .replace(/[^a-z0-9-]/g, '');
-  //     .replace(/[^\u0000-\u007E]/g, a => diacriticsMap[a] || a);
-  // }
 }
 
 module.exports = Text;

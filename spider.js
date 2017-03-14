@@ -11,7 +11,6 @@ const SpiderStatus = require('./helpers/SpiderStatus');
 const elapsy = new Elapsy();
 
 const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1';
-// const url = 'http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1/codigos-1';
 
 /**
  * Define if the Spider should create a cron job or run now

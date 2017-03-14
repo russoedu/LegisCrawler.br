@@ -30,8 +30,9 @@ class Db {
     return new Promise((resolve, reject) => {
       const query = {
         name: data.name,
+        type: data.type,
         slug: data.slug,
-        url: data.url,
+        parent: data.parent,
         path: data.path,
       };
       const options = {

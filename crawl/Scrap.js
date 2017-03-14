@@ -255,18 +255,17 @@ class Scrap {
    */
   static legislation(leg) {
     const legislation = leg;
-    legislation.date = new Date().toLocaleString(
+    legislation.date = new Date();
+    const date = new Date().toLocaleString(
       'pt-BR',
       {
         timeZone: 'America/Sao_Paulo',
       });
 
-    const date = DateFormat.brazil(legislation.date);
-
     const style = '<link rel="stylesheet" type="text/css" href="/legislation.css" />';
     const prepend = `<div class="source">
     <span class="title"></span>
-    <a class="data" href="${legislation.url}" target="_blank">${legislation.url}</a>
+    <span class="data">${legislation.url}</span>
     </div>
     <div class="date">
     <span class="title"></span>
