@@ -1,15 +1,33 @@
 const debug = require('debug')('crawl');
 const slug = require('slug');
 const async = require('async');
+const Nightmare = require('nightmare');
+// const request = require('requestretry');
 
 const Scrap = require('./Scrap');
 
 const Legislation = require('../models/Legislation');
 
-const request = require('requestretry');
 const error = require('../helpers/error');
 const SpiderStatus = require('../helpers/SpiderStatus');
 
+
+function nigtmareRequest(url) {
+  return new Promise((resolve, reject) => {
+    const nightmare = new Nightmare();
+    nightmare
+    .useragent('Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36')
+    // .goto('http://google.com')
+    // .goto('http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1')
+    .goto(url)
+    .wait('#extra-footer')
+    .evaluate(() => document.body.innerHTML)
+    .end()
+    .then((body) => {
+      resolve(body);
+    });
+  });
+}
 /**
  * Crawl urls for the desired content
  * @module Crawler
@@ -27,16 +45,16 @@ class Crawl {
    */
   static page(url, parent = '', breadCrumb = '') {
     debug(parent, breadCrumb, url);
-    const requestOptions = {
-      url,
-      axAttempts: 100,
-      retryDelay: 10000,
-      rejectUnauthorized: false,
-      fullResponse: false,
-      retryStrategy: true,
-    };
+    // const requestOptions = {
+    //   url,
+    //   axAttempts: 100,
+    //   retryDelay: 10000,
+    //   rejectUnauthorized: false,
+    //   fullResponse: false,
+    //   retryStrategy: true,
+    // };
     return new Promise((resolve, reject) => {
-      request(requestOptions)
+      nigtmareRequest(url)
         .then((crawlHtml) => {
           const scrap = new Scrap(crawlHtml);
           return scrap.categories();
