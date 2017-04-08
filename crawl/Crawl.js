@@ -16,16 +16,17 @@ function nigtmareRequest(url) {
   return new Promise((resolve, reject) => {
     const nightmare = new Nightmare();
     nightmare
-    .useragent('Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36')
-    // .goto('http://google.com')
-    // .goto('http://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1')
-    .goto(url)
-    .wait('#extra-footer')
-    .evaluate(() => document.body.innerHTML)
-    .end()
-    .then((body) => {
-      resolve(body);
-    });
+      .useragent('Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36')
+      .goto(url)
+      .wait('#extra-footer')
+      .evaluate(() => document.body.innerHTML)
+      .end()
+      .then((body) => {
+        resolve(body);
+      })
+      .catch((err) => {
+        reject(err);
+      });
   });
 }
 /**

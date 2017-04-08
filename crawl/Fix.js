@@ -4,10 +4,10 @@ const PageType = require('../models/PageType');
 class Fix {
   static name(title) {
     let response = title.trim().replace(/\s\s+/gm, '').replace(/\n+/, ' ');
-    if (title === 'copy3_of_CdigodeProcessoCivil2015'
+    if (title === 'Copy3_of_CdigodeProcessoCivil2015'
     ) {
-      response = 'Código de processo civil';
-    } else if (title === 'Código de processo civil') {
+      response = 'Código de Processo Civil';
+    } else if (title === 'Codigo de Processo Civil') {
       response = null;
     } else if (title === 'Veja aqui todas as leis complementares') {
       response = null;
