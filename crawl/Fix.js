@@ -6,9 +6,9 @@ class Fix {
     let response = title.trim().replace(/\s\s+/gm, '').replace(/\n+/, ' ');
     if (title === 'Copy3_of_CdigodeProcessoCivil2015'
     ) {
-      response = 'Código de Processo Civil';
-    } else if (title === 'Codigo de Processo Civil') {
-      response = null;
+      response = 'Código de Processo Civil (2015)';
+    } else if (title === 'Código de Processo Civil') {
+      response = 'Código de Processo Civil (1973)';
     } else if (title === 'Veja aqui todas as leis complementares') {
       response = null;
     }
