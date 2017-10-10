@@ -5,7 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "spider": "node spider.js --no-schedule --parallel 1",
+    "spider5": "node spider.js --no-schedule --parallel 5",
+    "debug": "DEBUG=* node spider.js --no-schedule --parallel 1",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "8.x",
+    "npm": "5.x"
   },
   "author": "Eduardo Russo",
   "license": "MIT",
